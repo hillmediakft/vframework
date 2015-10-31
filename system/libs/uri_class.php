@@ -56,7 +56,7 @@ class Uri {
 
 		//$this->port = $_SERVER['SERVER_PORT'];
 		$this->host = $_SERVER['SERVER_NAME'];
-		$this->scheme = (isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
+		$this->scheme = (isset($_SERVER['REQUEST_SCHEME'])) ? $_SERVER['REQUEST_SCHEME'] : 'http';
 
 		$this->get_request_uri();
 		$this->_parse_uri();
