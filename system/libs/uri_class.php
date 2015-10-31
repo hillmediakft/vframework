@@ -1,20 +1,6 @@
 <?php
 /**
- * vFramework
- *
- * MVC alapú keretrendszer
- *
- * @package		vFramework
- * @author		Várnagy brothers
- * @since		Version 1.0
- */
-
-// ------------------------------------------------------------------------
-
-/**
  * URI Class
- *
- * uri feldolgozó metódusok
  *
  * @package		vFramework
  * @subpackage	Libraries
@@ -23,240 +9,342 @@
  */
 class Uri {
 
-	public $uri = '';
-		
-	/**
-	 *	A teljes jelenlegi url
-	 */
-	public $current_url = '';
+	//private $valid_uri = true;
 
-	/**
-	 *	base url + lang + modul
-	 */ 
-	public $site_url = '';
+	private $port;
+	private $host;
+	private $scheme;
+
+	private $request_uri;
 	
-	/**
-	 *	Az URI a query string nélkül pl.:
-	 * example.com/user/search/name/joe?order=1&view=grid
-	 * az eredmény: example.com/user/search/name/joe
-	 */
-	public $uri_path = '';
-	public $query_string = '';
-	public $query_string_arr = array();
-	public $area = '';
+	private $path; // Az URI a query string nélkül
+	private $path_arr; // Az URI path részei tömbben
 	
-	//nyelvi kód
-	public $lang = '';
-	//megadja, hogy van-e nyelvi kód az url-ben
-	public $lang_code = false;
-	// nyelvi kódok tömbje
-	public $languages = array('hu','en','de','ru');
+	private $query; // query string
+	private $query_arr = array();
+	
+	// Az uri részeit tartalmazó tömb (path, query, scheme, host...)
+	private $uri_parts = array();
+
+	//private $current_url; // A teljes url
+	//private $site_url; // base url + lang + modul
+
+	// area
+	private $area = 'site';
+	// megadja, hogy van-e admin modul az url-ben
+	private $is_admin = false;
+	
+	// nyelvi kód
+	private $lang;
+	// megadja, hogy van-e nyelvi kód az url-ben
+	private $is_lang = false;
+	// engedélyezett nyelvi kódok
+	private $allowed_languages;
+
+	// az admin modul indexe a path_arr tömbben
+	private $index_admin;
+	// a nyelvi kód indexe a path_arr tömbben
+	private $index_lang;
+
 	
 //-----------------------------------------------------------------	
 
-	function __construct()
+	public function __construct($default_lang, $allowed_languages)
 	{
-        //default nyelvi kód
-        $this->lang = Config::get('language_default');
+		$this->lang = $default_lang;
+		$this->allowed_languages = $allowed_languages;
+
+		//$this->port = $_SERVER['SERVER_PORT'];
+		$this->host = $_SERVER['SERVER_NAME'];
+		$this->scheme = $_SERVER['REQUEST_SCHEME'];
+
+		$this->get_request_uri();
+		$this->_parse_uri();
+		$this->_check_admin();
+		$this->_check_lang_code();
 		
-        $this->get_uri();
-		$this->check_admin_and_lang();
-		$this->set_site_url();
-		$this->get_uri_without_query_string();
-		$this->query_string_to_assoc();
+		//$this->_validate_url();
+		
+		$this->debug();
+
 	}
 
-	
-	/**
-	 * Az URI Stringet adja vissza, és szűrést végez rajta (eltávolítja a "rossz" karaktereket)    
-	 * Kivágja az URI-ból a BASE_PATH-t
-	 *
-	 * @return	beállítja az $uri tulajdonság értékét
-	 */
-	public function get_uri()
-	{
-		// Dekódol bármilyen %## kódolást a megadott karakterláncban. A dekódolt stringet adja vissza.
-		$uri = urldecode($_SERVER['REQUEST_URI']);
-		
-		//kivágjuk az url-ből a BASE_PATH-t ha kell
-		$uri = str_replace(BASE_PATH,'',$uri);
-		
-		// Eltávolítja a // és ../ jeleket az URI-ból, és levágja a / jeleket az elejéről és a végéről
-		$uri = str_replace(array('//', '../'), '/', trim($uri, '/'));
+public function debug()
+{
+	echo "<hr>Request uri";
+	var_dump($this->request_uri);
 
-		// Szűri az URI-t
-		$uri = filter_var($uri, FILTER_SANITIZE_URL);
-		
-		// Ha az URI csak egy / jelet tartalmaz vagy üres, akkor üres karaktert ad vissza 
-		$uri = ($uri == '/' || empty($uri)) ? '' : $uri;
-		
-		// Tisztított uri a tulajdonságba 
-		$this->uri = $uri;
-		
-		// Tisztított uri a current_url tulajdonságba (az elejéhez hozzáfűzzük a base url-t)
-		$this->current_url = BASE_URL . $uri;
-	}
+	echo "<hr>Uri_parts";
+	var_dump($this->uri_parts);
 
-				
-	/**
-	 * Area meghatározása: admin vagy site
-	 * Megvizsgálja, hogy az admin string szerepel-e az uri-ban, illetve hogy az "admin" string 
-	 * az első (0) vagy a második (1) a tömbben (akkor a második, ha nyelvi string előzi meg).
-	 * Így az uri * későbbi részében szerepelhet az admin string
-	 *
-	 * @return	beállítja az $area és a $query_string (ha van) tulajdonság értékét 
-	 */
-	public function check_admin_and_lang()
-	{
-	// Szétbontjuk az uri-t (a sima / jeles elemeket a path tömbelembe teszi, a query_stringet (ha van) a query tömbelembe
-		$str = parse_url($this->uri);
+	echo "<hr>Path:";
+	$this->get_path();
+	var_dump($this->path);
 
-		// Szétbontjuk a path elemet
-		if (isset($str['path'])) {
-			$arr = explode('/', $str['path']);
-		} else{
-			$arr = array();
-		}
-	// Beállítjuk a $query_string tulajdonság értékét (ha van query_string)
-		if (isset($str['query'])) {
-			$this->query_string = $str['query'];
-		} 
-		
-	// Megvizsgáljuk, hogy szerepel-e a tömbben az admin, és hogy a 0-dik vagy 1-dik elem-e.
-		if(in_array('admin', $arr) && (array_search('admin', $arr) == 0 || array_search('admin', $arr) == 1)){
-			// Kivágjuk az uri-ból az admin-t (vagy csak az elsőt: preg_replace par3 :1, vagy az összeset, akkor -1)
-			$this->uri = preg_replace('@admin\/?@', '', $this->uri, 1);
-			// Beállítjuk az $area tulajdonság értékét
+	echo "<hr>Path_arr";
+	var_dump($this->path_arr);
+
+	echo "<hr>Query string";
+	var_dump( $this->get_query_string() );
+
+	echo "<hr>Query string array";
+	var_dump($this->get_query_string_arr());
+
+	echo "<hr>Area:";
+	var_dump($this->area);
+
+	echo "<hr>Van e lang code:";
+	var_dump($this->has_langcode());
+
+	echo "<hr>Lang:";
+	var_dump($this->get_langcode());
+
+	echo "<hr>Host:";
+	var_dump($this->get_base());
+
+	echo "<hr>Site url:";
+	var_dump($this->get_site_url());
+
+	echo "<hr>Current url:";
+	var_dump($this->get_current_url());
+
+	die('----------- Uri class debug ----------');
+}
+
+
+
+/**
+ * Visszadja a request uri-t
+ * Kivágja a BASE_PATH-t, és trimmeli a / jeleket a string végeiről
+ *
+ * @return string
+ */
+public function get_request_uri()
+{
+	$this->request_uri = urldecode($_SERVER['REQUEST_URI']);
+	$this->request_uri = str_replace(BASE_PATH,'', trim($this->request_uri, '/'));
+	//$this->request_uri = str_replace(array('//', '../'), '/', trim($this->request_uri, '/'));
+	return $this->request_uri;
+}
+
+
+			private function _validate_url()
+			{
+				if(!filter_var($this->get_current_url(), FILTER_SANITIZE_URL)){
+					$this->valid_uri = false;
+					exit('rossz_url');
+				}
+
+				foreach ($this->path_arr as $value) {
+					if ($value == '') {
+						$this->valid_uri = false;
+						exit('rossz_url_2');
+						//break;
+					}
+				}
+
+			}
+
+
+
+/**
+ * URI részekre bontása
+ */
+private function _parse_uri()
+{
+	$this->uri_parts = parse_url($this->request_uri);
+
+	$this->uri_parts['scheme'] = (isset($this->uri_parts['scheme'])) ? $this->uri_parts['scheme'] : $this->scheme;
+	$this->uri_parts['host'] = (isset($this->uri_parts['host'])) ? $this->uri_parts['host'] : $this->host;
+	$this->uri_parts['path'] = (isset($this->uri_parts['path'])) ? $this->uri_parts['path'] : '';
+	$this->uri_parts['query'] = (isset($this->uri_parts['query'])) ? $this->uri_parts['query'] : '';
+	$this->uri_parts['fragment'] = (isset($this->uri_parts['fragment'])) ? $this->uri_parts['fragment'] : '';
+
+	// Szétbontjuk a path elemet
+	$this->path_arr = ($this->uri_parts['path'] == '') ? array() : explode('/', $this->uri_parts['path']);
+	//$this->path_arr = (isset($this->uri_parts['path'])) ? explode('/', $this->uri_parts['path']) : array();
+}
+
+/**
+ * Megvizsgáljuk, hogy szerepel-e a path_arr tömbben az admin, és hogy a 0-dik vagy 1-dik elem-e.
+ */
+private function _check_admin()
+{
+	if(in_array('admin', $this->path_arr)){
+		$index_admin = array_search('admin', $this->path_arr);
+		if($index_admin <= 1){
+				$this->index_admin = $index_admin;
+
+				// eltávolítjuk az admin elemet
+				//unset($this->path_arr[$index_admin]);
+
+			$this->is_admin = true;
 			$this->area = 'admin';
-		}	
-		else {
-			// Beállítjuk az $area tulajdonság értékét
-			$this->area ='site';
 		}
-		
-	// Megvizsgáljuk, hogy szerepel-e nyelvi kód az uri-ban, és ha igen kivágjuk
-		foreach($this->languages as $value) {
-			if(in_array($value,$arr)){
-				// ha szerepel az $arr tömbben a nyelvi kód, akkor beállítjuk a $lang_code tulajdonság értékét true-ra (ezzel azt adjuk meg, hogy van nyelvi kód az url-ben)
-				$this->lang_code = true;
-				// ha szerepel az $arr tömbben a nyelvi kód, akkor beállítjuk a $lang tulajdonság értékét
-				$this->lang = $value;
-				// Eltávolítjuk az uri elejéről a nyelvi kódot
-				$this->uri = preg_replace("@^$value\/?@", '', $this->uri, 1);
+	}
+}
+
+/**
+ * Megvizsgáljuk, hogy szerepel-e (engedélyezett) nyelvi kód az url-ben (0. vagy 1. helyen)
+ * Beállítja a is_lang, lang, index_lang tulajdonságok értékeit
+ */
+private function _check_lang_code()
+{
+	foreach($this->allowed_languages as $lang) {
+		if(in_array($lang, $this->path_arr)){
+			$index_lang = array_search($lang, $this->path_arr);
+			if($index_lang <= 1){
+				$this->is_lang = true;
+				$this->lang = $lang;
+				$this->index_lang = $index_lang;
+
+					// eltávolítjuk a nyelvi kód elemet
+					//unset($this->path_arr[$index_lang]);
+				
+				break;
 			}
 		}
 	}
+}
 
 
-	/**
-	 * A query stringben szereplő paramétereket asszociatív tömbben adja vissza
-	 * example.com/user/search?name=joe&location=UK&gender=male
-	 * array (
-	 *			name => joe
-	 *			location => UK
-	 *			gender => male
-	 *		 )
-	 *
-	 * @return	array	beállítja a $query_string_arr tulajdonság értékét
-	 */
-	public function query_string_to_assoc()
-	{
-		if(!empty($this->query_string) && (strpos($this->query_string,'=') !== false)) {
-			foreach (explode('&', $this->query_string) as $couple) {
-				list ($key, $val) = explode('=', $couple);
-				$params[$key] = $val;
-			}	
-		$this->query_string_arr = $params;		
-		}
-		
+/**
+ * Visszaadja a bázis url-t (pl.: http://www.valami.hu)
+ *
+ * @return string	
+ */
+public function get_base()
+{
+	return $this->scheme . '://' . $this->host;
+}
+
+/**
+ * Visszaadja, hogy tartalmaz-e az url nyelvi kódot
+ *
+ * @return boolean 
+ */
+public function has_langcode()
+{
+	return $this->is_lang;
+}
+
+/**
+ * Visszaadja a nyelvi kódot
+ *
+ * @return string
+ */
+public function get_langcode()
+{
+	return $this->lang;
+}
+
+/**
+ * Visszaadja az area értékét
+ *
+ * @return string
+ */
+public function get_area(){
+	return $this->area;
+}
+
+
+/**
+ * Visszaadja az uri path-t (request uri a query string nélkül)
+ *
+ * @return string
+ */
+public function get_path()
+{
+	$temp = $this->path_arr;
+	if(isset($this->index_admin)){
+		unset($temp[$this->index_admin]);
 	}
-	
-	
-	/**
-	 * Az URI a query string nélkül pl.:
-	 * example.com/user/search/name/joe?order=1&view=grid
-	 * az eredmény: example.com/user/search/name/joe
-	 * 
-	 * @return  string	Beállítja az $uri_path tulajdonság értékét
-	 */
-	public function get_uri_without_query_string()
-	{
-		if (strpos($this->uri,'?') !== false) {
-			$uri_temp_arr = array();
-			$uri_temp_arr = explode('?', $this->uri);
-			$this->uri_path = $uri_temp_arr[0];
-			unset($uri_temp);
-		}
-		else {
-			$this->uri_path = $this->uri;
-		}
+	if(isset($this->index_lang)){
+		unset($temp[$this->index_lang]);
+	}	
+	$this->path = implode('/', $temp);
+	unset($temp);
+	return $this->path;
+}
+
+/**
+ * Visszadja a query stringet
+ *
+ * @return string
+ */
+public function get_query_string()
+{
+	return $this->uri_parts['query'];
+}
+
+/**
+ * Visszadja a query string-ből létrehozott tömböt (mint a $_GET tömb)
+ *
+ * @return array
+ */
+public function get_query_string_arr()
+{
+	if(!empty($this->uri_parts['query'])){
+		parse_str($this->uri_parts['query'], $query_string_arr);
+		return $query_string_arr;
+	} else {
+		return array();
 	}
-	
-	/**
-	 *	site_url beállítása
-	 */
-	public function set_site_url()
-	{
-		$temp_url = BASE_URL;
-		if($this->area != 'site') {
-			$temp_url .= $this->area . "/";
-		}
-		if($this->lang_code === true) {
-			$temp_url .= $this->lang . "/";
-		}
-		$this->site_url = $temp_url;				
+}
+
+public function get_site_url()
+{
+	$site_url = BASE_URL;
+	if($this->is_admin === true) {
+		$site_url .= $this->area . '/';
 	}
-	
-	
-	
-// --------------------------------------------------------------------
-				
-				
-				/**
-				 * Filter segments for malicious characters - ezt esetleg még használhatjuk
-				 *
-				 * @access	private
-				 * @param	string
-				 * @return	string
-				 */
-				public function _filter_uri($str)
-				{
-					if ($str != '' && $this->config->item('permitted_uri_chars') != '' && $this->config->item('enable_query_strings') == FALSE)
-					{
-						// preg_quote() in PHP 5.3 escapes -, so the str_replace() and addition of - to preg_quote() is to maintain backwards
-						// compatibility as many are unaware of how characters in the permitted_uri_chars will be parsed as a regex pattern
-						if ( ! preg_match("|^[".str_replace(array('\\-', '\-'), '-', preg_quote($this->config->item('permitted_uri_chars'), '-'))."]+$|i", $str))
-						{
-							show_error('The URI you submitted has disallowed characters.', 400);
-						}
-					}
+	if($this->is_lang === true) {
+		$site_url .= $this->lang . '/';
+	}
+	return $site_url;
+}
 
-					// Convert programatic characters to entities
-					$bad	= array('$',		'(',		')',		'%28',		'%29');
-					$good	= array('&#36;',	'&#40;',	'&#41;',	'&#40;',	'&#41;');
+public function get_current_url()
+{
+	return $this->get_base() . '/' . $this->request_uri; 
+}
 
-					return str_replace($bad, $good, $str);
-				}
+/**
+ * URI string generálás asszociatív tömbből
+ *
+ * @param	array	asszociatív tömb (kulcs/érték párok)
+ * @return	string 	a paraméterek / jellel elválasztva
+ */
+public function assoc_to_uri($array)
+{
+	$temp = array();
+	foreach ((array)$array as $key => $val)
+	{
+		$temp[] = $key;
+		$temp[] = $val;
+	}
+	return implode('/', $temp);
+}
 
 
 
-				/**
-				 * URI string generálás asszociatív tömbből
-				 *
-				 * @param	array	asszociatív tömb (kulcs/érték párok)
-				 * @return	string 	a paraméterek / jellel elválasztva
-				 */
-				public function assoc_to_uri($array)
-				{
-					$temp = array();
-					foreach ((array)$array as $key => $val)
-					{
-						$temp[] = $key;
-						$temp[] = $val;
-					}
+/*
 
-					return implode('/', $temp);
-				}
+
+		// Dekódol bármilyen %## kódolást a megadott karakterláncban. A dekódolt stringet adja vissza.
+		$uri = urldecode($_SERVER['REQUEST_URI']);
+		//kivágjuk az url-ből a BASE_PATH-t ha kell
+		$uri = str_replace(BASE_PATH,'',$uri);
+		// Eltávolítja a // és ../ jeleket az URI-ból, és levágja a / jeleket az elejéről és a végéről
+		$uri = str_replace(array('//', '../'), '/', trim($uri, '/'));
+		// Szűri az URI-t
+		$uri = filter_var($uri, FILTER_SANITIZE_URL);
+		// Ha az URI csak egy / jelet tartalmaz vagy üres, akkor üres karaktert ad vissza 
+		$uri = ($uri == '/' || empty($uri)) ? '' : $uri;
+							
+*/
+
+
 		
 }	
 ?>
