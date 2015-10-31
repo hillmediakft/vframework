@@ -56,7 +56,7 @@ class Uri {
 
 		//$this->port = $_SERVER['SERVER_PORT'];
 		$this->host = $_SERVER['SERVER_NAME'];
-		$this->scheme = $_SERVER['REQUEST_SCHEME'];
+		$this->scheme = (isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
 
 		$this->get_request_uri();
 		$this->_parse_uri();
@@ -107,6 +107,10 @@ public function debug()
 
 	echo "<hr>Current url:";
 	var_dump($this->get_current_url());
+
+	echo "<br><hr> SERVER:";
+	var_dump($_SERVER);
+
 
 	die('----------- Uri class debug ----------');
 }
