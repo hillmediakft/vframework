@@ -52,7 +52,6 @@ var Users = function () {
                 {"orderable": false}, //e-mail
                 {"orderable": false}, //telefon
                 {"orderable": true}, //jogosultság
-                {"orderable": true}, //munkák száma
                 {"orderable": true}, //státusz
                 {"orderable": false} //menü
             ],
@@ -75,8 +74,7 @@ var Users = function () {
                 {'searchable': false, 'targets': 5},
                 {'searchable': false, 'targets': 6},
                 {'searchable': false, 'targets': 7},
-                {'searchable': false, 'targets': 8},
-                {"searchable": false, "targets": 9}
+                {"searchable": false, "targets": 8}
             ],
             
             "order": [

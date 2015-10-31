@@ -99,7 +99,7 @@ public function debug()
 	echo "<hr>Lang:";
 	var_dump($this->get_langcode());
 
-	echo "<hr>Host:";
+	echo "<hr>Base url:";
 	var_dump($this->get_base());
 
 	echo "<hr>Site url:";

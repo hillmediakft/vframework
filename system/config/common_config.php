@@ -59,13 +59,6 @@ $config['language_default'] = 'hu';
 $config['allowed_languages'] = array('hu','en','de','ru');
 $config['reg_email_verify'] = true;
 
-$config['jobphoto'] = array(
-	'width' => 300,
-	'height' => 200,
-	'thumb_width' => 80,
-	'upload_path' => UPLOADS . 'job_category_photo/',
-	'default_photo' => 'default.jpg'
-);
 
 $config['user'] = array(
 	'width' => 600,

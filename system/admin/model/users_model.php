@@ -20,17 +20,6 @@ class Users_model extends Admin_model {
 	}
 	
     /*
-     * User referens id-k lekérdezése a jobs táblából
-     */
-    public function user_ref_id_query()
-    {
-		$this->query->reset();
-        $this->query->set_table(array('jobs')); 
-		$this->query->set_columns(array('job_ref_id'));
-        return $this->query->select();
-    }
-    
-    /*
      * Felhsználók adatainak lekérdezése
      */
 	public function all_user()

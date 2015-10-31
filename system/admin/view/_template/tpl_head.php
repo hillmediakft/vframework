@@ -127,70 +127,6 @@
                                 <span class="selected"></span>
                             </a>
                         </li>
-                        <!-- MUNKA MENÜ -->		
-                        <li class="<?php echo ($this->registry->controller == 'jobs') ? 'active' : ''; ?>">
-                            <a href="javascript:;">
-                                <i class="fa fa-gavel"></i> 
-                                <span class="title">Munkák</span>
-                                <span class="arrow "></span>
-                            </a>
-                            <ul class="sub-menu">
-                                <li class="<?php echo ($this->registry->controller == 'jobs' && $this->registry->action == 'index') ? 'active' : ''; ?>">
-                                    <a href="admin/jobs">
-                                        Munkák listája</a>
-                                </li>
-                                <li class="<?php echo ($this->registry->action == 'new_job') ? 'active' : ''; ?>">
-                                    <a href="admin/jobs/new_job">
-                                        Új munka hozzáadása</a>
-                                </li>
-                                <li class="<?php echo ($this->registry->action == 'category') ? 'active' : ''; ?>">
-                                    <a href="admin/jobs/category">
-                                        Munka kategóriák</a>
-                                </li>
-                                <li class="<?php echo ($this->registry->action == 'category_insert') ? 'active' : ''; ?>">
-                                    <a href="admin/jobs/category_insert">
-                                        Új kategória hozzáadása</a>
-                                </li>
-                            </ul>
-                        </li>				
-                        <!-- MUNKA MENÜ VÉGE -->
-                        <!-- CÉGEK MENÜ VÉGE -->
-                        <li class="<?php echo ($this->registry->controller == 'employer') ? 'active' : ''; ?>">
-                            <a href="javascript:;">
-                                <i class="fa fa-book"></i> 
-                                <span class="title">Munkaadók</span>
-                                <span class="arrow "></span>
-                            </a>
-                            <ul class="sub-menu">
-                                <li class="<?php echo ($this->registry->controller == 'employer' && $this->registry->action == 'index') ? 'active' : ''; ?>">
-                                    <a href="admin/employer">
-                                        Munkaadók listája</a>
-                                </li>
-                                <li class="<?php echo ($this->registry->action == 'insert') ? 'active' : ''; ?>">
-                                    <a href="admin/employer/insert">
-                                        Új munkaadó hozzáadása</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <!-- CÉGEK MENÜ VÉGE -->
-
-                        <!-- ELŐREGISZTRÁCIÓ -->
-                        <li class="<?php echo ($this->registry->controller == 'pre_register') ? 'active' : ''; ?>">
-                            <a href="admin/pre_register">
-                                <i class="fa fa-file-text-o"></i> 
-                                <span class="title">Előregisztráció</span>
-                            </a>
-                        </li>		
-                        <!-- ELŐREGISZTRÁCIÓ VÉGE -->
-
-                        <!-- REGISZTRÁLTAK ÉS FELIRATKOZOTTAK -->
-                        <li class="<?php echo ($this->registry->controller == 'register_subscribe') ? 'active' : ''; ?>">
-                            <a href="admin/register_subscribe">
-                                <i class="fa fa-sign-in"></i> 
-                                <span class="title">Regisztráltak</span>
-                            </a>
-                        </li>		
-                        <!-- REGISZTRÁLTAK ÉS FELIRATKOZOTTAK VÉGE -->
 
                         <!-- SZERKESZTHETŐ OLDALAK -->
                         <li class="<?php echo ($this->registry->controller == 'pages' || $this->registry->controller == 'content') ? 'active' : ''; ?>">
@@ -243,26 +179,6 @@
                             </ul>
                         </li>
 
-
-                        <!-- IRODÁK -->
-                        <li class="<?php echo ($this->registry->controller == 'offices') ? 'active' : ''; ?>">
-                            <a href="javascript:;">
-                                <i class="fa fa-building"></i> 
-                                <span class="title">Irodák</span>
-                                <span class="arrow "></span>
-                            </a>                
-                            <ul class="sub-menu">
-                                <li class="<?php echo ($this->registry->controller == 'offices' && $this->registry->action == 'index') ? 'active' : ''; ?>">
-                                    <a href="admin/offices">
-                                        Irodák listája</a>
-                                </li>
-                                <li class="<?php echo ($this->registry->action == 'insert') ? 'active' : ''; ?>">
-                                    <a href="admin/offices/insert">
-                                        Új iroda hozzáadása</a>
-                                </li>
-                            </ul>                
-                        </li>			
-                        <!-- IRODÁK VÉGE -->				
 
 
                         <!--  GALÉRIÁK

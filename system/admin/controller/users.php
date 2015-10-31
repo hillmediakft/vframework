@@ -29,26 +29,6 @@ class Users extends Controller {
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'datatable.js');
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/users.js');
 		
-        // referens id-k lekérdezése a jobs táblából (annak meghatározásához, hogy egy bizonyos userhez mennyi felvett munka tartozik)
-		$this->view->user_ref_temp = $this->users_model->user_ref_id_query();	
-
-        // referenshez tartozó munkák számának meghatározása 
-            $temp = array();
-            foreach($this->view->user_ref_temp as $key => $value){
-                foreach($value as $v){
-                    if(isset($temp[$v])){
-                        $temp[$v] += 1;
-                    } else {
-                        $temp[$v] = 1;
-                    }
-                }    
-            }        
-            
-            // a user_ref az egyes userekehez tartozó munkák számát tárolja tömbben kulcs a user id, value a munkák száma (5 => 18, 3 => 42)
-            $this->view->user_ref = $temp;
-            $this->view->user_ref_temp = null;
-            unset($temp);
-        
         // userek adatainak lekérdezése
         $this->view->all_user = $this->users_model->all_user();	
 		

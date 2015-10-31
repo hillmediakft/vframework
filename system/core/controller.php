@@ -26,7 +26,7 @@ class Controller {
 	public function loadModel($model)
 	{
 		// model file elérési útja
-		$file = 'system/' . $this->registry->area . '/model/' . $model . '.php';
+		$file = 'system/' . $this->registry->uri->get_area() . '/model/' . $model . '.php';
 
 		// megnézzük, hogy megnyitható-e a file, ha nem kivételt dobunk.
 		try {

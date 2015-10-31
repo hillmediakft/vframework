@@ -20,24 +20,24 @@ class Auth {
      * Osztály tulajdonságainak beállítása
      *
      */
-    private static function set_attributes()
+    private static function _set_attributes()
     {
 		$registry = Registry::get_instance();
 		
-		if($registry->area == 'site'){
+		if($registry->uri->get_area() == 'site'){
 			self::$expire_time = Config::get('session.expire_time_site', 3600);
 			self::$element_name = 'user_site_last_activity';
 			self::$logged_in = 'user_site_logged_in';
 			self::$target_url = '';
 		}
-		if($registry->area == 'admin'){
+		if($registry->uri->get_area() == 'admin'){
 			self::$expire_time = Config::get('session.expire_time_admin', 3600);
 			self::$element_name = 'user_last_activity';
 			self::$logged_in = 'user_logged_in';
 			self::$target_url = 'login';
 		}
 		
-		self::$site_url = $registry->site_url;
+		self::$site_url = $registry->uri->get_site_url();
     }
     
     /**
@@ -77,7 +77,7 @@ class Auth {
      */
     public static function handleExpire($target_url = null)
     {
-        self::set_attributes();
+        self::_set_attributes();
 
 		if(!is_null($target_url)) {
 			self::$target_url = $target_url;
@@ -93,7 +93,7 @@ class Auth {
      */
     public static function handleLogin($target_url = null)
     {
-        self::set_attributes();
+        self::_set_attributes();
         
 		if(!is_null($target_url)) {
 			self::$target_url = $target_url;

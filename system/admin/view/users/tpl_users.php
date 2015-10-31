@@ -84,7 +84,6 @@
                                         <th>E-mail</th>
                                         <th>Telefon</th>
                                         <th>Jogosultság</th>
-                                        <th>Munkák száma</th>
                                         <th>Státusz</th>
                                         <th style="width:0px;"></th>
                                     </tr>
@@ -103,7 +102,6 @@
                                             <td><a href="mailto:<?php echo $value['user_email']; ?>"><?php echo $value['user_email']; ?> </a></td>
                                             <td><?php echo $value['user_phone']; ?></td>
                                             <td><?php echo $value['role_name']; ?></td>
-                                            <td><?php echo isset($user_ref[$value['user_id']]) ? $user_ref[$value['user_id']] : 0; ?></td>
                                             <?php if ($value['user_active'] == 1) { ?>
                                                 <td><span class="label label-sm label-success">Aktív</span></td>
                                             <?php } ?>

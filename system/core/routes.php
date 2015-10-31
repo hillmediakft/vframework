@@ -17,21 +17,6 @@
 	 */
 	
 	$routes = array(
-	// munka részletek
-	'(munka)/:title/:id/?' => array('munka', 'munka_name', 'munka_id'),
-
-	// feltétekek menü
-	'(feltetelek)/(munkavallalas)/?' => array('feltetelek/munkavallalas'),
-	'(feltetelek)/(kilepes)/?' => array('feltetelek/kilepes'),
-	'(feltetelek)/(kifizetes)/?' => array('feltetelek/kifizetes'),
-	
-	//feliratkozás hírlevélre visszaigazolás
-	'(feliratkozas)/:id/:hash/?' => array('feliratkozas', 'user_id', 'user_activation_verification_code'),
-	// regisztráció visszaigazolás
-	'(regisztracio)/:id/:hash/?' => array('regisztracio', 'user_id', 'user_activation_verification_code'),
-	//leiratkozás hirlevelről visszaigazolás
-	//'(leiratkozas)/:id/:hash/?' => array('$1', 'user_id', 'newsletter_unsubscribe_code'),
-	
 	//users útvonalak
 	'(users)/(login)/?' => array('error/index'),
 	'(users)/(logout)/?' => array('error/index'),

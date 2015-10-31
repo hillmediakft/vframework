@@ -57,10 +57,10 @@ class View {
 	/**
 	 *	Constructor
 	 */
-	function __construct()
+	public function __construct()
 	{
 		$this->registry = Registry::get_instance();
-		$this->area = $this->registry->area;
+		$this->area = $this->registry->uri->get_area();
 	}
 	
 	/**
