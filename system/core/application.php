@@ -8,6 +8,9 @@ class Application {
 		// Registry objektum létrehozása, és hozzárendelése a registry tulajdonsághoz
 		$this->registry = Registry::get_instance();
 	
+
+		$this->registry->request = new Request();
+
 		// uri objektum példányosítása a registry-be
 		$this->registry->uri = new Uri(Config::get('language_default'), Config::get('allowed_languages'));
 

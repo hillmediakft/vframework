@@ -4,99 +4,212 @@
 */
 class Request {
 
-	
-	private function __construct(){}
+
+	public function __construct(){}
 
 
+	private $allowed_filters = array('int', 'integer', 'bool', 'boolean');
 
 
 	/**
-	 * Visszadja a POST vagy GET tömbelem értékét
+	 * Adatok visszaadása a szuperglobális tömbökből
 	 *
-	 * @param string $item (a post vagy get tömbelem kulcsa)
-	 * @return mixed
+	 * @param	array	$array		$_GET, $_POST stb.
+	 * @param	mixed	$index		Kulcs, aminek az értékét vissza kell adni az $array tömbből
+	 * @return	mixed
 	 */
-	public static function get_1($item){
-		if (isset($_POST[$item])) {
-			return $_POST[$item];	
-		} else if (isset($_GET[$item])){
-			return $_GET[$item];
-		}
-		return ''; 
-	}
-
-	public static function get($key, $cast_to = NULL, $default_value = NULL, $use_default_for_blank = FALSE)
+	private function _fetch_from_array($array, $index = NULL)
 	{
-		$value = $default_value;
-		
-		$array_dereference = NULL;
-		if (strpos($key, '[')) {
-			$bracket_pos       = strpos($key, '[');
-			$array_dereference = substr($key, $bracket_pos);
-			$key               = substr($key, 0, $bracket_pos);
-		}
-		
-		if (isset($_POST[$key])) {
-			$value = $_POST[$key];
-		} elseif (isset($_GET[$key])) {
-			$value = $_GET[$key];
+		// Ha az $index értéke NULL, az $index az $array tömb kulcsait fogja tartalmazni
+		if(is_null($index)){
+			$index = array_keys($array);
 		}
 
-		if ($value === '' && $use_default_for_blank && $default_value !== NULL) {
-			$value = $default_value;
+		// allow fetching multiple keys at once
+		if (is_array($index)) {
+			$output = array();
+			foreach ($index as $key) {
+				$output[$key] = $this->_fetch_from_array($array, $key);
+			}
+
+			return $output;
 		}
-		
-		if ($array_dereference) {
-			preg_match_all('#(?<=\[)[^\[\]]+(?=\])#', $array_dereference, $array_keys, PREG_SET_ORDER);
-			$array_keys = array_map('current', $array_keys);
-			foreach ($array_keys as $array_key) {
-				if (!is_array($value) || !isset($value[$array_key])) {
-					$value = $default_value;
+
+		if (isset($array[$index])) {
+			$value = $array[$index];
+		}
+		elseif (($count = preg_match_all('/(?:^[^\[]+)|\[[^]]*\]/', $index, $matches)) > 1) {
+			$value = $array;
+			for ($i = 0; $i < $count; $i++) {
+				$key = trim($matches[0][$i], '[]');
+				if ($key === '') {
 					break;
 				}
-				$value = $value[$array_key];
+
+				if (isset($value[$key])) {
+					$value = $value[$key];
+				} else {
+					return NULL;
+				}
 			}
+
 		}
-		
-		// This allows for data_type? casts to allow NULL through
-		if ($cast_to !== NULL && substr($cast_to, -1) == '?') {
-			if ($value === NULL || $value === '') {
-				return NULL;
-			}	
-			$cast_to = substr($cast_to, 0, -1);
+		else {
+			return NULL;
 		}
-		
-		return self::cast($value, $cast_to);
+
+		return $value;
 	}
 
 
+	/**
+	 * Értékek szűrése, adott típusra alakítása, default érték beállítása
+	 */				
+	private function _filter($filter, $value, $default_value)
+	{
+
+		// ha nincs filter, és üres a value
+		if (is_null($filter) && empty($value)) {
+			$value = $default_value;
+		}
+		// ha nincs filter és nem üres a value - alap szűrések
+		elseif (is_null($filter) && !empty($value)) {
+			
+			// ha működik a magic_quotes_gpc (csak régi PHP-nál) hozzáadott /-ek eltávolítása
+			if (get_magic_quotes_gpc() && ($this->is_post() || $this->is_get())) {
+				$value = $this->_stripSlashes($value);
+			}
+
+			// html tag-ek eltávolítása 
+			$value = $this->_stripTags($value);
+		}		
+		// ha a filter integer
+		elseif (($filter == 'int' || $filter == 'integer') && is_string($value)) {
+			$default_value = (is_null($default_value)) ? 0 : $default_value;
+			$value = (empty($value)) ? $default_value : (int) $value;
+		}
+		// ha a filter boolean
+		elseif ($filter == 'bool' || $filter == 'boolean') {
+			//$value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);	
+			$value = strtolower($value);
+			if (($value == 'f') || ($value == 'false') || ($value == 'no') || ($value == 'off') || !$value) {
+				$value = FALSE;
+			} else {
+				$value = TRUE;
+			}
+
+		}
+
+		return $value; 
+	}				
 
 
+	/**
+	 * Adatok visszaadása a $_POST tömbből
+	 *
+	 * @param string $key 	 
+	 * @param string $filter	 
+	 * @param string $default_value
+	 * @return mixed	 
+	 */
+	public function get_post($key = NULL, $filter = NULL, $default_value = NULL)
+	{
+		if(!is_null($filter) && !in_array($filter, $this->allowed_filters)){
+			throw new Exception("Nem megengedett filter a request class get_post metodusaban");
+			exit();
+		}
+
+		// adatok a $_POST tömbből
+		$value = $this->_fetch_from_array($_POST, $key);
+
+		return $this->_filter($filter, $value, $default_value);
+	}
+
+	/**
+	 * Adatok visszaadása a $_POST tömbből
+	 *
+	 * @param string $key 	 
+	 * @param string $filter	 
+	 * @param string $default_value
+	 * @return mixed	 
+	 */
+	public function get_query($key, $filter = NULL, $default_value = NULL)
+	{
+		if(!is_null($filter) && !in_array($filter, $this->allowed_filters)){
+			throw new Exception("Nem megengedett filter a request class get_query metodusaban");
+			exit();
+		}
+
+		// adatok a $_GET tömbből
+		$value = $this->_fetch_from_array($_GET, $key);
+
+		return $this->_filter($filter, $value, $default_value);
+	}
 
 
+	/**
+	 * HTTP Referer visszaadása a $_SERVER szuperglobális tömbből
+	 */
+	public function get_httpreferer()
+	{
+		return (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null);
+	}
+
+	/**
+	 * Visszadja a kérés metódusát (get vagy post)
+	 */
+	public function get_method()
+	{
+		return strtolower($_SERVER['REQUEST_METHOD']);
+	}
 
 
+	/**
+	 * Ellenőrzi, hogy létezik-e a paraméterként kapott index a $_REQUEST szuperglobális tömbben
+	 *
+	 * @return boolean
+	 */
+	public function has($index)
+	{
+		return isset($_REQUEST[$index]);
+	}
 
+	/**
+	 * Ellenőrzi, hogy létezik-e a paraméterként kapott index a $_POST szuperglobális tömbben
+	 *
+	 * @return boolean
+	 */
+	public function has_post($index)
+	{
+		return isset($_POST[$index]);
+	}
 
-
+	/**
+	 * Ellenőrzi, hogy létezik-e a paraméterként kapott index a $_GET szuperglobális tömbben
+	 *
+	 * @return boolean
+	 */
+	public function has_query($index)
+	{
+		return isset($_GET[$index]);
+	}
 
 	/**
 	 * Ellenőrzi, hogy a kérés metódusa GET volt-e
 	 * 
 	 * @return boolean
 	 */
-	public static function isGet()
+	public function is_get()
 	{
 		return strtolower($_SERVER['REQUEST_METHOD']) == 'get';
 	}
-	
-	
+		
 	/**
 	 * Ellenőrzi, hogy a kérés metódusa POST volt-e
 	 * 
 	 * @return boolean
 	 */
-	public static function isPost()
+	public function is_post()
 	{
 		return strtolower($_SERVER['REQUEST_METHOD']) == 'post';
 	}
@@ -106,7 +219,7 @@ class Request {
 	 *
 	 * @return boolean
 	 */
-	public static function is_ajax()
+	public function is_ajax()
 	{
 		return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 	}
@@ -114,21 +227,40 @@ class Request {
 
 
 
+// ------- Szürő metódusok 
+
 	/**
-	 * Removes slashes from a value
+	 * Removes slashes from a value (rekurzív)
 	 * 
 	 * @param string|array $value  The value to strip
 	 * @return string|array  The `$value` with slashes stripped
 	 */
-	private static function stripSlashes($value)
+	private function _stripSlashes($value)
 	{
 		if (is_array($value)) {
 			foreach ($value as $key => $sub_value) {
-				$value[$key] = self::stripSlashes($sub_value);
+				$value[$key] = $this->_stripSlashes($sub_value);
 			}
 			return $value;
 		}
 		return stripslashes($value);
+	}
+
+	/**
+	 * Removes slashes from a value (rekurzív)
+	 * 
+	 * @param string|array $value  The value to strip
+	 * @return string|array  The `$value` with slashes stripped
+	 */
+	private function _stripTags($value)
+	{
+		if (is_array($value)) {
+			foreach ($value as $key => $sub_value) {
+				$value[$key] = $this->_stripTags($sub_value);
+			}
+			return $value;
+		}
+		return strip_tags($value);
 	}
 
 }
