@@ -1,0 +1,116 @@
+<?php 
+class Testimonials_model extends Admin_model {
+
+	/**
+     * Constructor, létrehozza az adatbáziskapcsolatot
+     */
+	function __construct()
+	{
+		parent::__construct();
+	}
+	
+	public function all_testimonials()
+	{
+		// a query tulajdonság ($this->query) tartalmazza a query objektumot
+		$this->query->set_table(array('testimonials')); 
+		$this->query->set_columns(array('id', 'text', 'name', 'title')); 
+		$result = $this->query->select(); 
+	
+		return $result;
+	}
+	
+	public function update_testimonial($id)
+	{
+		$data['name'] = $_POST['testimonial_name'];
+		$data['title'] = $_POST['testimonial_title'];
+		$data['text'] = $_POST['testimonial_text'];
+		
+
+		// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
+		$this->query->reset();
+		$this->query->set_table(array('testimonials'));
+		$this->query->set_where('id', '=', $id);
+		$result = $this->query->update($data);
+				
+		if($result) {
+            Message::set('success', 'testimonial_update_success');
+			return true;
+		}
+		else {
+            Message::set('error', 'unknown_error');
+			return false;
+		}
+	}
+	
+	/**
+	 *	Egy oldal adatait kérdezi le az adatbázisból (pages tábla)
+	 *
+	 *	@param	$id String or Integer
+	 *	@return	az adatok tömbben
+	 */
+	public function testimonial_data_query($id)
+	{
+		$this->query->reset();
+		$this->query->set_table(array('testimonials'));
+		$this->query->set_columns(array('id', 'text', 'name', 'title'));
+		$this->query->set_where('id', '=', $id);
+		
+		return $this->query->select();
+	}
+	
+	/**
+	 *	Egy oldal adatait kérdezi le az adatbázisból (pages tábla)
+	 *
+	 *	@param	$id String or Integer
+	 *	@return	az adatok tömbben
+	 */
+	public function new_testimonial()
+	{
+		
+		$data['name'] = $_POST['testimonial_name'];
+		$data['title'] = $_POST['testimonial_title'];
+		$data['text'] = $_POST['testimonial_text'];
+		
+		
+		$this->query->reset();
+		$this->query->set_table(array('testimonials'));
+		$result = $this->query->insert($data);
+
+		// ha sikeres az insert visszatérési érték true
+		if($result) {
+            Message::set('success', 'new_testimonial_success');
+			return true;
+		}
+		else {
+            Message::set('error', 'unknown_error');
+			return false;
+		}
+	}
+	
+	/**
+	 *	Vélemény törlése a testimonials táblából
+	 *
+	 *	@param	$id String or Integer
+	 *	@return	az adatok tömbben
+	 */
+	public function delete_testimonial($id)
+	{
+				
+		$this->query->reset();
+		$this->query->set_table(array('testimonials'));
+		$this->query->set_where('id', '=', $id);
+		$result = $this->query->delete();
+
+		// ha sikeres a törlés 1 a vissaztérési érték
+		if($result == 1) {
+            Message::set('success', 'testimonial_delete_success');
+			return true;
+		}
+		else {
+            Message::set('error', 'unknown_error');
+			return false;
+		}
+	}
+	
+}
+?>
