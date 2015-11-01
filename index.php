@@ -14,7 +14,8 @@ include_once(CORE.'/model.php');
 include_once(CORE.'/view.php');
 
 include_once(LIBS.'/registry_class.php');
-include_once(LIBS.'/uri_class.php');
+// include_once(LIBS.'/uri_class.php');
+include_once(LIBS.'/uri_class_v2.php');
 include_once(LIBS.'/request_class.php');
 include_once(CORE.'/router.php');
 

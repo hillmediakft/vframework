@@ -8,12 +8,25 @@ class Application {
 		// Registry objektum létrehozása, és hozzárendelése a registry tulajdonsághoz
 		$this->registry = Registry::get_instance();
 	
-
-		$this->registry->request = new Request();
-
 		// uri objektum példányosítása a registry-be
-		$this->registry->uri = new Uri(Config::get('language_default'), Config::get('allowed_languages'));
+		$uri = new Uri(Config::get('language_default'), Config::get('allowed_languages'));
+		
+		$request = new Request($uri);
 
+
+
+var_dump($request->get_uri('base'));
+var_dump($request->get_uri('request_uri'));
+var_dump($request->get_uri('current_url'));
+var_dump($request->get_uri('site_url'));
+var_dump($request->get_uri('area'));
+var_dump($request->get_uri('langcode'));
+var_dump($request->get_uri('is_langcode'));
+var_dump($request->get_uri('path'));
+var_dump($request->get_uri('query'));
+var_dump($request->get_uri('query_arr'));
+
+die('stop');
 
 
 		// Az area-nak megfelelő leszármazott Model osztály betöltése (site, vagy admin)	

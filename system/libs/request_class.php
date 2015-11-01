@@ -4,11 +4,25 @@
 */
 class Request {
 
+	private $uri;
 
-	public function __construct(){}
+	public function __construct($uri)
+	{
+		$this->uri = $uri;
+	}
 
 
 	private $allowed_filters = array('int', 'integer', 'bool', 'boolean');
+
+
+	/**
+	 * Visszaadja az uri objektumban tárolt url részeket
+	 */
+	public function get_uri($name)
+	{
+		return $this->uri->get($name);
+	}
+
 
 
 	/**
