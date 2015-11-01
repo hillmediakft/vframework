@@ -111,7 +111,7 @@ public function debug()
 
 	public function get_all()
 	{
-		return $this->$uri_contents;
+		return $this->uri_contents;
 	}
 
 

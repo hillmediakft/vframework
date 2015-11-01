@@ -3,16 +3,11 @@ class Application {
 	
 	public $registry;
 	
-	public function __construct () 
+	public function __construct($registry) 
 	{
-		// Registry objektum létrehozása, és hozzárendelése a registry tulajdonsághoz
-		$this->registry = Registry::get_instance();
-	
-		// uri objektum példányosítása a registry-be
-		$uri = new Uri(Config::get('language_default'), Config::get('allowed_languages'));
-		
-		$request = new Request($uri);
+		$this->registry = $registry;	
 
+		$request = $this->registry->request;
 
 
 var_dump($request->get_uri('base'));

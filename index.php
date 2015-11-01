@@ -36,6 +36,23 @@ if (version_compare(PHP_VERSION, '5.3.7', '<')) {
     require_once(LIBS.'/password_compatibility_library.php');
 }
 
+
+
+
+		// Registry objektum létrehozása, és hozzárendelése a registry tulajdonsághoz
+		$registry = Registry::get_instance();
+
+		// uri objektum példányosítása a registry-be
+		$uri = new Uri(Config::get('language_default'), Config::get('allowed_languages'));
+		$request = new Request($uri);
+
+		$registry->request = $request;
+
+
+
+
+
+
 // application objektum példányosítása	
-$application = new Application();
+$application = new Application($registry);
 ?>

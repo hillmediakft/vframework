@@ -44,7 +44,12 @@ class Registry {
 	 *	@return	Mixed
 	 */
 	public function __get($key) {
-		return $this->vars[$key];
+		if(isset($this->vars[$key])){
+			return $this->vars[$key];
+		} else {
+			return null;
+		}
+
 	}
 } // registry class vége
 ?>
