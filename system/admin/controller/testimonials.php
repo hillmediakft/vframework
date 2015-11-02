@@ -1,5 +1,5 @@
 <?php
-class Testimonials extends Controller {
+class Testimonials extends Admin_controller {
 
 	function __construct()
 	{

@@ -1,5 +1,5 @@
 <?php
-class User_manual extends Controller {
+class User_manual extends Admin_controller {
 
 	function __construct()
 	{

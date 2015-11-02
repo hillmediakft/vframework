@@ -1,6 +1,5 @@
 <?php 
-
-class Error extends Controller {
+class Error extends Admin_controller {
 
 	function __construct()
 	{

@@ -1,5 +1,5 @@
 <?php 
-class Newsletter extends Controller {
+class Newsletter extends Admin_controller {
 
 	function __construct()
 	{

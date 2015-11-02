@@ -61,7 +61,7 @@ class Router
 		} else {
 			require(CORE . '/routes.php');
 		}
-	
+
 		// a $key_url a kulcs, a $_route az érték a $routes tömbben. pl: $key_url: ':controller/:action/:id/?', $_route: array('$1/$2', 'id')
 		foreach ( $routes as $key_url => $_route ) {
 		
@@ -124,7 +124,7 @@ class Router
 			
 			// megadjuk a $params tulajdonság értékét
 			$this->params = $this->params_to_assoc($_route, $params_temp);
-			
+
 		return;
 		}
 	}

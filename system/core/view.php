@@ -59,8 +59,11 @@ class View {
 	 */
 	public function __construct()
 	{
+		// registry objektum
 		$this->registry = Registry::get_instance();
-		$this->area = $this->registry->uri->get_area();
+		// request objektum
+		$this->request = $this->registry->request;
+		$this->area = $this->request->get_uri('area');
 	}
 	
 	/**

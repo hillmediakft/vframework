@@ -1,6 +1,5 @@
 <?php 
-
-class Content extends Controller {
+class Content extends Admin_controller {
 
 	function __construct()
 	{

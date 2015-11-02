@@ -1,5 +1,5 @@
 <?php
-class Languages extends Controller {
+class Languages extends Admin_controller {
 
 	function __construct()
 	{

@@ -1,5 +1,5 @@
 <?php
-class Photo_gallery extends Controller {
+class Photo_gallery extends Admin_controller {
 
 	function __construct()
 	{

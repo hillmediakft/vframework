@@ -1,5 +1,5 @@
 <?php 
-class Error extends Controller {
+class Error extends Site_controller {
 
 	function __construct()
 	{

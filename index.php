@@ -2,20 +2,29 @@
 //alap configurációs beállítások betöltése
 include_once('system/core/base_config.php');
 
+	// autolader osztály betöltése
+	include_once(CORE . '/autoloader.php');
+	$autoloader = new Autoloader();
+	// spl_autoload_register(array($autoloader, 'autoload'));
+
+	// sima autoloader
+	// include_once(CORE . '/autoload_sima.php');
+
+
+
 // config file betöltése
 //require_once('system/core/config.php');
 //require_once('system/core/config_email.php');
 //require_once('system/core/config_login.php');
 
-
+/*
 include_once(CORE.'/application.php');
 include_once(CORE.'/controller.php');
 include_once(CORE.'/model.php');
 include_once(CORE.'/view.php');
 
 include_once(LIBS.'/registry_class.php');
-// include_once(LIBS.'/uri_class.php');
-include_once(LIBS.'/uri_class_v2.php');
+include_once(LIBS.'/uri_class.php');
 include_once(LIBS.'/request_class.php');
 include_once(CORE.'/router.php');
 
@@ -26,6 +35,7 @@ include_once(LIBS.'/session_class.php');
 include_once(LIBS.'/auth_class.php');
 include_once(LIBS.'/message_class.php');
 include_once(LIBS.'/replacer_class.php');
+*/
 
 // checking for minimum PHP version
 if (version_compare(PHP_VERSION, '5.3.7', '<')) {
@@ -37,20 +47,14 @@ if (version_compare(PHP_VERSION, '5.3.7', '<')) {
 }
 
 
-
-
-		// Registry objektum létrehozása, és hozzárendelése a registry tulajdonsághoz
-		$registry = Registry::get_instance();
-
-		// uri objektum példányosítása a registry-be
-		$uri = new Uri(Config::get('language_default'), Config::get('allowed_languages'));
-		$request = new Request($uri);
-
-		$registry->request = $request;
-
-
-
-
+	// Registry objektum létrehozása, és hozzárendelése a registry tulajdonsághoz
+	$registry = Registry::get_instance();
+	// uri objektum példányosítása a registry-be
+	$uri = new Uri(Config::get('language_default'), Config::get('allowed_languages'));
+	// router objektum példányosítása		
+	$router = new Router();
+	// request objektum példányosítása
+	$registry->request = new Request($uri, $router);
 
 
 // application objektum példányosítása	

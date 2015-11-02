@@ -51,7 +51,7 @@ class Site_model extends Model {
     public function send_email($from_email, $from_name, $subject, $message, $to_email, $to_name)
     {
 		// Email kezelő osztály behívása
-		include(LIBS . '/simple_mail_class.php');
+		//include(LIBS . '/simplemail_class.php');
 		
         // Létrehozzuk a SimpleMail objektumot
 		$mail = new SimpleMail();

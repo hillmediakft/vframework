@@ -1,6 +1,5 @@
 <?php 
-
-class Pages extends Controller {
+class Pages extends Admin_controller {
 
 	function __construct()
 	{

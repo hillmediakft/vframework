@@ -14,6 +14,7 @@ class Controller {
 		Session::init();
         
         $this->registry = Registry::get_instance();
+		$this->request = $this->registry->request;
 		// létrehozzuk a view objektumot és hozzárendeljük a $view tulajdonsághoz
 		$this->view = new View();
 	}
@@ -26,7 +27,7 @@ class Controller {
 	public function loadModel($model)
 	{
 		// model file elérési útja
-		$file = 'system/' . $this->registry->uri->get_area() . '/model/' . $model . '.php';
+		$file = 'system/' . $this->request->get_uri('area') . '/model/' . $model . '.php';
 
 		// megnézzük, hogy megnyitható-e a file, ha nem kivételt dobunk.
 		try {

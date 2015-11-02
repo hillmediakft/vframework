@@ -23,21 +23,22 @@ class Auth {
     private static function _set_attributes()
     {
 		$registry = Registry::get_instance();
-		
-		if($registry->uri->get_area() == 'site'){
+		$request = $registry->request;
+
+		if($request->get_uri('area') == 'site'){
 			self::$expire_time = Config::get('session.expire_time_site', 3600);
 			self::$element_name = 'user_site_last_activity';
 			self::$logged_in = 'user_site_logged_in';
 			self::$target_url = '';
 		}
-		if($registry->uri->get_area() == 'admin'){
+		if($request->get_uri('area') == 'admin'){
 			self::$expire_time = Config::get('session.expire_time_admin', 3600);
 			self::$element_name = 'user_last_activity';
 			self::$logged_in = 'user_logged_in';
 			self::$target_url = 'login';
 		}
 		
-		self::$site_url = $registry->uri->get_site_url();
+		self::$site_url = $request->get_uri('site_url');
     }
     
     /**

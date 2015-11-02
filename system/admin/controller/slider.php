@@ -1,5 +1,5 @@
 <?php
-class Slider extends Controller {
+class Slider extends Admin_controller {
 
 	function __construct()
 	{

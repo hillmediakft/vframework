@@ -1,5 +1,5 @@
 <?php
-class Blog extends Controller {
+class Blog extends Admin_controller {
 
 	function __construct()
 	{

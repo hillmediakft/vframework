@@ -1,5 +1,5 @@
 <?php
-class File_manager extends Controller {
+class File_manager extends Admin_controller {
 
 	function __construct()
 	{

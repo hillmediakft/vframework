@@ -1,5 +1,5 @@
 <?php
-class Ajax_request extends Controller {
+class Ajax_request extends Site_controller {
 
     function __construct() {
         parent::__construct();

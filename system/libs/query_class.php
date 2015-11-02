@@ -12,7 +12,7 @@
  *
  *	Táblák megadása (string) (vesszővel elválsztva az oszlopnevek), vagy (array)
  *	1. (string) ebben az esteben nem lesz automatikusan backtick-elve a táblanév!! 	
-		set_table('users, colors, lakhely');
+ *		set_table('users, colors, lakhely');
  *	2. (array)	ebben az esteben backtick-elve lesznek az táblanevek!!		
  *		set_table(array('users','colors','lakhely'));
  *
