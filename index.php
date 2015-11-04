@@ -11,7 +11,6 @@ include_once('system/core/base_config.php');
 	// include_once(CORE . '/autoload_sima.php');
 
 
-
 // config file betöltése
 //require_once('system/core/config.php');
 //require_once('system/core/config_email.php');

@@ -38,7 +38,8 @@ class Slider extends Admin_controller {
 	 */
 	public function new_slide()
 	{
-		if(isset($_POST['submit_new_slide'])) {
+		//if(isset($_POST['submit_new_slide'])) {
+		if($this->request->has_post('submit_new_slide')) {
 			
 			$result = $this->slider_model->add_slide();
 			if($result){
@@ -68,13 +69,10 @@ class Slider extends Admin_controller {
 	 */
 	public function edit()
 	{
-		if(!isset($this->registry->params['id'])){
-			throw new Exception('Nincs "id" nevű eleme a $params tombnek! (lekerdezes nem hajthato vegre id alapjan)');
-			return false;
-		}
-		$id = (int)$this->registry->params['id'];
+		$id = (int)$this->request->get_params('id');
 		
-		if(isset($_POST['submit_update_slide'])) {
+		//if(isset($_POST['submit_update_slide'])) {
+		if($this->request->has_post('submit_update_slide')) {
 			$result = $this->slider_model->update_slide($id);
 			if($result){
 				Util::redirect('slider');
@@ -101,12 +99,7 @@ class Slider extends Admin_controller {
 	 */
 	public function delete()
 	{
-		if(!isset($this->registry->params['id'])){
-			throw new Exception('Nincs "id" nevű eleme a $params tombnek! (a lekerdezes nem hajthato vegre)');
-			return false;
-		}
-		
-		$id = (int)$this->registry->params['id'];
+		$id = (int)$this->request->get_params('id');
 		$this->slider_model->delete_slide($id);
 		Util::redirect('slider');
 	}
@@ -121,7 +114,7 @@ class Slider extends Admin_controller {
 	 */
 	public function order()
 	{
-		if (Util::is_ajax()) {
+		if ($this->request->is_ajax()) {
 			if (isset($_POST["action"]) && $_POST["action"] == "update_slider_order") {
 				$this->slider_model->slider_order();
 			}

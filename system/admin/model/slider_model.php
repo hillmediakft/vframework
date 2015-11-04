@@ -130,7 +130,7 @@ class Slider_model extends Admin_model {
 	 */
 	public function slider_order()
 	{
- 		$order = $_POST['order'];
+ 		$order = $this->request->get_post('order');
 		parse_str($order, $order_array);
 	
 		foreach ($order_array as $key => $recordIDValue) {

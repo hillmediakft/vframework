@@ -59,6 +59,7 @@
                                     <input type='text' name='setting_email' class='form-control input-large' value="<?php echo (empty($settings['email'])) ? "" : $settings['email']; ?>"/>
                                 </div>
                                 
+                            <!--
                                 <div class="form-group">
                                     <label for="setting_email_ceges">E-mail céges (céges kapcsolat)</label>	
                                     <input type='text' name='setting_email_ceges' class='form-control input-large' value="<?php echo (empty($settings['email_ceges'])) ? "" : $settings['email_ceges']; ?>"/>
@@ -78,6 +79,7 @@
                                     <label for="setting_email_diak">Facebook link</label>	
                                     <input type='text' name='setting_facebook_link' class='form-control input-large' value="<?php echo (empty($settings['facebook_link'])) ? "" : $settings['facebook_link']; ?>"/>
                                 </div>
+                            -->
 								
 							</div> <!-- END USER GROUPS PORTLET BODY-->
 						</div> <!-- END USER GROUPS PORTLET-->

@@ -19,14 +19,11 @@ class Settings extends Admin_controller {
 		*/
 		
 		
-		if(isset($_POST['submit_settings'])) {
-			
+		//if(isset($_POST['submit_settings'])) {
+		if($this->request->has_post('submit_settings')) {
 			$result = $this->settings_model->update_settings();
-			
 			Util::redirect('settings');
-
-			}
-			
+		}
 		
 		$this->view->settings = $this->settings_model->get_settings();
 

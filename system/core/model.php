@@ -12,7 +12,10 @@ class Model {
 	{
 		// adatbáziskapcsolat létrehozása
 		$this->connect = db::get_connect();
+		
 		$this->registry = Registry::get_instance();
+		
+		$this->request = $this->registry->request;
 		
 		// hozzárendeljük a query tulajdonsághoz a Query objektumot
 		// ez a query tulajdonság a gyerek model-ek bármelyik metódusában elérhető

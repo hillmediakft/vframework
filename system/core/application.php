@@ -8,9 +8,6 @@ class Application {
 		$this->registry = $registry;	
 		$this->request = $this->registry->request;
 
-		// Az area-nak megfelelő leszármazott Model osztály betöltése (site, vagy admin)	
-		//$this->load_model();
-
         // Beállítjuk, hogy az üzenetek melyik modulra vonatkozzanak (message_site vagy message_admin)
         Message::set_area($this->request->get_uri('area'));
 		// Betöltjük az aktuális nyelvnek megfelelő üzenet fájlt
@@ -19,12 +16,12 @@ class Application {
 
 				// nyelvi fájl betöltése
 				//$language = new Language();
-				//$this->registry->language = $language->load($this->registry->lang);
+				//$this->registry->language = $language->load($this->request->get_uri('lang'));
 
 
 				// hook objektum létrehozása, a rendszer elindítása előtti hook-ok futtatása
 				//$this->hooks = new Hooks();
-				//$this->hooks->_call_hook($this->registry->area . '_pre_system');
+				//$this->hooks->_call_hook($this->request->get_uri('area') . '_pre_system');
 
 
 		// controller file betöltése és a megfelelő action behívása
@@ -36,9 +33,6 @@ class Application {
 	 */
 	private function load_controller()
 	{
-		// site vagy admin controller osztály behívása
-		//include_once(CORE . '/' . $this->request->get_uri('area') . '_controller.php');
-
 		$controller_name = $this->request->get_controller();
 		$action_name = $this->request->get_action();
 
@@ -61,14 +55,6 @@ class Application {
 				$controller->index();
 			}
 		}
-	}
-
-	/**
-	 * Az area-nak megfelelő Model osztály betöltése (site, vagy admin) 
-	 */
-	private function load_model()
-	{
-		include_once(CORE . '/' . $this->request->get_uri('area') . '_model.php');
 	}
 	
 } // osztály vége

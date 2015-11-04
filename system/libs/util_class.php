@@ -10,13 +10,14 @@ class Util
      */
     public static function redirect($location, $status = 302) {
 		$registry = Registry::get_instance();
+		$request = $registry->request;
 		
 		if ($location == '') {
-			header("Location: " . $registry->site_url, true, $status);
+			header("Location: " . $request->get_uri('site_url'), true, $status);
 			exit;
 		}
 		
-		header("Location: " . $registry->site_url . $location, true, $status);
+		header("Location: " . $request->get_uri('site_url') . $location, true, $status);
 		exit;
     }
 	
