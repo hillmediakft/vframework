@@ -15,16 +15,13 @@ class Languages extends Admin_controller {
 		if (!Acl::create()->userHasAccess('home_menu')) {
 		exit('nincs hozzáférése');
 		}
-
 */
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Nyelvek oldal';
 		$this->view->description = 'Nyelvek oldal description';
 		
 		$this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css');
-		
 		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js');
-
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/languages.js');
 		
 		$this->view->languages = $this->languages_model->get_language_data();
@@ -41,12 +38,20 @@ class Languages extends Admin_controller {
 	 */
 	public function save()
 	{
-		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-		if (isset($_POST["name"])) {
+		if($this->request->is_ajax()) {
+			if ($this->request->has_post('name')) {
 				$this->languages_model->save_language_text();
 			}
 		}
-		
+
+
+/*
+		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+			if (isset($_POST["name"])) {
+				$this->languages_model->save_language_text();
+			}
+		}
+*/		
 		
 	}
 }

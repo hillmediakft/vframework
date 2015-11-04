@@ -10,14 +10,11 @@ class Settings extends Admin_controller {
 
 	public function index()
 	{
-/*		Auth::handleLogin();
-
+/*
 		if (!Acl::create()->userHasAccess('home_menu')) {
 		exit('nincs hozzáférése');
 		}
-		
-		*/
-		
+*/
 		
 		//if(isset($_POST['submit_settings'])) {
 		if($this->request->has_post('submit_settings')) {

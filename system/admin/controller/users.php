@@ -78,19 +78,19 @@ class Users extends Admin_controller {
 	/**
 	 * Felhasználó adatainak megjelenítése és módosítása
      *
-	 * A metódusnak szüksége van egy user id-jére amit módosítani akarunk ($this->registry->params['id'])
+	 * A metódusnak szüksége van egy user id-jére amit módosítani akarunk ($this->request->get_params('id'))
 	 */
 	public function profile()
 	{
 		if(isset($_POST['submit_edit_user'])) {
             
-			$result = $this->users_model->edit_user($this->registry->params['id']);
+			$result = $this->users_model->edit_user($this->request->get_params('id'));
 			
 			if($result) {
 				Util::redirect('users');
 			}
 			else {
-				Util::redirect('users/profile/' . $this->registry->params['id']);
+				Util::redirect('users/profile/' . $this->request->get_params('id'));
 			}
 		}
 		
@@ -108,7 +108,7 @@ class Users extends Admin_controller {
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/profile.js');
         
 		// visszadja a bejelentkezett user adatait egy tömbbe (id, név, telefon, password... stb.)
-		$this->view->data_arr = $this->users_model->user_data_query($this->registry->params['id']);
+		$this->view->data_arr = $this->users_model->user_data_query($this->request->get_params('id'));
 		
 	// $this->view->debug(true);
 		
