@@ -39,12 +39,23 @@ class Request {
 	}
 
 	/**
-	 * Visszaadja a (uri path) paraméterek tömbjét
-	 * @return string
+	 * Visszaadja a (uri path) paraméterek tömbjét, ha a nem adunk meg paramétert
+	 * Vagy a paraméterban megadott nevű uri_path paramétert adja vissza
+	 *
+	 * @param string $index 	A paraméter neve
+	 * @return mixed
 	 */
-	public function get_params()
+	public function get_params($index = null)
 	{
-		return $this->router->params;
+		if(is_null($index)){
+			return $this->router->params;
+		}
+		if(array_key_exists($index, $this->router->params)){
+			return $this->router->params[$index];
+		} else {
+			throw new Exception('Nincs ' . $index . ' nevu elem a parameterek kozott!');
+			exit();
+		}
 	}
 
 	/**
