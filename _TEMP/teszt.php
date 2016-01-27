@@ -26,32 +26,6 @@
 <?php
 include('validator_class.php');
 
-$tomb = array(
-	'username' => '',
-	'password' => 'ertu',
-	'password_again' => 'ertzghertu',
-	'email' => 'aaarrrrr.hu',
-);
-
-	/*
-	$items = array(
-		'username' => array(
-			'required' => true,
-			'max' => 5
-		),
-		'password' => array(
-			'required' => true,
-			'min' => 8		
-		),
-		'password_again' => array(
-			'matches' => 'password'	
-		),
-		'email' => array(
-			'email' => true	
-		)
-	);
-	*/
-
 if(!empty($_POST)){
 
 	$validator = new Validate();
@@ -80,11 +54,6 @@ if(!empty($_POST)){
 
 	// validálás lefuttatása	
 		$validator->check($_POST);
-
-	var_dump($validator->rules_arr);
-	var_dump($validator->label_arr);
-		
-
 		
 	echo "<hr/>";	
 		
