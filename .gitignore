@@ -45,6 +45,7 @@ Temporary Items
 *.tmp
 uploads/
 nbproject/
+_TEMP/
 system/config/db_local.php
 system/config/db_online.php
 system/config/email.php
