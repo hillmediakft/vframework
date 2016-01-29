@@ -41,11 +41,10 @@ class Photo_gallery extends Admin_controller {
 	 */
 	public function new_photo()
 	{
-	
-		if(isset($_POST['submit_new_photo'])) {
-				$this->photo_gallery_model->save_photo();
-				Util::redirect('photo_gallery');
-			}
+		if($this->request->has_post('submit_new_photo')) {
+			$this->photo_gallery_model->save_photo();
+			Util::redirect('photo_gallery');
+		}
 			
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Új fotó oldal';
@@ -54,12 +53,9 @@ class Photo_gallery extends Admin_controller {
 		$this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.css');
 		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.js');
 		
-		
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/common.js');
 		
-		
 		$this->view->render('photo_gallery/tpl_new_photo');	
-		
 	}
 	
 	/**
@@ -70,16 +66,13 @@ class Photo_gallery extends Admin_controller {
 	 */
 	public function edit()
 	{
-		$id = $this->registry->params;
+		$id = $this->request->get_params('id');
 
-		if(isset($_POST['submit_update_photo'])) {
-	
-		
+		if($this->request->has_post('submit_update_photo')) {
 			
 			$result = $this->photo_gallery_model->update_photo($id);
-			
-				Util::redirect('photo-gallery');
-			}
+			Util::redirect('photo-gallery');
+		}
 			
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Fotó szerkesztése oldal';
@@ -101,13 +94,11 @@ class Photo_gallery extends Admin_controller {
 	 */
 	public function delete()
 	{
-		$id = $this->registry->params['id'];
+		$id = $this->request->get_params('id');
 		
 		$result = $this->photo_gallery_model->delete_photo($id);
 			
 		Util::redirect('photo-gallery');
-
-	
 	}
 	
 }

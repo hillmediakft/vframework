@@ -11,7 +11,7 @@ class Blog extends Admin_controller {
     
 	public function index()
 	{
-	
+
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Admin blog oldal';
 		$this->view->description = 'Admin blog oldal description';	
@@ -38,7 +38,7 @@ class Blog extends Admin_controller {
     
     public function insert()
 	{
-		if(isset($_POST['submit_add_blog'])){
+		if($this->request->has_post('submit_add_blog')){
 			$result = $this->blog_model->insert();
 			if($result){
 				Util::redirect('blog');
@@ -63,14 +63,13 @@ class Blog extends Admin_controller {
 	public function update()
 	{
 		if(isset($_POST['submit_update_blog'])){
-			$result = $this->blog_model->update($this->registry->params['id']);
+			$result = $this->blog_model->update($this->request->get_params('id'));
 			if($result){
 				Util::redirect('blog');
 			} else {
-				Util::redirect('blog/update/'. $this->registry->params['id']);
+				Util::redirect('blog/update/'. $this->request->get_params('id'));
 			}
 		}
-		
 		
 		$this->view->title = 'Admin blog oldal';
 		$this->view->description = 'Admin blog oldal description';	
@@ -81,7 +80,7 @@ class Blog extends Admin_controller {
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/common.js');		
         
 		$this->view->category_list = $this->blog_model->blog_category_query();
-		$this->view->content = $this->blog_model->blog_query2($this->registry->params['id']);
+		$this->view->content = $this->blog_model->blog_query2($this->request->get_params('id'));
 		
 // $this->view->debug(true);		
 		
@@ -127,7 +126,7 @@ class Blog extends Admin_controller {
 	
 	public function category_insert()
 	{
-		if(isset($_POST['submit_category_insert'])){
+		if($this->request->has_post('submit_category_insert')){
 			$result = $this->blog_model->category_insert();
 			if($result){
 				Util::redirect('blog/category');
@@ -147,12 +146,13 @@ class Blog extends Admin_controller {
 	
 	public function category_update()
 	{
-	if(isset($_POST['submit_category_update'])){
-			$result = $this->blog_model->category_update($this->registry->params['id']);
+		if(isset($_POST['submit_category_update'])){
+		if($this->request->has_post('submit_category_update')){
+			$result = $this->blog_model->category_update($this->request->get_params('id'));
 			if($result){
 				Util::redirect('blog/category');
 			} else {
-				Util::redirect('blog/category_update/'. $this->registry->params['id']);
+				Util::redirect('blog/category_update/'. $this->request->get_params('id'));
 			}
 		}
 
@@ -161,13 +161,10 @@ class Blog extends Admin_controller {
 
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/common.js');	   
 		
-		$this->view->content = $this->blog_model->blog_category_query($this->registry->params['id']);
+		$this->view->content = $this->blog_model->blog_category_query($this->request->get_params('id'));
 		
 		$this->view->render('blog/tpl_category_update');	
 	}
-	
-	
-    
 
 }
 ?>

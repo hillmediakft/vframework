@@ -15,8 +15,7 @@ class Settings extends Admin_controller {
 		exit('nincs hozzáférése');
 		}
 */
-		
-		//if(isset($_POST['submit_settings'])) {
+
 		if($this->request->has_post('submit_settings')) {
 			$result = $this->settings_model->update_settings();
 			Util::redirect('settings');

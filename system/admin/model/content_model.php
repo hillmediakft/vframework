@@ -21,8 +21,8 @@ class Content_model extends Admin_model {
 	
 	public function update_content($id)
 	{
-		$data['content_title'] = $_POST['content_title'];
-		$data['content_body'] = $_POST['content_body'];
+		$data['content_title'] = $this->request->get_post('content_title');
+		$data['content_body'] = $this->request->get_post('content_body');
 		
 
 		// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 

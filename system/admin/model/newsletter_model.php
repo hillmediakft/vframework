@@ -56,10 +56,10 @@ class Newsletter_model extends Admin_model {
 	
 	public function new_newsletter()
 	{
-		$data['newsletter_name'] = $_POST['newsletter_name'];
-		$data['newsletter_subject'] = $_POST['newsletter_subject'];
-		$data['newsletter_body'] = $_POST['newsletter_body'];
-		$data['newsletter_status'] = (int)$_POST['newsletter_status'];
+		$data['newsletter_name'] = $this->request->get_post('newsletter_name');
+		$data['newsletter_subject'] = $this->request->get_post('newsletter_subject');
+		$data['newsletter_body'] = $this->request->get_post('newsletter_body');
+		$data['newsletter_status'] = (int)$this->request->get_post('newsletter_status');
 		$data['newsletter_create_date'] = date('Y-m-d-G:i');
 		
 		$this->query->reset();
@@ -68,11 +68,11 @@ class Newsletter_model extends Admin_model {
 	
 	// ha sikeres az insert visszatérési érték true
 		if($result) {
-			$_SESSION["feedback_positive"][] = "Új hírlevél hozzáadva!";
+			Message::set('success', 'Új hírlevél hozzáadva!');
 			return true;
 		}
 		else {
-			$_SESSION["feedback_negative"][] = FEEDBACK_UNKNOWN_ERROR;
+			Message::set('error', 'unknown_error');
 			return false;
 		}
 	
@@ -84,10 +84,10 @@ class Newsletter_model extends Admin_model {
 	{
 		$id = (int)$id;
 	
-		$data['newsletter_name'] = $_POST['newsletter_name'];
-		$data['newsletter_subject'] = $_POST['newsletter_subject'];
-		$data['newsletter_body'] = $_POST['newsletter_body'];
-		$data['newsletter_status'] = (int)$_POST['newsletter_status'];
+		$data['newsletter_name'] = $this->request->get_post('newsletter_name');
+		$data['newsletter_subject'] = $this->request->get_post('newsletter_subject');
+		$data['newsletter_body'] = $this->request->get_post('newsletter_body');
+		$data['newsletter_status'] = $this->request->get_post('newsletter_status', 'integer');
 		//$data['newsletter_create_date'] = date('Y-m-d-G:i');
 		
 		$this->query->reset();
@@ -97,11 +97,11 @@ class Newsletter_model extends Admin_model {
 	
 	// ha sikeres az insert visszatérési érték true
 		if($result) {
-			$_SESSION["feedback_positive"][] = "Hírlevél módosítva!";
+			Message::set('success', 'Hírlevél módosítva!');
 			return true;
 		}
 		else {
-			$_SESSION["feedback_negative"][] = FEEDBACK_UNKNOWN_ERROR;
+			Message::set('error', 'unknown_error');
 			return false;
 		}
 	
@@ -117,8 +117,8 @@ class Newsletter_model extends Admin_model {
 		$fail_counter = 0; 
 		
 		// Több user törlése
-		if(isset($_POST['delete_newsletter'])) {
-			$data_arr = $_POST;
+		if( $this->request->has_post('delete_newsletter') ) {
+			$data_arr = $this->request->get_post();
 			
 			//eltávolítjuk a tömbből a felesleges elemeket	
 			if(isset($data_arr['delete_newsletter'])) {
@@ -129,12 +129,12 @@ class Newsletter_model extends Admin_model {
 			}
 		} else {
 		// egy user törlése (nem POST adatok alapján)
-			if(!isset($this->registry->params['id'])){
+			if( !isset($this->request->get_params('id')) ){
 				throw new Exception('Nincs id-t tartalmazo parameter az url-ben (ezert nem tudunk torolni id alapjan)!');
 				return false;
 			}
 			//berakjuk a $data_arr tömbbe a törlendő felhasználó id-jét
-			$data_arr = array($this->registry->params['id']);
+			$data_arr = array($this->request->get_params('id'));
 		}
 
 		// bejárjuk a $data_arr tömböt és minden elemen végrehajtjuk a törlést
@@ -168,10 +168,10 @@ class Newsletter_model extends Admin_model {
 
 		// üzenetek eltárolása
 		if($success_counter > 0) {
-			$_SESSION["feedback_positive"][] = $success_counter . ' ' . 'hírlevél törlése sikerült.';
+			Message::set('success', $success_counter . ' ' . 'hírlevél törlése sikerült.');
 		}
 		if($fail_counter > 0){
-			$_SESSION["feedback_negative"][] = $fail_counter . ' ' . 'hírlevél törlése nem sikerült!';
+			Message::set('error', $fail_counter . ' ' . 'hírlevél törlése nem sikerült!');
 		}
 		
 		// default visszatérési érték (akkor tér vissza false-al ha hibás az sql parancs)	
@@ -193,7 +193,7 @@ class Newsletter_model extends Admin_model {
 		
 		// Több user törlése
 		if(isset($_POST['newsletter_id'])) {
-			$data_arr = $_POST;
+			$data_arr = $this->request->get_post();
 
 			//eltávolítjuk a tömbből a felesleges elemeket	
 			if(isset($data_arr['delete_newsletter'])) {
@@ -358,7 +358,7 @@ class Newsletter_model extends Admin_model {
 	
 				// adatok beírása a stats_newsletters táblába
 				$data['sent_date'] = date('Y-m-d-G:i');
-				$data['newsletter_id'] = $newsletter_id = (int)$_POST['newsletter_id'];;
+				$data['newsletter_id'] = $newsletter_id = $this->request->get_post('newsletter_id', 'integer');
 				$data['recepients'] = $success + $fail;
 				$data['send_success'] = $success;
 				$data['send_fail'] = $fail;
@@ -380,7 +380,7 @@ class Newsletter_model extends Admin_model {
 	// id megadása	
 	$x = Session::get('newsletter_id');
 	$newsletter_id = (isset($x)) ? $x : null;
-	//$newsletter_id = (int)$_POST['newsletter_id'];
+	//$newsletter_id = $this->request->get_post('newsletter_id', 'integer');
 			
 			
 		$data['newsletter_id'] = $newsletter_id;

@@ -13,9 +13,7 @@ class Home extends Admin_controller {
 		$this->view->title = 'Admin kezdő oldal';
 		$this->view->description = 'Admin kezdő oldal description';
 		
-		
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/common.js');
-		
 		
 		$this->view->render('home/tpl_home');
 	}

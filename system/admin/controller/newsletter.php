@@ -42,7 +42,7 @@ class Newsletter extends Admin_controller {
 	
 	public function new_newsletter()
 	{
-		if(isset($_POST['submit_new_newsletter'])) {
+		if($this->request->has_post('submit_new_newsletter')) {
 			$this->newsletter_model->new_newsletter();
 			Util::redirect('newsletter');
 		}
@@ -63,8 +63,8 @@ class Newsletter extends Admin_controller {
 	
 	public function edit_newsletter()
 	{
-		if(isset($_POST['submit_edit_newsletter'])) {
-			$this->newsletter_model->edit_newsletter($this->registry->params['id']);
+		if($this->request->has_post('submit_edit_newsletter')) {
+			$this->newsletter_model->edit_newsletter($this->request->get_params('id'));
 			Util::redirect('newsletter');
 		}
 
@@ -75,8 +75,7 @@ class Newsletter extends Admin_controller {
 		
 		$this->view->ckeditor = true;
 		
-		$this->view->newsletter = $this->newsletter_model->newsletter_query($this->registry->params['id']);
-		
+		$this->view->newsletter = $this->newsletter_model->newsletter_query($this->request->get_params('id'));
 	
 		// template betöltése
 		$this->view->render('newsletter/tpl_edit_newsletter');	
@@ -97,7 +96,7 @@ class Newsletter extends Admin_controller {
 	 */
 	public function delete_newsletter_AJAX()
 	{
-		if( Util::is_ajax() ) {
+		if( $this->request->is_ajax() ) {
 			$result = $this->newsletter_model->delete_newsletter_AJAX();
 			echo $result;
 		}
@@ -109,7 +108,7 @@ class Newsletter extends Admin_controller {
 	 *	Az echo $result megy vissza a javascriptnek
 	public function send_newsletter()
 	{
-		if( Util::is_ajax() ) {
+		if( $this->request->is_ajax() ) {
 			$result = $this->newsletter_model->send_newsletter();
 			//echo $result;
 		}
@@ -121,7 +120,7 @@ class Newsletter extends Admin_controller {
 
 	public function setid()
 	{
-		if(isset($_POST['newsletter_id'])) {
+		if($this->request->has_post('newsletter_id')) {
 			Session::set('newsletter_id', (int)$_POST['newsletter_id']);
 			echo json_encode(array('status' => 'done'));
 		} else {
@@ -134,10 +133,10 @@ class Newsletter extends Admin_controller {
 
 	public function setid_2()
 	{
-		if(isset($_POST['newsletter_id'])) {
-			echo json_encode(array('status' => 'letezik POST newsletter_id: ' . $_POST['newsletter_id']));
+		if($this->request->has_post('newsletter_id')) {
+			echo json_encode(array('status' => 'letezik POST newsletter_id: ' . $this->request->get_post('newsletter_id') ));
 		} else {
-			echo json_encode(array('status' => 'NEM letezik POST newsletter_id: '. $_POST['newsletter_id']));
+			echo json_encode(array('status' => 'NEM letezik POST newsletter_id: '. $this->request->get_post('newsletter_id') ));
 		}
 		
 		

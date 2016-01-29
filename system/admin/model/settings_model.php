@@ -29,9 +29,9 @@ class Settings_model extends Admin_model {
 	 */
 	public function update_settings()
 	{
-		$data['ceg'] = $_POST['setting_ceg'];
-		$data['cim'] = $_POST['setting_cim'];
-		$data['email'] = $_POST['setting_email'];
+		$data['ceg'] = $this->request->get_post('setting_ceg');
+		$data['cim'] = $this->request->get_post('setting_cim');
+		$data['email'] = $this->request->get_post('setting_email');
 
 		// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
 		$this->query->reset();

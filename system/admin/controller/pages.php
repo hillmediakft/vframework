@@ -10,11 +10,9 @@ class Pages extends Admin_controller {
 
 	public function index()
 	{
-		
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Admin pages oldal';
 		$this->view->description = 'Admin pages oldal description';
-		
 		
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/pages.js');
 		
@@ -28,9 +26,10 @@ class Pages extends Admin_controller {
 	 */
 	public function edit()
 	{
-		$id = (int)$this->registry->params['id'];
+		$id = (int)$this->request->get_params('id');
 
-		if(isset($_POST['submit_update_page'])) {
+		//if(isset($_POST['submit_update_page'])) {
+		if($this->request->has_post('submit_update_page')) {
 			
 			$result = $this->pages_model->update_page($id);
 			
@@ -41,8 +40,6 @@ class Pages extends Admin_controller {
 				Util::redirect('pages/edit/' . $id);
 			}
 		}	
-		
-
 		
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Oldal szerkesztése';
@@ -67,7 +64,6 @@ class Pages extends Admin_controller {
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Admin egyéb tartalom oldal';
 		$this->view->description = 'Admin egyéb tartalom oldal description';
-		
 		
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/common.js');
 		

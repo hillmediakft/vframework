@@ -17,10 +17,10 @@ class Login extends Admin_controller
 	 * Ez a metódus jeleníti meg a bejelentkezési oldalt!
 	 * Ha a bejelentkezési adatok helyesek, bejelentkezteti a felhasználót	
      */
-    function index()
+    public function index()
     {
 		// ha elküldték a POST adatokat
-		if(isset($_POST['submit_login'])) {
+		if($this->request->has_post('submit_login')) {
 			// perform the login method, put result (true or false) into $login_successful
 			$login_successful = $this->login_model->login();
 
@@ -44,7 +44,7 @@ class Login extends Admin_controller
     /**
      * The logout action, login/logout
      */
-    function logout()
+    public function logout()
     {
         $this->login_model->logout();
         // redirect user to base URL
@@ -83,7 +83,7 @@ class Login extends Admin_controller
      */
     function register()
     {
-		if(isset($_POST['register'])){
+		if($this->request->has_post('register')){
 		
 			$registration_successful = $this->login_model->registerNewUser();
 
@@ -106,7 +106,7 @@ class Login extends Admin_controller
      */
     function verify()
     {
-        $this->login_model->verifyNewUser($this->registry->params['user_id'], $this->registry->params['user_activation_verification_code']);
+        $this->login_model->verifyNewUser($this->request->get_params('user_id'), $this->request->get_params('user_activation_verification_code'));
         $this->view->render('login/tpl_verify', true);
     }
 
@@ -116,7 +116,7 @@ class Login extends Admin_controller
     function requestPasswordReset()
     {
 		//ha a form el lett küldve
-		if(isset($_POST['request_password_reset'])) {
+		if($this->request->has_post('request_password_reset')) {
 			$this->login_model->requestPasswordReset();
 			header('location:' . BASE_URL . 'admin/login');
 			exit;
@@ -134,10 +134,10 @@ class Login extends Admin_controller
      */
     function verifyPasswordReset()
     {
-        if ($this->login_model->verifyPasswordReset($this->registry->params['user_name'], $this->registry->params['verification_code'])) {
+        if ($this->login_model->verifyPasswordReset($this->request->get_params('user_name'), $this->request->get_params('verification_code'))) {
             // get variables for the view
-            $this->view->user_name = $this->registry->params['user_name'];
-            $this->view->user_password_reset_hash = $this->registry->params['verification_code'];
+            $this->view->user_name = $this->request->get_params('user_name');
+            $this->view->user_password_reset_hash = $this->request->get_params('verification_code');
 			$this->view->render('login/tpl_changepassword', true);
         } else {
             header('location: ' . BASE_URL . 'admin/login');

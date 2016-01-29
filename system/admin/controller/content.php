@@ -6,17 +6,14 @@ class Content extends Admin_controller {
 		parent::__construct();
 		Auth::handleLogin();
 		$this->loadModel('content_model');
-	
 	}
 
-		public function index()
+	public function index()
 	{
 		
-
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Egyéb tartalom oldal';
 		$this->view->description = 'Egyéb tartalom oldal description';
-		
 		
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/content.js');
 		
@@ -31,18 +28,13 @@ class Content extends Admin_controller {
 	 */
 	public function edit()
 	{
-		$id = $this->registry->params;
+		$id = $this->request->get_params('id');
 
-		if(isset($_POST['submit_update_content'])) {
-			
-			$result = $this->content_model->update_content($id);
-			
-				Util::redirect('content');
-			}
-
-			
+		if($this->request->has_post('submit_update_content')) {
 		
-
+			$result = $this->content_model->update_content($id);
+			Util::redirect('content');
+		}
 		
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Tartalom szerkesztése';
@@ -58,7 +50,6 @@ class Content extends Admin_controller {
 		$this->view->render('content/tpl_edit_content');
 	
 	}
-	
 
 }
 ?>

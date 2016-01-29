@@ -39,11 +39,10 @@ class Testimonials extends Admin_controller {
 	 */
 	public function new_testimonial()
 	{
-	
-		if(isset($_POST['submit_new_testimonial'])) {
-				$this->testimonials_model->new_testimonial();
-				Util::redirect('testimonials');
-			}
+		if($this->request_has('submit_new_testimonial')) {
+			$this->testimonials_model->new_testimonial();
+			Util::redirect('testimonials');
+		}
 			
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Új testimonials oldal';
@@ -51,7 +50,6 @@ class Testimonials extends Admin_controller {
 		
 		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootbox/bootbox.min.js');
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/new_testimonial.js');
-		
 		
 	
 //		$this->view->testimonials = $this->testimonials_model->get_testimonials_data();	
@@ -66,15 +64,12 @@ class Testimonials extends Admin_controller {
 	 */
 	public function edit()
 	{
-		$id = $this->registry->params;
+		$id = $this->request->get_params('id');
 
-
-		if(isset($_POST['submit_update_testimonial'])) {
-			
+		if($this->request_has('submit_update_testimonial')) {
 			$result = $this->testimonials_model->update_testimonial($id);
-			
-				Util::redirect('testimonials');
-			}
+			Util::redirect('testimonials');
+		}
 		
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Rólunk mondták szerkesztése';
@@ -90,23 +85,16 @@ class Testimonials extends Admin_controller {
 	
 	}
 	
-	
 	/**
 	 *	Rólunk mondták elem törlése
 	 *
 	 */
 	public function delete()
 	{
-		$id = $this->registry->params;
-		
+		$id = $this->request->get_params('id');
 		$result = $this->testimonials_model->delete_testimonial($id);
-			
 		Util::redirect('testimonials');
-
-	
 	}
-
-			
 	
 }
 ?>

@@ -77,18 +77,18 @@ class Slider_model extends Admin_model {
 		}		
 	
 	// adatok beállítása
-		$data['active'] = (int)$_POST['slider_status'];
+		$data['active'] = $this->request->get_post('slider_status', 'integer');
 		
 		if($new_picture) {
 			$data['picture'] = $dest_image_name;
 			// régi kép adatai (ezt használjuk a régi kép törléséhez, ha új kép lett feltöltve)
-			$old_img_path = Config::get('slider.upload_path') . $_POST['old_img'];
+			$old_img_path = Config::get('slider.upload_path') . $this->request->get_post('old_img');
 			$old_thumb_path = Util::thumb_path($old_img_path);
 		}
 		
-		$data['text'] = htmlentities($_POST['slider_text'], ENT_QUOTES, "UTF-8");
-		$data['title'] = htmlentities($_POST['slider_title'], ENT_QUOTES, "UTF-8");
-		$data['target_url'] = $_POST['slider_link'];
+		$data['text'] = htmlentities($this->request->get_post('slider_text'), ENT_QUOTES, "UTF-8");
+		$data['title'] = htmlentities($this->request->get_post('slider_title'), ENT_QUOTES, "UTF-8");
+		$data['target_url'] = $this->request->get_post('slider_link');
 
 		// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
 		$this->query->reset();
@@ -168,13 +168,13 @@ class Slider_model extends Admin_model {
 		}
 		
 	//adatok bevitele az adatbázisba
-		$data['active'] = (int)$_POST['slider_status'];
+		$data['active'] = $this->request->get_post('slider_status', 'integer');
 		$data['slider_order'] = ($this->slide_highest_order_number())+1;
 		$data['picture'] = $dest_image_name;
 		//$data['target_url'] = "";
-		$data['text'] = htmlentities($_POST['slider_text'], ENT_QUOTES, "UTF-8");
-		$data['title'] = htmlentities($_POST['slider_title'], ENT_QUOTES, "UTF-8");
-		$data['target_url'] = $_POST['slider_link'];
+		$data['text'] = htmlentities($this->request->get_post('slider_text'), ENT_QUOTES, "UTF-8");
+		$data['title'] = htmlentities($this->request->get_post('slider_title'), ENT_QUOTES, "UTF-8");
+		$data['target_url'] = $this->request->get_post('slider_link');
 		
 	// adatbázis lekérdezés	
 		$this->query->reset();

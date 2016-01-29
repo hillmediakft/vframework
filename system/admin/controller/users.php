@@ -44,7 +44,7 @@ class Users extends Admin_controller {
 	public function new_user()
 	{
 		// új user hozzáadása
-		if(isset($_POST['submit_new_user'])) {
+		if($this->request->has_post('submit_new_user')) {
 			$result = $this->users_model->new_user();
 			
 			if($result) {
@@ -82,7 +82,7 @@ class Users extends Admin_controller {
 	 */
 	public function profile()
 	{
-		if(isset($_POST['submit_edit_user'])) {
+		if($this->request->has_post('submit_edit_user')) {
             
 			$result = $this->users_model->edit_user($this->request->get_params('id'));
 			
@@ -167,7 +167,7 @@ class Users extends Admin_controller {
 	 */
 	public function user_img_upload()
 	{
-		if(Util::is_ajax()){
+		if( $this->request->is_ajax() ){
 			echo $this->users_model->user_img_upload();
 		}
 	}
@@ -178,11 +178,11 @@ class Users extends Admin_controller {
      * @return void
      */
     public function change_status() {
-        if (Util::is_ajax()) {
-            if (isset($_POST['action']) && isset($_POST['id'])){
+        if ( $this->request->is_ajax() ) {
+            if ( $this->request->has_post('action') && $this->request->has_post('id') ) {
 			
-				$id = (int)$_POST['id'];
-				$action = $_POST['action'];
+				$id = (int)$this->request->get_post('id');
+				$action = $this->request->get_post('action');
 
 				if($action == 'make_active') {
 					$result = $this->users_model->change_status_query($id, 1);

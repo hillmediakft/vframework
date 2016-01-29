@@ -29,11 +29,11 @@ class Login_model extends Admin_model
     public function login()
     {
         // we do negative-first checks here
-        if (!isset($_POST['user_name']) OR empty($_POST['user_name'])) {
+        if ( !$this->request->has_post('user_name') OR empty( $this->request->get_post('user_name') ) ) {
             Message::set('error', 'username_field_empty');
             return false;
         }
-        if (!isset($_POST['user_password']) OR empty($_POST['user_password'])) {
+        if ( !$this->request->has_post('user_password') OR empty( $this->request->get_post('user_password') ) ) {
             Message::set('error', 'password_field_empty');
             return false;
         }
@@ -54,7 +54,7 @@ class Login_model extends Admin_model
                                           AND user_provider_type = :provider_type");
         // DEFAULT is the marker for "normal" accounts (that have a password etc.)
         // There are other types of accounts that don't have passwords etc. (FACEBOOK)
-        $sth->execute(array(':user_name' => $_POST['user_name'], ':provider_type' => 'DEFAULT'));
+        $sth->execute(array(':user_name' => $this->request->get_post('user_name'), ':provider_type' => 'DEFAULT'));
         $count =  $sth->rowCount();
         // if there's NOT one result
 		
@@ -74,7 +74,7 @@ class Login_model extends Admin_model
             return false;
         }
         // check if hash of provided password matches the hash in the database
-        if (password_verify($_POST['user_password'], $result->user_password_hash)) {
+        if ( password_verify($this->request->get_post('user_password'), $result->user_password_hash) ) {
 
 			// HA MÉG NINCS EMAILEN AKTIVÁLVA (a user_active -nak 1-nek lennie) 		
 			if ($result->user_active != 1) {
@@ -112,7 +112,7 @@ class Login_model extends Admin_model
             $sth->execute(array(':user_id' => $result->user_id, ':user_last_login_timestamp' => $user_last_login_timestamp));
 
             // if user has checked the "remember me" checkbox, then write cookie
-            if (isset($_POST['user_rememberme'])) {
+            if ( $this->request->has_post('user_rememberme') ) {
 
                 // generate 64 char random string
                 $random_token_string = hash('sha256', mt_rand());
@@ -140,7 +140,7 @@ class Login_model extends Admin_model
                     SET user_failed_logins = user_failed_logins+1, user_last_failed_login = :user_last_failed_login
                     WHERE user_name = :user_name OR user_email = :user_name";
             $sth = $this->connect->prepare($sql);
-            $sth->execute(array(':user_name' => $_POST['user_name'], ':user_last_failed_login' => time() ));
+            $sth->execute(array(':user_name' => $this->request->get_post('user_name'), ':user_last_failed_login' => time() ));
             // feedback message
             Message::set('error', 'password_wrong');
             return false;

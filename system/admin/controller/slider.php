@@ -38,7 +38,6 @@ class Slider extends Admin_controller {
 	 */
 	public function new_slide()
 	{
-		//if(isset($_POST['submit_new_slide'])) {
 		if($this->request->has_post('submit_new_slide')) {
 			
 			$result = $this->slider_model->add_slide();
@@ -47,7 +46,6 @@ class Slider extends Admin_controller {
 			} else {
 				Util::redirect('slider/new_slide');
 			}
-
 		}
 			
 		// adatok bevitele a view objektumba
@@ -71,7 +69,6 @@ class Slider extends Admin_controller {
 	{
 		$id = (int)$this->request->get_params('id');
 		
-		//if(isset($_POST['submit_update_slide'])) {
 		if($this->request->has_post('submit_update_slide')) {
 			$result = $this->slider_model->update_slide($id);
 			if($result){
@@ -114,8 +111,8 @@ class Slider extends Admin_controller {
 	 */
 	public function order()
 	{
-		if ($this->request->is_ajax()) {
-			if (isset($_POST["action"]) && $_POST["action"] == "update_slider_order") {
+		if ( $this->request->is_ajax() ) {
+			if ($this->request->has_post('action') && $this->request->get_post('action') == 'update_slider_order') {
 				$this->slider_model->slider_order();
 			}
 		}

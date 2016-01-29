@@ -15,16 +15,14 @@ class Testimonials_model extends Admin_model {
 		$this->query->set_table(array('testimonials')); 
 		$this->query->set_columns(array('id', 'text', 'name', 'title')); 
 		$result = $this->query->select(); 
-	
 		return $result;
 	}
 	
 	public function update_testimonial($id)
 	{
-		$data['name'] = $_POST['testimonial_name'];
-		$data['title'] = $_POST['testimonial_title'];
-		$data['text'] = $_POST['testimonial_text'];
-		
+		$data['name'] = $this->request->get_post('testimonial_name');
+		$data['title'] = $this->request->get_post('testimonial_title');
+		$data['text'] = $this->request->get_post('testimonial_text');
 
 		// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
 		$this->query->reset();
@@ -54,7 +52,6 @@ class Testimonials_model extends Admin_model {
 		$this->query->set_table(array('testimonials'));
 		$this->query->set_columns(array('id', 'text', 'name', 'title'));
 		$this->query->set_where('id', '=', $id);
-		
 		return $this->query->select();
 	}
 	
@@ -66,11 +63,9 @@ class Testimonials_model extends Admin_model {
 	 */
 	public function new_testimonial()
 	{
-		
-		$data['name'] = $_POST['testimonial_name'];
-		$data['title'] = $_POST['testimonial_title'];
-		$data['text'] = $_POST['testimonial_text'];
-		
+		$data['name'] = $this->request->get_post('testimonial_name');
+		$data['title'] = $this->request->get_post('testimonial_title');
+		$data['text'] = $this->request->get_post('testimonial_text');
 		
 		$this->query->reset();
 		$this->query->set_table(array('testimonials'));
@@ -95,7 +90,6 @@ class Testimonials_model extends Admin_model {
 	 */
 	public function delete_testimonial($id)
 	{
-				
 		$this->query->reset();
 		$this->query->set_table(array('testimonials'));
 		$this->query->set_where('id', '=', $id);

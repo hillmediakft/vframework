@@ -141,24 +141,24 @@ class Users_model extends Admin_model {
 			
             // clean the input
             //$user_name = htmlentities($_POST['name'], ENT_QUOTES, "UTF-8");
-            $user_name = $_POST['name'];
-            $first_name = $_POST['first_name'];
-            $last_name = $_POST['last_name'];
+            $user_name = $this->request->get_post('name');
+            $first_name = $this->request->get_post('first_name');
+            $last_name = $this->request->get_post('last_name');
             
-			if(!empty($_POST['email'])){
-				$user_email = htmlentities($_POST['email'], ENT_QUOTES, "UTF-8");
+			if( !empty( $this->request->get_post('email') ) ){
+				$user_email = htmlentities($this->request->get_post('email'), ENT_QUOTES, "UTF-8");
 			} else {
 				$user_email = null;
 			}
 			
-			if(empty($_POST['img_url'])){
+			if( empty($this->request->get_post('img_url')) ){
 				$img_url = Config::get('user.default_photo');
 			} else {
-				$path_parts = pathinfo($_POST['img_url']);
+				$path_parts = pathinfo( $this->request->get_post('img_url') );
 				$img_url = htmlentities($path_parts['filename'] . '.' . $path_parts['extension'], ENT_QUOTES, "UTF-8");
 			}
 
-            $user_group = (int)$_POST['user_group'];
+            $user_group = $this->request->get_post('user_group', 'integer');
             
             // crypt the user's password with the PHP 5.5's password_hash() function, results in a 60 character
             // hash string. the PASSWORD_DEFAULT constant is defined by the PHP 5.5, or if you are using PHP 5.3/5.4,
@@ -280,9 +280,9 @@ class Users_model extends Admin_model {
 		$fail_counter = 0; 
 		
 		// Több user törlése
-		if(isset($_POST['delete_user'])) {
+		if( $this->request->has_post('delete_user') ) {
 				
-			$data_arr = $_POST;
+			$data_arr = $this->request->get_post();
 
 			//eltávolítjuk a tömbből a felesleges elemeket	
 			if(isset($data_arr['delete_user'])) {
@@ -293,12 +293,12 @@ class Users_model extends Admin_model {
 			}
 		} else {
 		// egy user törlése (nem POST adatok alapján)
-			if(!isset($this->registry->params['id'])){
+			if( !isset($this->request->get_params('id')) ){
 				throw new Exception('Nincs id-t tartalmazo parameter az url-ben (ezert nem tudunk torolni id alapjan)!');
 				return false;
 			}
 			//berakjuk a $data_arr tömbbe a törlendő felhasználó id-jét
-			$data_arr = array($this->registry->params['id']);
+			$data_arr = array($this->request->get_params('id'));
 		}
 
 		// bejárjuk a $data_arr tömböt és minden elemen végrehajtjuk a törlést
@@ -383,7 +383,7 @@ class Users_model extends Admin_model {
 			$error_counter = 0;
 	
 		// User név ellenőrzés
-			if (empty($_POST['name'])) {
+			if ( empty($this->request->get_post('name')) ) {
 				Message::set('error', 'username_field_empty');
                 $error_counter += 1;
 			}
@@ -399,7 +399,7 @@ class Users_model extends Admin_model {
         */    
 			
 		// Vezetéknév ellenőrzés	
-			if(empty($_POST['first_name'])) {
+			if( empty($this->request->get_post('first_name')) ) {
 				Message::set('error', 'userfirstname_field_empty');
                 $error_counter += 1;
 			}
@@ -415,7 +415,7 @@ class Users_model extends Admin_model {
         */    
 				
 		// Utónév ellenőrzés
-			if(empty($_POST['last_name'])) {
+			if( empty($this->request->get_post('last_name')) ) {
 				Message::set('error', 'userlastname_field_empty');
                 $error_counter += 1;
 			}
@@ -443,26 +443,26 @@ class Users_model extends Admin_model {
 		// Jelszó ellenőrzés
 			
 			// ha üres a password és az ellenőrző password mezö
-			if (empty($_POST['password']) AND empty($_POST['password_again'])) {
+			if (empty($this->request->get_post('password')) AND empty($this->request->get_post('password_again'))) {
 				$password_empty = true;
 			}
 			else {
-				if (empty($_POST['password']) OR empty($_POST['password_again'])) {
+				if (empty($this->request->get_post('password')) OR empty($this->request->get_post('password_again'))) {
 					Message::set('error', 'password_field_empty');
                     $error_counter += 1;
 				}
-				if (strlen($_POST['password']) < 6) {
+				if (strlen($this->request->get_post('password')) < 6) {
 					Message::set('error', 'password_too_short');
                     $error_counter += 1;
 				}
-				if ($_POST['password'] !== $_POST['password_again']) {
+				if ($this->request->get_post('password') !== $this->request->get_post('password_again')) {
 					Message::set('error', 'password_repeat_wrong');
                     $error_counter += 1;
 				}
 			}
 
 		// E-mail ellenőrzés
-			if (empty($_POST['email'])) {
+			if ( empty($this->request->get_post('email')) ) {
 				Message::set('error', 'email_field_empty');
                 $error_counter += 1;
 			}
@@ -482,10 +482,10 @@ class Users_model extends Admin_model {
 			if ($error_counter == 0) {
 				
 				// clean the input
-				$data['user_name'] = $_POST['name'];
-				$data['user_first_name'] = $_POST['first_name'];
-				$data['user_last_name'] = $_POST['last_name'];
-				$data['user_phone'] = $_POST['phone'];			
+				$data['user_name'] = $this->request->get_post('name');
+				$data['user_first_name'] = $this->request->get_post('first_name');
+				$data['user_last_name'] = $this->request->get_post('last_name');
+				$data['user_phone'] = $this->request->get_post('phone');			
 
 				//ha nem létezik a $password_empty változó, vagyis nem üres mindkét password mező	
 				if(!isset($password_empty)) {
@@ -497,19 +497,19 @@ class Users_model extends Admin_model {
 					$data['user_password_hash'] = password_hash($_POST['password'], PASSWORD_DEFAULT, array('cost' => $hash_cost_factor));
 				}	
 				
-				if(!empty($_POST['email'])){
-					$data['user_email'] = htmlentities($_POST['email'], ENT_QUOTES, "UTF-8");
+				if( !empty($this->request->get_post('email')) ){
+					$data['user_email'] = htmlentities($this->request->get_post('email'), ENT_QUOTES, "UTF-8");
 				} else {
 					$data['user_email'] = null;
 				}				
 				
-                if(isset($_POST['user_group'])) {
-                    $data['user_role_id'] = $_POST['user_group'];			
+                if( $this->request->has_post('user_group')) ) {
+                    $data['user_role_id'] = $this->request->get_post('user_group');			
                 }
 
 				//ha van feltöltve user kép
-				if(!empty($_POST['img_url'])){
-					$path_parts = pathinfo($_POST['img_url']);
+				if( !empty($this->request->get_post('img_url')) ){
+					$path_parts = pathinfo($this->request->get_post('img_url'));
 					$data['user_photo'] = htmlentities($path_parts['filename'] . '.' . $path_parts['extension'], ENT_QUOTES, "UTF-8");
 				}
 				
@@ -610,12 +610,12 @@ class Users_model extends Admin_model {
 	 */
 	public function user_img_upload()
 	{
-		if(isset($this->registry->params['id'])) {
+		if(isset($this->request->get_params('id'))) {
 
 			include(LIBS . "/upload_class.php");
 			
 			// Kiválasztott kép feltöltése
-			if($this->registry->params['id'] == 'upload') {
+			if($this->request->get_params('id') == 'upload') {
 				
 				// feltöltés helye
 				$imagePath = Config::get('user.upload_path');
@@ -668,27 +668,27 @@ class Users_model extends Admin_model {
 			
 			
 			// Kiválasztott kép vágása és vágott kép feltöltése
-			if ($this->registry->params['id'] == 'crop') {
+			if ($this->request->get_params('id') == 'crop') {
 		
 			// a croppic js küldi ezeket a POST adatokat 	
-				$imgUrl = $_POST['imgUrl'];
+				$imgUrl = $this->request->get_post('imgUrl');
 				// original sizes
-				$imgInitW = $_POST['imgInitW'];
-				$imgInitH = $_POST['imgInitH'];
+				$imgInitW = $this->request->get_post('imgInitW');
+				$imgInitH = $this->request->get_post('imgInitH');
 				// resized sizes
 				//kerekítjük az értéket, mert lebegőpotos számot is kaphatunk és ez hibát okozna a kép generálásakor
-				$imgW = round($_POST['imgW']);
-				$imgH = round($_POST['imgH']);
+				$imgW = round($this->request->get_post('imgW'));
+				$imgH = round($this->request->get_post('imgH'));
 				// offsets
 				// megadja, hogy mennyit kell vágni a kép felső oldalából
-				$imgY1 = $_POST['imgY1'];
+				$imgY1 = $this->request->get_post('imgY1');
 				// megadja, hogy mennyit kell vágni a kép bal oldalából
-				$imgX1 = $_POST['imgX1'];
+				$imgX1 = $this->request->get_post('imgX1');
 				// crop box
-				$cropW = $_POST['cropW'];
-				$cropH = $_POST['cropH'];
+				$cropW = $this->request->get_post('cropW');
+				$cropH = $this->request->get_post('cropH');
 				// rotation angle
-				//$angle = $_POST['rotation'];
+				//$angle = $this->request->get_post('rotation');
 
 				//a $right_crop megadja, hogy mennyit kell vágni a kép jobb oldalából
 				$right_crop = ($imgW - $imgX1) - $cropW;	

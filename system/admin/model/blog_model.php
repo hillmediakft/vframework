@@ -96,11 +96,11 @@ class blog_model extends Admin_model {
 		}
 
 	// az adatbázisba kerülő adatok
-		$data['blog_title'] = htmlentities($_POST['blog_title'], ENT_QUOTES, "UTF-8");
-		$data['blog_body'] = $_POST['blog_body'];
+		$data['blog_title'] = htmlentities($this->request->get_post('blog_title'), ENT_QUOTES, "UTF-8");
+		$data['blog_body'] = $this->request->get_post('blog_body');
 		$data['blog_picture'] = $dest_imagePath;
-		$data['blog_category'] = $_POST['blog_category'];
-		$data['blog_add_date'] = (empty($_POST['blog_add_date'])) ? date('Y-m-d-G:i') : $_POST['blog_add_date'];
+		$data['blog_category'] = $this->request->get_post('blog_category');
+		$data['blog_add_date'] = empty( $this->request->get_post('blog_add_date') ) ? date('Y-m-d-G:i') : $this->request->get_post('blog_add_date');
 
 	// adatbázis lekérdezés	
 		$this->query->reset();
@@ -120,7 +120,6 @@ class blog_model extends Admin_model {
 
 	public function update($id)
 	{
-	
 		// kép feltöltése
 		if(isset($_FILES['upload_blog_picture']) && $_FILES['upload_blog_picture']['error'] != 4) {
 			// kép feltöltése, upload_slider_picture() metódussal (visszatér a feltöltött kép elérési útjával, vagy false-al)
@@ -138,15 +137,15 @@ class blog_model extends Admin_model {
 		*/
 
 	// az adatbázisba kerülő adatok
-		$data['blog_title'] = htmlentities($_POST['blog_title'], ENT_QUOTES, "UTF-8");
-		$data['blog_body'] = $_POST['blog_body'];
+		$data['blog_title'] = htmlentities($this->request->get_post('blog_title'), ENT_QUOTES, "UTF-8");
+		$data['blog_body'] = $this->request->get_post('blog_body');
 		
 		if(isset($dest_imagePath)){
 			$data['blog_picture'] = $dest_imagePath;
 		}
 		
-		$data['blog_category'] = $_POST['blog_category'];
-		$data['blog_add_date'] = (empty($_POST['blog_add_date'])) ? date('Y-m-d-G:i') : $_POST['blog_add_date'];
+		$data['blog_category'] = $this->request->get_post('blog_category');
+		$data['blog_add_date'] = empty($this->request->get_post('blog_add_date')) ? date('Y-m-d-G:i') : $this->request->get_post('blog_add_date');
 
 	// adatbázis lekérdezés	
 		$this->query->reset();
@@ -175,8 +174,8 @@ class blog_model extends Admin_model {
 		$fail_counter = 0; 
 		
 		// Több user törlése
-		if(isset($_POST['delete_blog'])) {
-			$data_arr = $_POST;
+		if($this->request->has_post('delete_blog')) {
+			$data_arr = $this->request->get_post();
 			
 			//eltávolítjuk a tömbből a felesleges elemeket	
 			if(isset($data_arr['delete_blog'])) {
@@ -187,12 +186,12 @@ class blog_model extends Admin_model {
 			}
 		} else {
 		// egy user törlése (nem POST adatok alapján)
-			if(!isset($this->registry->params['id'])){
+			if(!isset($this->request->get_params('id'))){
 				throw new Exception('Nincs id-t tartalmazo parameter az url-ben (ezert nem tudunk torolni id alapjan)!');
 				return false;
 			}
 			//berakjuk a $data_arr tömbbe a törlendő felhasználó id-jét
-			$data_arr = array($this->registry->params['id']);
+			$data_arr = array($this->request->get_params('id'));
 		}
 		
 		// bejárjuk a $data_arr tömböt és minden elemen végrehajtjuk a törlést
@@ -264,7 +263,7 @@ class blog_model extends Admin_model {
 
 	public function category_update($id)
 	{
-		$data['category_name'] = $_POST['category_name'];
+		$data['category_name'] = $this->request->get_post('category_name');
 		
 		// kategóriák lekérdezése (annak ellenőrzéséhez, hogy már létezik-e ilyen kategória)
 		$existing_categorys = $this->blog_category_query();
@@ -295,7 +294,7 @@ class blog_model extends Admin_model {
 
 	public function category_insert()
 	{
-		$data['category_name'] = $_POST['category_name'];
+		$data['category_name'] = $this->request->get_post('category_name');
 	
 		// kategóriák lekérdezése (annak ellenőrzéséhez, hogy már létezik-e ilyen kategória)
 		$existing_categorys = $this->blog_category_query();
@@ -335,7 +334,7 @@ class blog_model extends Admin_model {
 	 */
 	private function upload_blog_picture($files_array)
 	{
-		include(LIBS . "/upload_class.php");
+		//include(LIBS . "/upload_class.php");
 		// feltöltés helye
 		$imagePath = UPLOADS . "images/";
 		//képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül)	

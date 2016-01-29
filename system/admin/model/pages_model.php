@@ -19,10 +19,10 @@ class Pages_model extends Admin_model {
 	
 	public function update_page($id)
 	{
-		$data['page_body'] = $_POST['page_body'];
-		$data['page_metatitle'] = $_POST['page_metatitle'];
-		$data['page_metadescription'] = $_POST['page_metadescription'];
-		$data['page_metakeywords'] = $_POST['page_metakeywords'];
+		$data['page_body'] = $this->request->get_post('page_body');
+		$data['page_metatitle'] = $this->request->get_post('page_metatitle');
+		$data['page_metadescription'] = $this->request->get_post('page_metadescription');
+		$data['page_metakeywords'] = $this->request->get_post('page_metakeywords');
 
 		// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
 		$this->query->reset();

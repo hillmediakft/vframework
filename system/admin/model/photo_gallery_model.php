@@ -90,14 +90,14 @@ class Photo_gallery_model extends Admin_model {
 		
 		
 		$data['photo_filename'] =  UPLOADS . 'photo_gallery/' . $filename;
-		$data['photo_caption'] = $_POST['photo_caption'];
-		$data['photo_category'] = $_POST['photo_category'];
-		if(isset($_POST['photo_slider'])) {
-			$data['photo_slider'] = $_POST['photo_slider'];
-		} else $data['photo_slider'] = 0;
-		
-
-		
+		$data['photo_caption'] = $this->request->get_post('photo_caption');
+		$data['photo_category'] = $this->request->get_post('photo_category');
+		if( $this->request->has_post('photo_slider') ) {
+			$data['photo_slider'] = $this->request->get_post('photo_slider');
+		} else {
+			$data['photo_slider'] = 0;
+		}	
+				
 		$this->query->reset();
 		$this->query->set_table(array('photo_gallery'));
 		$result = $this->query->insert($data);
@@ -183,13 +183,15 @@ class Photo_gallery_model extends Admin_model {
 		}
 		
 
-		$data['photo_caption'] = $_POST['photo_caption'];
-		$data['photo_category'] = $_POST['photo_category'];
-		if(isset($_POST['photo_slider'])) {
-			$data['photo_slider'] = $_POST['photo_slider'];
-		} else $data['photo_slider'] = 0;
-		
-		$old_img = $_POST['old_photo'];
+		$data['photo_caption'] = $this->request->get_post('photo_caption');
+		$data['photo_category'] = $this->request->get_post('photo_category');
+		if( $this->request->has_post('photo_slider') ) {
+			$data['photo_slider'] = $this->request->get_post('photo_slider');
+		} else {
+			$data['photo_slider'] = 0;
+		} 
+
+		$old_img = $this->request->get_post('old_photo');
 /*		
 		var_dump($id);
 		echo 'POST<br>';
@@ -206,8 +208,8 @@ class Photo_gallery_model extends Admin_model {
 				
 		if($result) {
 			if($flag){
-			unlink($old_img); 
-			unlink(Util::thumb_path($old_img));
+				unlink($old_img); 
+				unlink(Util::thumb_path($old_img));
 			}
             Message::set('success', 'photo_update_success');
 			return true;
@@ -227,8 +229,6 @@ class Photo_gallery_model extends Admin_model {
 	 */
 	public function delete_photo($id)
 	{
-		
-
 		$this->query->reset();
 		$this->query->set_table(array('photo_gallery'));
 		$this->query->set_columns(array('photo_filename')); 

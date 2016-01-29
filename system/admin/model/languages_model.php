@@ -31,10 +31,9 @@ class Languages_model extends Admin_model {
 	 */
 	public function save_language_text()
 	{
- 			
-		$text_code = $_POST['name'];
-		$id = $_POST['pk'];
-		$text = $_POST['value'];
+		$text_code = $this->request->get_post('name');
+		$id = $this->request->get_post('pk');
+		$text = $this->request->get_post('value');
 
 		$lang = substr($text_code, -2);
 		$column = 'text_' . $lang;
