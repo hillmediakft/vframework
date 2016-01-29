@@ -503,7 +503,7 @@ class Users_model extends Admin_model {
 					$data['user_email'] = null;
 				}				
 				
-                if( $this->request->has_post('user_group')) ) {
+                if( $this->request->has_post('user_group')) {
                     $data['user_role_id'] = $this->request->get_post('user_group');			
                 }
 
