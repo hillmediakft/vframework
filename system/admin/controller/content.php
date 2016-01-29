@@ -52,4 +52,5 @@ class Content extends Admin_controller {
 	}
 
 }
+// teszt modositas
 ?>
