@@ -62,7 +62,7 @@ class Blog extends Admin_controller {
     
 	public function update()
 	{
-		if(isset($_POST['submit_update_blog'])){
+		if($this->request->has_post('submit_update_blog')){
 			$result = $this->blog_model->update($this->request->get_params('id'));
 			if($result){
 				Util::redirect('blog');
