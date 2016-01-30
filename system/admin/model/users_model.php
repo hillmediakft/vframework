@@ -273,7 +273,6 @@ class Users_model extends Admin_model {
 	 */
 	public function delete_user()
 	{
-        
 		// a sikeres törlések számát tárolja
 		$success_counter = 0;
 		// a sikertelen törlések számát tárolja
@@ -292,7 +291,7 @@ class Users_model extends Admin_model {
 				unset($data_arr['users_length']);
 			}
 		} else {
-		// egy user törlése (nem POST adatok alapján) 
+		// egy user törlése (nem POST adatok alapján)
 			if( !$this->request->has_params('id') ){
 				throw new Exception('Nincs id-t tartalmazo parameter az url-ben (ezert nem tudunk torolni id alapjan)!');
 				return false;
@@ -503,11 +502,7 @@ class Users_model extends Admin_model {
 					$data['user_email'] = null;
 				}				
 				
-<<<<<<< HEAD
-                if( $this->request->has_post('user_group')) {
-=======
-                if( $this->request->has_post('user_group') ) {
->>>>>>> origin/master
+                if( $this->request->has_post('user_group')) ) {
                     $data['user_role_id'] = $this->request->get_post('user_group');			
                 }
 
