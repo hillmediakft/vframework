@@ -1,8 +1,9 @@
 <?php
+
 //log fileok adatai
 $config['log'] = array(
-	'error' => 'logs_error.log',
-	'notice' => 'logs_notice.log'
+    'error' => 'logs_error.log',
+    'notice' => 'logs_notice.log'
 );
 
 $config['email'] = array(
@@ -21,7 +22,7 @@ $config['email'] = array(
         'site_url' => BASE_URL . 'felhasznalok/ellenorzes_hirlevel',
         'subject' => 'Hírlevélre feliratkozás hitelesítése.',
         'link' => 'Kattints erre a linkre a feliratkozás aktiválásához.'
-    )    
+    )
 );
 
 $config['login'] = array(
@@ -46,7 +47,7 @@ $config['slider'] = array(
     'width' => 1170,
     'height' => 420,
     'thumb_width' => 200,
-	'upload_path' => UPLOADS . 'slider_photo/'
+    'upload_path' => UPLOADS . 'slider_photo/'
 );
 
 $config['photogallery'] = array(
@@ -56,22 +57,30 @@ $config['photogallery'] = array(
 
 $config['hash_cost_factor'] = 10;
 $config['language_default'] = 'hu';
-$config['allowed_languages'] = array('hu','en','de','ru');
+$config['allowed_languages'] = array('hu', 'en', 'de', 'ru');
 $config['reg_email_verify'] = true;
 
 
 $config['user'] = array(
-	'width' => 600,
-	'height' => 200,
-	//'thumb_width' => 80,
-	'upload_path' => UPLOADS . 'user_photo/',
-	'default_photo' => 'user_placeholder.png'
+    'width' => 600,
+    'height' => 200,
+    //'thumb_width' => 80,
+    'upload_path' => UPLOADS . 'user_photo/',
+    'default_photo' => 'user_placeholder.png'
+);
+
+$config['clientphoto'] = array(
+    'width' => 150,
+    'height' => 100,
+    'thumb_width' => 150,
+    'upload_path' => UPLOADS . 'client_photo/',
+    'default_photo' => 'client_placeholder.png'
 );
 
 $config['session'] = array(
     'expire_time_admin' => 3600,
     'expire_time_site' => 3600
-   // 'last_activity_name_admin' => 'user_last_activity', // A $_SESSION['last_activity'] elem fogja tárolni az utolsó aktivitás idejét
-   // 'last_activity_name_site' => 'user_site_last_activity' // A $_SESSION['last_activity'] elem fogja tárolni az utolsó aktivitás idejét
+        // 'last_activity_name_admin' => 'user_last_activity', // A $_SESSION['last_activity'] elem fogja tárolni az utolsó aktivitás idejét
+        // 'last_activity_name_site' => 'user_site_last_activity' // A $_SESSION['last_activity'] elem fogja tárolni az utolsó aktivitás idejét
 );
 ?>
