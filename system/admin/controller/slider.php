@@ -5,6 +5,10 @@ class Slider extends Admin_controller {
     function __construct() {
         parent::__construct();
         Auth::handleLogin();
+        require_once "system/libs/logged_in_user.php";
+        $this->user = new Logged_in_user();
+        $this->check_access("menu_slider", $this->request->get_httpreferer());
+        $this->view->user = $this->user;
         $this->loadModel('slider_model');
     }
 

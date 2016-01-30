@@ -3,9 +3,6 @@
     <div class="page-content">
         <!-- BEGIN PAGE HEADER-->
         <!-- BEGIN PAGE TITLE & BREADCRUMB-->
-        <h3 class="page-title">
-            Admin <small>kezdőoldal</small>
-        </h3>
         <div class="page-bar">
             <ul class="page-breadcrumb">
                 <li>
@@ -16,7 +13,7 @@
         </div>
         <!-- END PAGE TITLE & BREADCRUMB-->
         <!-- END PAGE HEADER-->
-
+        <?php $this->renderFeedbackMessages(); ?>
         <!-- BEGIN PAGE CONTENT-->
         <div class="row">
             <!-- BEGIN DASHBOARD STATS -->
@@ -94,8 +91,8 @@
             </div>
         </div><!-- END ROW-->
 
-        
-        
+
+
         <div class="row">
             <!-- BEGIN DASHBOARD STATS -->
             <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
@@ -171,45 +168,45 @@
                 </div>
             </div>
         </div><!-- END ROW-->         
-        
-        
+
+
         <!-- END DASHBOARD STATS -->
         <div class="clearfix"></div>
-<!--        <div class="row ">
-            <div class="col-md-6 col-sm-6">
-                <div class="portlet box blue-steel">
-                    <div class="portlet-title">
-                        <div class="caption">
-                            <i class="fa fa-check"></i>Modulok
+        <!--        <div class="row ">
+                    <div class="col-md-6 col-sm-6">
+                        <div class="portlet box blue-steel">
+                            <div class="portlet-title">
+                                <div class="caption">
+                                    <i class="fa fa-check"></i>Modulok
+                                </div>
+        
+                            </div>	
+                            <div class="portlet-body">
+                                <h4>Oldalak</h4>
+                                <p>A weblap egyes oldalai szerkeszthetők, a szövegek szövegszerkesztő-szerű felületen módosíthatók. Módosítható a title és descriptipn elem is. Ezek módosításakor ügyeljen arra, hogy keresőoptimalizálás szempontjai szerint történjen a változtatás.</p>
+                                <h4>Egyéb tartalom</h4>
+                                <p>A jobb oldali sáv és a footer bemutatkozó szövege szerkeszthető.</p>
+        
+                            </div>
                         </div>
-
                     </div>	
-                    <div class="portlet-body">
-                        <h4>Oldalak</h4>
-                        <p>A weblap egyes oldalai szerkeszthetők, a szövegek szövegszerkesztő-szerű felületen módosíthatók. Módosítható a title és descriptipn elem is. Ezek módosításakor ügyeljen arra, hogy keresőoptimalizálás szempontjai szerint történjen a változtatás.</p>
-                        <h4>Egyéb tartalom</h4>
-                        <p>A jobb oldali sáv és a footer bemutatkozó szövege szerkeszthető.</p>
-
-                    </div>
-                </div>
-            </div>	
-
-            <div class="col-md-6 col-sm-6">
-                <div class="portlet box green-haze">
-                    <div class="portlet-title">
-                        <div class="caption">
-                            <i class="fa fa-check"></i>Tennivalók
+        
+                    <div class="col-md-6 col-sm-6">
+                        <div class="portlet box green-haze">
+                            <div class="portlet-title">
+                                <div class="caption">
+                                    <i class="fa fa-check"></i>Tennivalók
+                                </div>
+        
+                            </div>	
+                            <div class="portlet-body">
+                                Ez a portlet body
+                            </div>
                         </div>
-
                     </div>	
-                    <div class="portlet-body">
-                        Ez a portlet body
-                    </div>
                 </div>
-            </div>	
-        </div>
-
--->
+        
+        -->
 
 
     </div> <!-- END PAGE CONTAINER-->    
