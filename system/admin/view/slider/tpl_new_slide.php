@@ -37,7 +37,7 @@
                 <div id="message"></div> 
                 <?php $this->renderFeedbackMessages(); ?>			
 
-                <form action="" method="POST" id="new_slider" enctype="multipart/form-data">	
+                <form action="" method="POST" id="new_slide" enctype="multipart/form-data">	
                     <!-- BEGIN EXAMPLE TABLE PORTLET-->
                     <div class="portlet">
 

@@ -79,8 +79,10 @@
                                         <div class="space10"></div>
                                         <div class="clearfix"></div>
                                         <div class="controls">
-                                            <span class="label label-danger">INFO</span>
-                                            <span>Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a megjelenő módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!</span>
+                                            <div class="alert alert-info alert-dismissable">
+                                                <button class="close" aria-hidden="true" data-dismiss="alert" type="button"></button>
+                                                <i class="fa fa-info-circle "></i>
+                                                <span>Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a megjelenő módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!</span></div>
                                         </div>
                                         <div class="space10"></div>
                                         <div class="space10"></div>
