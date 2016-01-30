@@ -66,7 +66,7 @@ class Testimonials extends Admin_controller {
 	{
 		$id = $this->request->get_params('id');
 
-		if($this->request_has('submit_update_testimonial')) {
+		if($this->request->has_post('submit_update_testimonial')) {
 			$result = $this->testimonials_model->update_testimonial($id);
 			Util::redirect('testimonials');
 		}
