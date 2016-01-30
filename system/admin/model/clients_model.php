@@ -98,13 +98,16 @@ class Clients_model extends Model {
 
         if ($error_counter == 0) {
             if (isset($data['img_url']) && $data['img_url'] != '') {
+                // új képet töltöttünk fel
                 $data['client_photo'] = $data['img_url'];
-                unset($data['img_url']);
+                $old_img = $data['old_img'];
+                $img_to_delete = true;
             } else {
+                // nincs úf feltöltött kép
                 $data['client_photo'] = $data['old_img'];
-                unset($data['img_url']);
+                $img_to_delete = false;
             }
-            $old_img_name = $data['old_img'];
+            unset($data['img_url']);
             unset($data['old_img']);
 
             // új adatok az adatbázisba
@@ -115,9 +118,9 @@ class Clients_model extends Model {
 
             if ($result >= 0) {
                 // megvizsgáljuk, hogy létezik-e új feltöltött kép és a régi kép, nem a default
-                if ($this->request->has_post('img_url')) {
+                if ($img_to_delete) {
                     //régi képek törlése
-                    if (!Util::del_file($old_img_name)) {
+                    if (!Util::del_file($old_img)) {
                         Message::set('error', 'unknown_error');
                     }
                 }
