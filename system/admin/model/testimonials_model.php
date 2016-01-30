@@ -30,7 +30,7 @@ class Testimonials_model extends Admin_model {
 		$this->query->set_where('id', '=', $id);
 		$result = $this->query->update($data);
 				
-		if($result) {
+		if($result >= 0) {
             Message::set('success', 'testimonial_update_success');
 			return true;
 		}
