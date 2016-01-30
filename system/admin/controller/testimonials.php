@@ -39,7 +39,7 @@ class Testimonials extends Admin_controller {
 	 */
 	public function new_testimonial()
 	{
-		if($this->request_has('submit_new_testimonial')) {
+		if($this->request->has_post('submit_new_testimonial')) {
 			$this->testimonials_model->new_testimonial();
 			Util::redirect('testimonials');
 		}
