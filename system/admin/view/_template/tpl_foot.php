@@ -35,14 +35,9 @@
 	
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
 	<?php
-	 foreach($this->js_link as $value) {
-		echo $value;
-	 } 
-		/*
-		if($this->js != ''){
-			$this->render_css_js($this->js, true);
-		}
-		*/
+		foreach($this->js_link as $value) {
+			echo $value;
+		} 
 	?>
 	<!-- END PAGE LEVEL SCRIPTS -->
 	<!-- END JAVASCRIPTS -->

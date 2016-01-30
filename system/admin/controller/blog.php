@@ -4,14 +4,13 @@ class Blog extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
-        Auth::handleLogin();
+		Auth::handleLogin();
 		$this->loadModel('blog_model');
 	}
     
     
 	public function index()
 	{
-
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Admin blog oldal';
 		$this->view->description = 'Admin blog oldal description';	
@@ -27,7 +26,6 @@ class Blog extends Admin_controller {
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'datatable.js');
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/blog.js');		
 		
-
 		$this->view->all_blog = $this->blog_model->blog_query2();
 
 //$this->view->debug(true);		
@@ -86,7 +84,6 @@ class Blog extends Admin_controller {
 		
 
 		$this->view->render('blog/tpl_blog_update');
-	
 	}  
 
 	public function delete()
@@ -146,7 +143,6 @@ class Blog extends Admin_controller {
 	
 	public function category_update()
 	{
-		if(isset($_POST['submit_category_update'])){
 		if($this->request->has_post('submit_category_update')){
 			$result = $this->blog_model->category_update($this->request->get_params('id'));
 			if($result){

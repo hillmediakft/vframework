@@ -36,13 +36,6 @@
         <!-- END THEME STYLES -->
         <link rel="shortcut icon" href="<?php echo ADMIN_IMAGE; ?>favicon.ico" />
 
-
-        <?php if (isset($ckeditor) && $ckeditor === true) { ?>
-            <script type="text/javascript" src="<?php echo ADMIN_ASSETS; ?>plugins/ckeditor/ckeditor.js"></script>
-<?php } ?>
-
-
-
     </head>
     <!-- END HEAD -->
     <!-- BEGIN BODY -->
