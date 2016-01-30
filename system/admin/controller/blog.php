@@ -10,6 +10,7 @@ class Blog extends Admin_controller {
     
 	public function index()
 	{
+		
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Admin blog oldal';
 		$this->view->description = 'Admin blog oldal description';	
