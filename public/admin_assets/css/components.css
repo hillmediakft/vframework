@@ -2235,7 +2235,7 @@ Form Layouts
 .form .form-section {
   margin: 30px 0px 25px 0px;
   padding-bottom: 5px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #e3e3e3;
 }
 .form .form-section:first-child {
   margin-top: 5px;
@@ -3905,7 +3905,7 @@ Portlets
   border-bottom: 1px solid #eee;
 }
 .portlet.light.bg-inverse {
-  background: #F7F7F7;
+  background: #f4f4f4;
 }
 .portlet.light > .portlet-title {
   padding: 0;
@@ -4883,7 +4883,7 @@ Custom tables
 
 .table thead tr th {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .table-advance {
@@ -12748,7 +12748,7 @@ Transparent Button
     text-align: left;
 }
 /**************** UI sortable ******************* */
-
+/*
 .ui-sortable {
 width: auto;
 margin: 20px 0 0 0;
@@ -12813,6 +12813,114 @@ font-size: 25px;
     color: #fff;
     text-decoration: none;
 }
+*/
+/**************** UI sortable END ******************* */
+
+
+/**************** UI sortable MOD ******************* */
+
+.ui-sortable {
+width: auto;
+margin: 0;
+padding: 0;
+background-color: #f7f7f7;
+list-style-type: none;
+/*
+-webkit-box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, .1);
+box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, .1);
+*/
+}
+
+/*
+.ui-sortable tr.ui-state-default {
+margin: 0;
+height: 90px;
+line-height: 48px;
+color: #fff;
+outline: 0;
+padding: 8px 0 0 0;
+text-indent: 15px;
+background: rgb(78,82,91);
+background: -moz-linear-gradient(top, rgb(78,82,91) 0%, rgb(57,61,68) 100%);
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(78,82,91)), color-stop(100%,rgb(57,61,68)));
+background: -webkit-linear-gradient(top, rgb(78,82,91) 0%,rgb(57,61,68) 100%);
+background: -o-linear-gradient(top, rgb(78,82,91) 0%,rgb(57,61,68) 100%);
+background: -ms-linear-gradient(top, rgb(78,82,91) 0%,rgb(57,61,68) 100%);
+background: linear-gradient(to bottom, rgb(78,82,91) 0%,rgb(57,61,68) 100%);
+border-top: 1px solid rgba(255,255,255,.2);
+border-bottom: 1px solid rgba(0,0,0,.5);
+text-shadow: -1px -1px 0px rgba(0,0,0,.5);
+font-size: 1.1em;
+position: relative;
+cursor: pointer;
+}
+*/
+
+.ui-sortable .ui-state-default {
+margin: 2px 0px 2px 0px;
+padding: 0;
+line-height: 48px;
+color: #DDDDDD;
+font-size: 35px;
+background: #eee;
+border: 1px solid #DDDDDD;
+position: relative;
+cursor: move;
+/*
+height: 90px; 
+text-indent: 15px;
+outline: 0;
+background: rgb(78,82,91);
+background: -moz-linear-gradient(top, rgb(78,82,91) 0%, rgb(57,61,68) 100%);
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(78,82,91)), color-stop(100%,rgb(57,61,68)));
+background: -webkit-linear-gradient(top, rgb(78,82,91) 0%,rgb(57,61,68) 100%);
+background: -o-linear-gradient(top, rgb(78,82,91) 0%,rgb(57,61,68) 100%);
+background: -ms-linear-gradient(top, rgb(78,82,91) 0%,rgb(57,61,68) 100%);
+background: linear-gradient(to bottom, rgb(78,82,91) 0%,rgb(57,61,68) 100%);
+border-top: 1px solid rgba(255,255,255,.2);
+border-bottom: 1px solid rgba(0,0,0,.5);
+text-shadow: -1px -1px 0px rgba(0,0,0,.5);
+*/
+}
+.ui-sortable li.ui-state-default:first-child {
+/*
+border-top: 0;
+*/
+}
+.ui-sortable li.ui-state-default:last-child {
+/*
+border-bottom: 0;
+*/
+}
+.ui-sortable-placeholder {
+border: 2px dashed #aaa;
+height: 82px;
+width: auto;
+background: #ccc;
+}
+.ui-sortable li.ui-state-default:after {
+content: "\f047";
+display: inline-block;
+font-family: "FontAwesome";
+position: relative;
+left: 15px;
+text-align: center;
+font-size: 20px;
+/*
+line-height: 30px;
+top: 15px;
+color: rgba(255,255,255,.2);
+text-shadow: 0px 0px 0px rgba(0,0,0,0);
+cursor: move;
+*/
+}
+/*
+.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
+    color: #FFBF00;
+    text-decoration: none;
+}
+*/
+/**************** UI sortable MOD END ******************* */
 
 #slider_list li a.label {
 margin-left: 10px;
@@ -12822,7 +12930,7 @@ margin-left: 10px;
 border: 1px solid #aaa;
 }   
 .table-hover.slider_list tbody tr:hover {
-background: #c0c0c0;
+background: #f2f2f2;
 }
 
 
@@ -12850,4 +12958,12 @@ cursor: move;
 /* dokumentáció alsó margó */
 .documentation {
     margin-bottom: 30px;
+}
+
+.documentation img {
+    margin: 10px 0px 20px 0px; 
+}
+
+.jatszohaz-view-modal img {
+    max-width: 100%;
 }
