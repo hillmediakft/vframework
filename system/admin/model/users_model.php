@@ -292,8 +292,8 @@ class Users_model extends Admin_model {
 				unset($data_arr['users_length']);
 			}
 		} else {
-		// egy user törlése (nem POST adatok alapján)
-			if( !isset($this->request->get_params('id')) ){
+		// egy user törlése (nem POST adatok alapján) 
+			if( !$this->request->has_params('id') ){
 				throw new Exception('Nincs id-t tartalmazo parameter az url-ben (ezert nem tudunk torolni id alapjan)!');
 				return false;
 			}
@@ -503,7 +503,11 @@ class Users_model extends Admin_model {
 					$data['user_email'] = null;
 				}				
 				
+<<<<<<< HEAD
                 if( $this->request->has_post('user_group')) {
+=======
+                if( $this->request->has_post('user_group') ) {
+>>>>>>> origin/master
                     $data['user_role_id'] = $this->request->get_post('user_group');			
                 }
 
@@ -610,7 +614,7 @@ class Users_model extends Admin_model {
 	 */
 	public function user_img_upload()
 	{
-		if(isset($this->request->get_params('id'))) {
+		if( $this->request->has_params('id') ) {
 
 			include(LIBS . "/upload_class.php");
 			

@@ -39,8 +39,8 @@ class Request {
 	}
 
 	/**
-	 * Visszaadja a (uri path) paraméterek tömbjét, ha a nem adunk meg paramétert
-	 * Vagy a paraméterban megadott nevű uri_path paramétert adja vissza
+	 * Visszaadja a paraméterek tömbjét, ha a nem adunk meg paramétert.
+	 * Vagy a paraméterban megadott nevű paramétert adja vissza.
 	 *
 	 * @param string $index 	A paraméter neve
 	 * @return mixed
@@ -56,6 +56,18 @@ class Request {
 			throw new Exception('Nincs ' . $index . ' nevu elem a parameterek kozott!');
 			exit();
 		}
+	}
+
+	/**
+	 * Ellenőrzi, hogy létezik-e a paraméter a router objektum params tömbjében
+	 *
+	 * @param string $index 	A paraméter neve
+	 * @return boolean
+	 */
+	public function has_params($index)
+	{
+		//return empty($this->router->params[$index]);
+		return isset($this->router->params[$index]);
 	}
 
 	/**

@@ -10,7 +10,6 @@ class Content extends Admin_controller {
 
 	public function index()
 	{
-		
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Egyéb tartalom oldal';
 		$this->view->description = 'Egyéb tartalom oldal description';

@@ -4,7 +4,7 @@ class Languages extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
-        Auth::handleLogin();
+		Auth::handleLogin();
 		$this->loadModel('languages_model');
 	}
 
