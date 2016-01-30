@@ -4,7 +4,7 @@
 		 2015 &copy; V-Framework.
 	</div>
 	<div class="scroll-to-top">
-		<i class="icon-arrow-up"></i>
+		<i class="fa fa-arrow-circle-up"></i>
 	</div>
 </div>
 	
