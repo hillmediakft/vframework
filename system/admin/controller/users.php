@@ -117,26 +117,46 @@ class Users extends Admin_controller {
 	}
 	
 	
-	public function user_roles()
-	{
-		// adatok bevitele a view objektumba
-		$this->view->title = 'Felhasználói csoportok oldal';
-		$this->view->description = 'Felhasználói csoportok description';
-		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/common.js');
-		// template betöltése
-		$this->view->render('users/tpl_user_roles');
-	}
+    public function user_roles() {
+   //     $this->check_access('menu_users_user_roles');
+        // adatok bevitele a view objektumba
+        $this->view->title = 'Felhasználói csoportok oldal';
+        $this->view->description = 'Felhasználói csoportok description';
+        $this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/common.js');
+
+        $this->view->roles = $this->users_model->getRoles();
+        $this->view->roles_counter = $this->users_model->roles_counter_query();
+
+        // template betöltése
+        $this->view->render('users/tpl_user_roles');
+    }
 	
 	
-	public function edit_roles()
-	{
-		// adatok bevitele a view objektumba
-		$this->view->title = 'Felhasználói jogosultságok szerkesztése oldal';
-		$this->view->description = 'Felhasználói jogosultságok szerkesztése description';
-		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/common.js');
-		// template betöltése
-		$this->view->render('users/tpl_edit_roles');
-	}
+ public function edit_roles() {
+        
+   //     $this->check_access('action_users_edit_roles');
+        
+        $role_id = $this->request->get_params('id');
+        
+        if ($this->request->has_post('submit_edit_roles')) {
+            $result = $this->users_model->save_role_permissions($role_id);
+                Util::redirect('users/edit_roles/' . $role_id);
+
+        }
+
+        // adatok bevitele a view objektumba
+        $this->view->title = 'Felhasználói jogosultságok szerkesztése oldal';
+        $this->view->description = 'Felhasználói jogosultságok szerkesztése description';
+        $this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/common.js');
+        // a szerkesztendő role neve
+        $this->view->role = $this->users_model->getRoles($role_id);
+        $this->view->role = $this->view->role[0];
+        // a szerkesztendő role-hoz tartozó engedélyek
+        $this->view->role_permissions = $this->users_model->getRolePerms($role_id);
+ 
+        // template betöltése
+        $this->view->render('users/tpl_edit_roles');
+    }
 	
 	/**
 	 *	User törlése

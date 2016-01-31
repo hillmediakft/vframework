@@ -154,41 +154,41 @@
                                         Felhasználók listája</a>
                                 </li>
 
-<?php if (Session::get('user_role_id') == 1) { ?>
+                                <?php if (Session::get('user_role_id') == 1) { ?>
                                     <li class="<?php echo ($this->request->get_action() == 'new_user') ? 'active' : ''; ?>">
                                         <a href="admin/users/new_user">
                                             Új felhasználó</a>
                                     </li>
-<?php } ?>
+                                <?php } ?>
 
                                 <li class="<?php echo ($this->request->get_action() == 'profile') ? 'active' : ''; ?>">
                                     <a href="admin/users/profile/<?php echo Session::get('user_id'); ?>">
                                         Profilom</a>
                                 </li>
-                                <!-- FELHASZNÁLÓI CSOPORTOK						
-                                                                                <li class="<?php //echo ($this->request->get_action() == 'user_roles' || $this->request->get_action() == 'edit_roles') ? 'active' : '';  ?>">
-                                                                                        <a href="admin/users/user_roles">
-                                                                                        Csoportok</a>
-                                                                                </li>
-                                -->
+
+                                <li class="<?php echo ($this->request->get_action() == 'user_roles' || $this->request->get_action() == 'edit_roles') ? 'active' : ''; ?>">
+                                    <a href="admin/users/user_roles">
+                                        Csoportok</a>
+                                </li>
+
                             </ul>
                         </li>
 
 
 
                         <!--  GALÉRIÁK
-                                                        <li class="<?php //echo ($this->request->get_controller() == 'photo_gallery' || $this->request->get_controller() == 'video_gallery') ? 'active' : '';  ?>">
+                                                        <li class="<?php //echo ($this->request->get_controller() == 'photo_gallery' || $this->request->get_controller() == 'video_gallery') ? 'active' : '';   ?>">
                                                                 <a href="javascript:;">
                                                                 <i class="fa fa-picture-o"></i> 
                                                                 <span class="title">Galériák</span>
                                                                 <span class="arrow "></span>
                                                                 </a>
                                                                 <ul class="sub-menu">
-                                                                        <li class="<?php //echo ($this->request->get_controller() == 'photo_gallery') ? 'active' : '';  ?>">
+                                                                        <li class="<?php //echo ($this->request->get_controller() == 'photo_gallery') ? 'active' : '';   ?>">
                                                                                 <a href="admin/photo_gallery">
                                                                                 Képgaléria</a>
                                                                         </li>
-                                                                        <li class="<?php //echo ($this->request->get_controller() == 'video_gallery') ? 'active' : '';  ?>">
+                                                                        <li class="<?php //echo ($this->request->get_controller() == 'video_gallery') ? 'active' : '';   ?>">
                                                                                 <a href="admin/video_gallery">
                                                                                 Videógaléra</a>
                                                                         </li>
@@ -248,7 +248,7 @@
                         </li>                                
 
                         <!--  NYELVEK				
-                                                        <li class="<?php //echo ($this->request->get_controller() == 'languages') ? 'active' : '';  ?>">
+                                                        <li class="<?php //echo ($this->request->get_controller() == 'languages') ? 'active' : '';   ?>">
                                                                 <a href="admin/languages">
                                                                 <i class="fa fa-globe"></i> 
                                                                 <span class="title">Nyelvek</span>
@@ -256,39 +256,39 @@
                                                         </li>
                         -->				
                         <!-- HÍRLEVÉL				
-                                                        <li class="<?php //echo ($this->request->get_controller() == 'newsletter') ? 'active' : '';  ?>">
+                                                        <li class="<?php //echo ($this->request->get_controller() == 'newsletter') ? 'active' : '';   ?>">
                                                                 <a href="javascript:;">
                                                                         <i class="fa fa-suitcase"></i> 
                                                                         <span class="title">Hírlevél</span>
                                                                         <span class="arrow "></span>
                                                                 </a>
                                                                 <ul class="sub-menu">
-                                                                        <li class="<?php //echo ($this->request->get_controller() == 'newsletter' && $this->request->get_action() == 'index') ? 'active' : '';  ?>">
+                                                                        <li class="<?php //echo ($this->request->get_controller() == 'newsletter' && $this->request->get_action() == 'index') ? 'active' : '';   ?>">
                                                                                 <a href="admin/newsletter">Hírlevelek</a>
                                                                         </li>
-                                                                        <li class="<?php //echo ($this->request->get_controller() == 'newsletter' && $this->request->get_action() == 'new_newsletter') ? 'active' : '';  ?>">
+                                                                        <li class="<?php //echo ($this->request->get_controller() == 'newsletter' && $this->request->get_action() == 'new_newsletter') ? 'active' : '';   ?>">
                                                                                 <a href="admin/newsletter/new_newsletter">Új hírlevél</a>
                                                                         </li>
-                                                                        <li class="<?php //echo ($this->request->get_controller() == 'newsletter' && $this->request->get_action() == 'new_newsletter') ? 'active' : '';  ?>">
+                                                                        <li class="<?php //echo ($this->request->get_controller() == 'newsletter' && $this->request->get_action() == 'new_newsletter') ? 'active' : '';   ?>">
                                                                                 <a href="admin/newsletter/newsletter_stats">Elküldött hírlevelek</a>
                                                                         </li>						
                                                                 </ul>
                                                         </li>
                                                         
-                                                        <li class="last <?php //echo ($this->request->get_controller() == 'blog') ? 'active' : '';  ?>">
+                                                        <li class="last <?php //echo ($this->request->get_controller() == 'blog') ? 'active' : '';   ?>">
                                                                 <a href="javascript:;">
                                                                         <i class="fa fa-suitcase"></i> 
                                                                         <span class="title">Blog</span>
                                                                         <span class="arrow "></span>
                                                                 </a>
                                                                 <ul class="sub-menu">
-                                                                        <li class="<?php //echo ($this->request->get_controller() == 'blog' && $this->request->get_action() == 'index') ? 'active' : '';  ?>">
+                                                                        <li class="<?php //echo ($this->request->get_controller() == 'blog' && $this->request->get_action() == 'index') ? 'active' : '';   ?>">
                                                                                 <a href="admin/blog">Bejegyzések</a>
                                                                         </li>
-                                                                        <li class="<?php //echo ($this->request->get_controller() == 'blog' && $this->request->get_action() == 'new_blog') ? 'active' : '';  ?>">
+                                                                        <li class="<?php //echo ($this->request->get_controller() == 'blog' && $this->request->get_action() == 'new_blog') ? 'active' : '';   ?>">
                                                                                 <a href="admin/blog/insert">Új bejegyzés</a>
                                                                         </li>
-                                                                        <li class="<?php //echo ($this->request->get_controller() == 'blog' && $this->request->get_action() == 'category') ? 'active' : '';  ?>">
+                                                                        <li class="<?php //echo ($this->request->get_controller() == 'blog' && $this->request->get_action() == 'category') ? 'active' : '';   ?>">
                                                                                 <a href="admin/blog/category">Kategóriák</a>
                                                                         </li>
                                                                 </ul>
