@@ -25,6 +25,11 @@ class Autoloader {
 			require $file;
 			return; 
 		}
+		$file = LIBS . '/' . strtolower($class_name) . '.php';
+		if (file_exists($file)){
+			require $file;
+			return; 
+		}
     }
 }
 ?>
