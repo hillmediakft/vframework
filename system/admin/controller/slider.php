@@ -2,24 +2,17 @@
 
 class Slider extends Admin_controller {
 
-    function __construct() {
+    function __construct()
+    {
         parent::__construct();
         Auth::handleLogin();
-        require_once "system/libs/logged_in_user.php";
-        $this->user = new Logged_in_user();
         $this->check_access("menu_slider", $this->request->get_httpreferer());
         $this->view->user = $this->user;
         $this->loadModel('slider_model');
     }
 
-    public function index() {
-        /* 		Auth::handleLogin();
-
-          if (!Acl::create()->userHasAccess('home_menu')) {
-          exit('nincs hozzáférése');
-          }
-
-         */
+    public function index()
+    {
         // adatok bevitele a view objektumba
         $this->view->title = 'Slider oldal';
         $this->view->description = 'Slider oldal description';
@@ -39,7 +32,8 @@ class Slider extends Admin_controller {
      *
      * @return void
      */
-    public function new_slide() {
+    public function new_slide()
+    {
         if ($this->request->has_post('submit_new_slide')) {
 
             $result = $this->slider_model->add_slide();
@@ -96,7 +90,8 @@ class Slider extends Admin_controller {
      * 	Slide törlése
      *
      */
-    public function delete() {
+    public function delete()
+    {
         $id = (int) $this->request->get_params('id');
         $this->slider_model->delete_slide($id);
         Util::redirect('slider');
@@ -109,7 +104,8 @@ class Slider extends Admin_controller {
      *
      * @return void
      */
-    public function order() {
+    public function order()
+    {
         if ($this->request->is_ajax()) {
             if ($this->request->has_post('action') && $this->request->get_post('action') == 'update_slider_order') {
                 $this->slider_model->slider_order();
@@ -118,5 +114,4 @@ class Slider extends Admin_controller {
     }
 
 }
-
 ?>
