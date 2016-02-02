@@ -186,7 +186,7 @@ class blog_model extends Admin_model {
 			}
 		} else {
 		// egy user törlése (nem POST adatok alapján)
-			if(!isset($this->request->get_params('id'))){
+			if(!$this->request->has_params('id')){
 				throw new Exception('Nincs id-t tartalmazo parameter az url-ben (ezert nem tudunk torolni id alapjan)!');
 				return false;
 			}

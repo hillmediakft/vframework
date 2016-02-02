@@ -82,12 +82,6 @@
 											<label for="blog_text" class="control-label">Szöveg</label>
 											<textarea name="blog_body" id="blog_body" placeholder="" class="form-control input-xlarge"></textarea>
 										</div>
-										<?php if(isset($ckeditor) && $ckeditor === true) { ?>
-										<script>
-											//CKEDITOR.replace( 'blog_body' );
-											CKEDITOR.replace( 'blog_body', {customConfig: 'config_custom3.js'});
-										</script>
-										<?php } ?>
 										
 										<div class="form-group">
 											<label for="blog_category">Kategória</label>

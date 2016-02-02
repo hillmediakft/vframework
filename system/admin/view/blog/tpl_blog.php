@@ -102,7 +102,7 @@
 								<?php } ?>
 								
 								<?php if (Session::get('user_role_id') > 0) { ?>
-									<li><a href="<?php echo $this->registry->site_url . 'blog/delete/' . $value['blog_id'];?>" id="delete_blog_<?php echo $value['blog_id'];?>"> <i class="fa fa-trash"></i> Töröl</a></li>
+									<li><a href="<?php echo $this->request->get_uri('site_url') . 'blog/delete/' . $value['blog_id'];?>" id="delete_blog_<?php echo $value['blog_id'];?>"> <i class="fa fa-trash"></i> Töröl</a></li>
 								<?php } ?>
 						
 
