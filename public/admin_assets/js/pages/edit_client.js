@@ -34,7 +34,8 @@ var editClient = function () {
                 boxed: true,
                 message: 'Feldolgozás...'
             });
-            currentForm.submit();
+        //    currentForm.submit();
+			setTimeout(function(){ currentForm.submit(); },300);
         });
     }
 
