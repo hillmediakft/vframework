@@ -112,7 +112,7 @@
 													</li>
 
 													<!--
-													<li><a href="<?php //echo $this->registry->site_url . 'newsletter/delete_newsletter/' . $value['newsletter_id'];?>" id="delete_newsletter_<?php //echo $value['newsletter_id'];?>" rel="<?php //echo $value['newsletter_id'];?>"> <i class="fa fa-trash"></i> Töröl</a></li>
+													<li><a href="<?php //echo $this->request->get_uri('site_url') . 'newsletter/delete_newsletter/' . $value['newsletter_id'];?>" id="delete_newsletter_<?php //echo $value['newsletter_id'];?>" rel="<?php //echo $value['newsletter_id'];?>"> <i class="fa fa-trash"></i> Töröl</a></li>
 													-->
 													
 													<li>

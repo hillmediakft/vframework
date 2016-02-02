@@ -68,7 +68,7 @@
 							<tr>
 								<th>Név</th>
 								<th>Bejegyzések száma</th>
-								<th></th>
+								<th style="width:0px;"></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -91,9 +91,8 @@
 				<td>									
 					<div class="actions">
 						<div class="btn-group">
-							<a class="btn btn-sm green" href="#" data-toggle="dropdown" <?php echo (Session::get('user_role_id') < 1) ? 'disabled' : '';?>>
-								<i class="fa fa-cogs"></i> Műveletek
-								<i class="fa fa-angle-down"></i>
+							<a class="btn btn-sm grey-steel" data-toggle="dropdown" <?php echo (Session::get('user_role_id') < 1) ? 'disabled' : '';?>>
+								<i class="fa fa-cogs"></i> 
 							</a>
 							<ul class="dropdown-menu pull-right">
 								<?php if (Session::get('user_role_id') > 0) { ?>	

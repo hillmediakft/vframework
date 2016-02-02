@@ -73,7 +73,7 @@ class Blog extends Admin_controller {
 
        	$this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.css');
 		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.js');
-		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/common.js');		
+		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/edit_blog.js');		
         
 		$this->view->category_list = $this->blog_model->blog_category_query();
 		$this->view->content = $this->blog_model->blog_query2($this->request->get_params('id'));
