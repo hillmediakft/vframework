@@ -183,5 +183,103 @@ HTML;
 		// echo out the feedback messages
 		require 'system/' . $this->area . '/view/_template/feedback.php';
 	}
+
+	/**
+	 * Template menü elem class-t active-ra állítja, ha a controller és az action a megadott paraméterekkel egyezik
+	 *
+	 * @param string $controller 	- vizsgálandó controller neve illetve nevek 
+	 * @param string $action 		- action neve illetve nevek
+	 */		
+	public function menu_active($controller, $action = null)
+	{
+		$active_controller = $this->request->get_controller();
+		$active_action = $this->request->get_action();
+
+		// ha csak controller van megadva paraméterként
+		if (!is_null($controller) && is_null($action)) {
+			
+			$controller = explode('|', $controller);
+			// megnézzük, hogy az aktuális controller neve benne van-e a $controller tömbben 
+			if (in_array($active_controller, $controller)) {
+				echo 'active';
+			}
+			return;
+		}
+
+		// ha csak action van megadva paraméterként
+		elseif (is_null($controller) && !is_null($action)) {
+			
+			$action = explode('|', $action);
+			// megnézzük, hogy az aktuális action neve benne van-e a $action tömbben 
+			if (in_array($active_action, $action)) {
+				echo 'active';
+			}
+			return;
+		}
+
+		// ha controller és action is meg van adva
+		elseif (!is_null($controller) && !is_null($action)) {
+
+			$controller = explode('|', $controller);
+			$action = explode('|', $action);
+
+			if (in_array($active_controller, $controller) && in_array($active_action, $action)) {
+				echo 'active';
+			}
+			return;
+		}
+	}
+
+
+					/**
+					 * Template menü elem class-t active-ra állítja, ha a controller és az action a megadott paraméterekkel egyezik
+					 *
+					 * @param string $controller 	- vizsgálandó controller neve illetve nevek 
+					 * @param string $action 		- action neve illetve nevek
+					 */		
+					public function menu_active_2($controller, $action = null)
+					{
+						$active_controller = $this->request->get_controller();
+						$active_action = $this->request->get_action();
+
+						// ha csak controller van megadva paraméterként
+						if (!is_null($controller) && is_null($action)) {
+							
+							$controller = (!is_array($controller)) ? array($controller) : $controller;
+							// megnézzük, hogy az aktuális controller neve benne van-e a $controller tömbben 
+							if (in_array($active_controller, $controller)) {
+								echo 'active';
+							}
+							return;
+						}
+
+						// ha csak action van megadva paraméterként
+						elseif (is_null($controller) && !is_null($action)) {
+							
+							$action = (!is_array($action)) ? array($action) : $action;
+							// megnézzük, hogy az aktuális action neve benne van-e a $action tömbben 
+							if (in_array($active_action, $action)) {
+								echo 'active';
+							}
+							return;
+						}
+
+						// ha controller és action is meg van adva
+						elseif (!is_null($controller) && !is_null($action)) {
+
+							$controller = (!is_array($controller)) ? array($controller) : $controller;
+							$action = (!is_array($action)) ? array($action) : $action;
+
+							if (in_array($active_controller, $controller) && in_array($active_action, $action)) {
+								echo 'active';
+							}
+							return;
+						}
+
+						// $arr = explode('/', $string);
+					}	
+
+
+
 } // end class
 ?>
