@@ -10,7 +10,7 @@ class Request {
 	/**
 	 * Az engedélyezett szűrőket tartalamzó tömb
 	 */
-	private $allowed_filters = array('int', 'integer', 'bool', 'boolean');
+	private $allowed_filters = array('int', 'integer', 'bool', 'boolean', 'remove_danger_tags');
 
 
 	public function __construct($uri, $router)
@@ -275,7 +275,14 @@ class Request {
 
 			// html tag-ek eltávolítása 
 			$value = $this->_stripTags($value);
-		}		
+		}
+
+		// veszélyes html tag-ek eltávolítása pl: <script>
+		elseif($filter == 'remove_danger_tags'){
+
+			$value = $this->_strip_dangertags($value, array('script')); 
+		}
+
 		// ha a filter integer
 		elseif (($filter == 'int' || $filter == 'integer') && is_string($value)) {
 			$default_value = (is_null($default_value)) ? 0 : $default_value;
@@ -316,20 +323,49 @@ class Request {
 	}
 
 	/**
-	 * Removes slashes from a value (rekurzív)
+	 * Eltávolítja a html tag-eket (rekurzív)
 	 * 
-	 * @param string|array $value  The value to strip
-	 * @return string|array  The `$value` with slashes stripped
+	 * @param string|array $value  			string amiből el kell távolítani a html tag-eket
+	 * @param string|array $allowed_tags  	engedélyezett html tag-ek ('<br><h1><p>')
+	 * @return string|array  				The `$value` with slashes stripped
 	 */
-	private function _stripTags($value)
+	private function _stripTags($value, $allowed_tags = null)
 	{
 		if (is_array($value)) {
 			foreach ($value as $key => $sub_value) {
-				$value[$key] = $this->_stripTags($sub_value);
+				$value[$key] = $this->_stripTags($sub_value, $allowed_tags);
 			}
 			return $value;
 		}
-		return strip_tags($value);
+
+		if(is_null($allowed_tags)) {
+			return strip_tags($value);
+		} else {
+			return strip_tags($value, $allowed_tags);
+		}
+	}
+
+	/**
+	 * Eltávolítja a paraméterben megadott html tag-eket (rekurzív)
+	 * 
+	 * @param string|array $value  	string amiből el kell távolítani a html script tag-eket
+	 * @param array $tags  			eltávolítandó html tag-ek
+	 * @return string|array  		The `$value` with slashes stripped
+	 */
+	private function _strip_dangertags($value, $tags)
+	{
+		if (is_array($value)) {
+			foreach ($value as $key => $sub_value) {
+				$value[$key] = $this->_strip_dangertags($sub_value, $tags);
+			}
+			return $value;
+		}
+	    
+	    foreach ($tags as $tag) {
+			$value = preg_replace("~<" . $tag . "(.*?)>(.*?)</" . $tag . ">~i","", $value);
+	    }
+
+		return $value;
 	}
 
 }
