@@ -257,49 +257,47 @@
                                             <span class="title">Nyelvek</span>
                                             </a>
                                     </li>
-                        -->				
-                        <!-- HÍRLEVÉL				
-                                    <li class="<?php //$this->menu_active('newsletter'); ?>">
-                                            <a href="javascript:;">
-                                                    <i class="fa fa-suitcase"></i> 
-                                                    <span class="title">Hírlevél</span>
-                                                    <span class="arrow "></span>
-                                            </a>
-                                            <ul class="sub-menu">
-                                                    <li class="<?php //$this->menu_active('newsletter', 'index'); ?>">
-                                                            <a href="admin/newsletter">Hírlevelek</a>
-                                                    </li>
-                                                    <li class="<?php //$this->menu_active('newsletter', 'new_newsletter'); ?>">
-                                                            <a href="admin/newsletter/new_newsletter">Új hírlevél</a>
-                                                    </li>
-                                                    <li class="<?php //$this->menu_active('newsletter', 'new_newsletter'); ?>">
-                                                            <a href="admin/newsletter/newsletter_stats">Elküldött hírlevelek</a>
-                                                    </li>						
-                                            </ul>
-                                    </li>
-                                                        
-                        -->	
+                        -->
+
+                        <!-- HÍRLEVÉL -->	
+                        <li class="<?php $this->menu_active('newsletter'); ?>">
+                            <a href="javascript:;">
+                                    <i class="fa fa-suitcase"></i> 
+                                    <span class="title">Hírlevél</span>
+                                    <span class="arrow "></span>
+                            </a>
+                            <ul class="sub-menu">
+                                <li class="<?php $this->menu_active('newsletter', 'index'); ?>">
+                                    <a href="admin/newsletter">Hírlevelek</a>
+                                </li>
+                                <li class="<?php $this->menu_active('newsletter', 'new_newsletter'); ?>">
+                                    <a href="admin/newsletter/new_newsletter">Új hírlevél</a>
+                                </li>
+                                <li class="<?php $this->menu_active('newsletter', 'newsletter_stats'); ?>">
+                                    <a href="admin/newsletter/newsletter_stats">Elküldött hírlevelek</a>
+                                </li>                       
+                            </ul>
+                        </li>
 
                         <!-- BLOG -->           
                         <li class="<?php $this->menu_active('blog'); ?>">
-                                <a href="javascript:;">
-                                        <i class="fa fa-suitcase"></i> 
-                                        <span class="title">Blog</span>
-                                        <span class="arrow "></span>
-                                </a>
-                                <ul class="sub-menu">
-                                        <li class="<?php $this->menu_active('blog', 'index'); ?>">
-                                            <a href="admin/blog">Bejegyzések</a>
-                                        </li>
-                                        <li class="<?php $this->menu_active('blog', 'insert'); ?>">
-                                            <a href="admin/blog/insert">Új bejegyzés</a>
-                                        </li>
-                                        <li class="<?php $this->menu_active('blog', 'category'); ?>">
-                                            <a href="admin/blog/category">Kategóriák</a>
-                                        </li>
-                                </ul>
+                            <a href="javascript:;">
+                                    <i class="fa fa-suitcase"></i> 
+                                    <span class="title">Blog</span>
+                                    <span class="arrow "></span>
+                            </a>
+                            <ul class="sub-menu">
+                                    <li class="<?php $this->menu_active('blog', 'index'); ?>">
+                                        <a href="admin/blog">Bejegyzések</a>
+                                    </li>
+                                    <li class="<?php $this->menu_active('blog', 'insert'); ?>">
+                                        <a href="admin/blog/insert">Új bejegyzés</a>
+                                    </li>
+                                    <li class="<?php $this->menu_active('blog', 'category'); ?>">
+                                        <a href="admin/blog/category">Kategóriák</a>
+                                    </li>
+                            </ul>
                         </li>  
-
 
 
                     </ul>
