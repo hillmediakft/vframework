@@ -156,7 +156,6 @@ var Newsletter = function () {
 			var link = $(this);
 			var newsletter_id = link.attr('rel');
 			
-			
 			bootbox.setDefaults({
 				locale: "hu", 
 			});
@@ -217,173 +216,169 @@ var Newsletter = function () {
 	
 	
 	/**
-	 *	Hírlevél törlése
+	 *	Hírlevél törlése AJAX-al
+	 *
+	 *	@param link 	<a> html elem, amire klikkeltünk a törléshez	
 	 *
 	 */
 	var delete_newsletter_AJAX = function(link) {
-		//$('a[id*=delete_newsletter]').click(function(event){
-			//event.preventDefault();    
+				
+		//a link rel attribútumának értékét változóhoz rendeljük (ez tartalmazza az id-t)
+		var newsletter_id = link.attr('rel');
 		
-			
-			//a link rel attribútumának értékét változóhoz rendeljük (ez tartalmazza az id-t)
-			var newsletter_id = link.attr('rel');
-			
-			// a del_tr változóhoz rendeljük a html táblázat törlendő sorát
-			var del_tr = link.closest("tr");
-			
-			//üzenet elem
-			var message = $('#message');
-			
-			//megjelenítjük a loading animációt
-			$('#loadingDiv').html('<img src="public/admin_assets/img/loader.gif">');
-			$('#loadingDiv').show();
-
-			//végrehajtjuk az AJAX hívást
-            $.ajax({
-                type: "POST",
-                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                data: {
-                    newsletter_id: newsletter_id
-                },
-                // a feldolgozó url-je
-                url: "admin/newsletter/delete_newsletter_AJAX",
-                // kész a hívás... utána ez történjen
-                complete: function(){
-                    $('#loadingDiv').hide();
-                },
-                // itt kapjuk meg (és dolgozzuk fel) a feldolgozó php által visszadott adatot 
-                success: function(result){
-					//JSON string elemeinek elhelyezése egy objektumba
-					var response = $.parseJSON(result);	
-					
-					if(response.status == 'success'){
-						message.append('<div class="alert alert-success">' + response.message + '</div>');
-						$('#message > div').delay( 2500 ).slideUp( 750, function(){
-							$(this).remove();
-						} );
-						del_tr.remove();
-					}
-
-					if(response.status == 'error'){
-						message.append('<div class="alert alert-danger">' + response.message + '</div>');
-						$('#message > div').delay( 2500 ).slideUp( 750, function(){
-							$(this).remove();
-						} );	
-					}
-
-				},
-                error: function(result, status, e){
-                        alert(e);
-                } 
-            });		
+		// a del_tr változóhoz rendeljük a html táblázat törlendő sorát
+		var del_tr = link.closest("tr");
 		
-		//});
+		//üzenet elem
+		var message = $('#message');
+		
+		//végrehajtjuk az AJAX hívást
+        $.ajax({
+            type: "POST",
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            data: {
+                newsletter_id: newsletter_id
+            },
+            // a feldolgozó url-je
+            url: "admin/newsletter/delete_newsletter_AJAX",
+            // küldés előtt megjelenítjük a folyamatjelzőt
+			beforeSend: function(){
+				Metronic.blockUI({
+					boxed: true,
+					message: 'Feldolgozás...'
+				});
+			},
+            // kész a hívás... utána ez történjen
+            complete: function(){
+                // ha az ajaxhívás kész, eltüntetjük a folyamatjelzőt
+                Metronic.unblockUI();
+            },
+            // itt kapjuk meg (és dolgozzuk fel) a feldolgozó php által visszadott adatot 
+            success: function(result){
+				//JSON string elemeinek elhelyezése egy objektumba
+				var response = $.parseJSON(result);	
+				
+				if(response.status == 'success'){
+					message.append('<div class="alert alert-success">' + response.message + '</div>');
+					$('#message > div').delay( 2500 ).slideUp( 750, function(){
+						$(this).remove();
+					} );
+					del_tr.remove();
+				}
+
+				if(response.status == 'error'){
+					message.append('<div class="alert alert-danger">' + response.message + '</div>');
+					$('#message > div').delay( 2500 ).slideUp( 750, function(){
+						$(this).remove();
+					} );	
+				}
+
+			},
+            error: function(result, status, e){
+                    alert(e);
+            } 
+        });		
 	
-		
 	}	
 /*--------------------------------------------------*/	
 
 
 
 
-	/**
-	 *	Hírlevél küldés AJAX (jQuery)
-	 *
-	 */
-	var submit_newsletter_AJAX = function(newsletter_id) {
-	
-			//var lastsent = $(this).closest("tr").find('td:nth-child(5)').text();
-			//var lastsent = link.closest("tr").find('td:nth-child(5)');
+								/**
+								 *	Hírlevél küldés AJAX (jQuery)
+								 *
+								 */
+								var submit_newsletter_AJAX = function(newsletter_id) {
+								
+										//var lastsent = $(this).closest("tr").find('td:nth-child(5)').text();
+										//var lastsent = link.closest("tr").find('td:nth-child(5)');
 
-			//var data = "newsletter_id="+newsletter_id;
-			
-			
-			//végrehajtjuk az AJAX hívást
-            $.ajax({
-                type: "POST",
-                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                data: {
-                   newsletter_id: newsletter_id
-                },
-                // a feldolgozó url-je
-                //url: "admin/newsletter/eventsource",
-                url: "admin/newsletter/setid_2",
-                // kész a hívás... utána ez történjen
-                dataType: "json",
-				beforeSend: function(){
-					console.log('before send');
-					//megjelenítjük a loading animációt
-					//$('#loadingDiv').html('<img src="public/admin_assets/img/loader.gif">');
-					//$('#loadingDiv').show();
-				},
-				complete: function(){
-					console.log('complete');
-                    $('#loadingDiv').hide();
-                },
-                // itt kapjuk meg (és dolgozzuk fel) a feldolgozó php által visszadott adatot 
-                success: function(result){
-					console.log('success');
-					console.log(result.status);
-					startTask();
-					//JSON string elemeinek elhelyezése egy objektumba
-				},
-                done: function(){
-					console.log('ez a done');
-				},
-				error: function(result, status, e){
-					console.log('error!!!');
-                    
-					//alert(e);
-                } 
-            });		
-		
-		//});
-	
-		
-	} // Hírlevél küldés AJAX (jQuery)
+										//var data = "newsletter_id="+newsletter_id;
+										
+										
+										//végrehajtjuk az AJAX hívást
+							            $.ajax({
+							                type: "POST",
+							                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+							                data: {
+							                   newsletter_id: newsletter_id
+							                },
+							                // a feldolgozó url-je
+							                //url: "admin/newsletter/eventsource",
+							                url: "admin/newsletter/setid_2",
+							                // kész a hívás... utána ez történjen
+							                dataType: "json",
+											beforeSend: function(){
+												console.log('before send');
+												//megjelenítjük a loading animációt
+												//$('#loadingDiv').html('<img src="public/admin_assets/img/loader.gif">');
+												//$('#loadingDiv').show();
+											},
+											complete: function(){
+												console.log('complete');
+							                    $('#loadingDiv').hide();
+							                },
+							                // itt kapjuk meg (és dolgozzuk fel) a feldolgozó php által visszadott adatot 
+							                success: function(result){
+												console.log('success');
+												console.log(result.status);
+												startTask();
+												//JSON string elemeinek elhelyezése egy objektumba
+											},
+							                done: function(){
+												console.log('ez a done');
+											},
+											error: function(result, status, e){
+												console.log('error!!!');
+							                    
+												//alert(e);
+							                } 
+							            });		
+									
+									//});
+								
+									
+								} // Hírlevél küldés AJAX (jQuery)
 
 	
 	
 	/**
-	 *	Hírlevél küldés AJAX (jQuery)
+	 *	Elküldjük a hírlevél küldés megkezdése előtt (a setid() metódusnak), hogy melyik id-vel rendelkező hírlevelet kell elküldeni
 	 *
 	 */
 	var submit_newsletter_id = function(newsletter_id) {
 	
-			//végrehajtjuk az AJAX hívást
-            $.ajax({
-                type: "POST",
-                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                data: {
-                    newsletter_id: newsletter_id
-                },
-				dataType: "json",
-                // a feldolgozó url-je
-                url: "admin/newsletter/setid",
-                //url: "admin/newsletter/eventsource",
-                // kész a hívás... utána ez történjen
-                beforeSend: function(){
-					console.log('before send');
-					//startTask();
-				},
-				complete: function(){
-					console.log('complete');
-                },
-                // itt kapjuk meg (és dolgozzuk fel) a feldolgozó php által visszadott adatot 
-                success: function(result){
-					//console.log('success');
-					console.log(result.status);
+        $.ajax({
+            type: "POST",
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            data: {
+                newsletter_id: newsletter_id
+            },
+			dataType: "json",
+            // a feldolgozó url-je
+            url: "admin/newsletter/setid",
+            //url: "admin/newsletter/eventsource",
+            // kész a hívás... utána ez történjen
+            beforeSend: function(){
+				console.log('before send');
+				//startTask();
+			},
+			complete: function(){
+				console.log('complete');
+            },
+            // itt kapjuk meg (és dolgozzuk fel) a feldolgozó php által visszadott adatot 
+            success: function(result){
+				//console.log('success');
+				console.log(result.status);
 
-				},
-                error: function(result, status, e){
-					console.log('error!!!');
-                    
-					//alert(e);
-                } 
-            });		
-		
-		//});
-	
+			},
+            error: function(result, status, e){
+				console.log('error!!!');
+                
+				//alert(e);
+            } 
+        });		
 		
 	} // Hírlevél küldés AJAX (jQuery)	
 

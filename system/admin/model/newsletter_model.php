@@ -1,5 +1,5 @@
 <?php 
-class Newsletter_model extends Admin_model {
+class Newsletter_model extends Model {
 
 	/**
      * Constructor, létrehozza az adatbáziskapcsolatot
@@ -56,10 +56,10 @@ class Newsletter_model extends Admin_model {
 	
 	public function new_newsletter()
 	{
-		$data['newsletter_name'] = $this->request->get_post('newsletter_name');
-		$data['newsletter_subject'] = $this->request->get_post('newsletter_subject');
-		$data['newsletter_body'] = $this->request->get_post('newsletter_body');
-		$data['newsletter_status'] = (int)$this->request->get_post('newsletter_status');
+		$data['newsletter_name'] = $_POST['newsletter_name'];
+		$data['newsletter_subject'] = $_POST['newsletter_subject'];
+		$data['newsletter_body'] = $_POST['newsletter_body'];
+		$data['newsletter_status'] = (int)$_POST['newsletter_status'];
 		$data['newsletter_create_date'] = date('Y-m-d-G:i');
 		
 		$this->query->reset();
@@ -75,8 +75,7 @@ class Newsletter_model extends Admin_model {
 			Message::set('error', 'unknown_error');
 			return false;
 		}
-	
-	
+		
 	}
 
 	
@@ -84,11 +83,11 @@ class Newsletter_model extends Admin_model {
 	{
 		$id = (int)$id;
 	
-		$data['newsletter_name'] = $this->request->get_post('newsletter_name');
-		$data['newsletter_subject'] = $this->request->get_post('newsletter_subject');
-		$data['newsletter_body'] = $this->request->get_post('newsletter_body');
-		$data['newsletter_status'] = $this->request->get_post('newsletter_status', 'integer');
-		//$data['newsletter_create_date'] = date('Y-m-d-G:i');
+		$data['newsletter_name'] = $_POST['newsletter_name'];
+		$data['newsletter_subject'] = $_POST['newsletter_subject'];
+		$data['newsletter_body'] = $_POST['newsletter_body'];
+		$data['newsletter_status'] = (int)$_POST['newsletter_status'];
+		$data['newsletter_create_date'] = date('Y-m-d-G:i');
 		
 		$this->query->reset();
 		$this->query->set_table(array('newsletters'));
@@ -97,7 +96,7 @@ class Newsletter_model extends Admin_model {
 	
 	// ha sikeres az insert visszatérési érték true
 		if($result) {
-			Message::set('success', 'Hírlevél módosítva!');
+			Message::set('success', 'Új hírlevél módosítva!');
 			return true;
 		}
 		else {
@@ -117,8 +116,8 @@ class Newsletter_model extends Admin_model {
 		$fail_counter = 0; 
 		
 		// Több user törlése
-		if( $this->request->has_post('delete_newsletter') ) {
-			$data_arr = $this->request->get_post();
+		if(isset($_POST['delete_newsletter'])) {
+			$data_arr = $_POST;
 			
 			//eltávolítjuk a tömbből a felesleges elemeket	
 			if(isset($data_arr['delete_newsletter'])) {
@@ -129,12 +128,12 @@ class Newsletter_model extends Admin_model {
 			}
 		} else {
 		// egy user törlése (nem POST adatok alapján)
-			if( !isset($this->request->get_params('id')) ){
+			if(!isset($this->registry->params['id'])){
 				throw new Exception('Nincs id-t tartalmazo parameter az url-ben (ezert nem tudunk torolni id alapjan)!');
 				return false;
 			}
 			//berakjuk a $data_arr tömbbe a törlendő felhasználó id-jét
-			$data_arr = array($this->request->get_params('id'));
+			$data_arr = array($this->registry->params['id']);
 		}
 
 		// bejárjuk a $data_arr tömböt és minden elemen végrehajtjuk a törlést
@@ -168,10 +167,10 @@ class Newsletter_model extends Admin_model {
 
 		// üzenetek eltárolása
 		if($success_counter > 0) {
-			Message::set('success', $success_counter . ' ' . 'hírlevél törlése sikerült.');
+			Message::set('success', $success_counter . ' hírlevél törlése sikerült.');
 		}
 		if($fail_counter > 0){
-			Message::set('error', $fail_counter . ' ' . 'hírlevél törlése nem sikerült!');
+			Message::set('error', $fail_counter . ' hírlevél törlése nem sikerült!');
 		}
 		
 		// default visszatérési érték (akkor tér vissza false-al ha hibás az sql parancs)	
@@ -193,7 +192,7 @@ class Newsletter_model extends Admin_model {
 		
 		// Több user törlése
 		if(isset($_POST['newsletter_id'])) {
-			$data_arr = $this->request->get_post();
+			$data_arr = $_POST;
 
 			//eltávolítjuk a tömbből a felesleges elemeket	
 			if(isset($data_arr['delete_newsletter'])) {
@@ -257,34 +256,10 @@ class Newsletter_model extends Admin_model {
 	}
 
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	public function set_progress($value)
-	{
-		$this->query->reset();
-		$this->query->set_table(array('newsletter_progress'));
-		$this->query->set_where('id', '=', 1);
-		//$this->query->set_column(array('percent'));
-		$this->query->update(array('percent' => $value));		
-	}
-
-	public function get_progress()
-	{
-		$this->query->reset();
-		$this->query->set_table(array('newsletter_progress'));
-		$this->query->set_columns(array('percent'));
-		$this->query->set_where(array('id', '=', 1));
-		return $this->query->select();			
-	}
-	
-	
-	private function send_msg($id, $message, $progress) {
+	/**
+	 * Üzenetet küld a böngészőnek a folyamat állásáról
+	 */
+	private function send_msg($id, $message, $progress = null) {
 		
 		$d = array('message' => $message , 'progress' => $progress);
 		  
@@ -295,13 +270,6 @@ class Newsletter_model extends Admin_model {
 		//ob_flush();
 		flush();
 	}	
-
-
-
-
-
-	
-	
 	
 	/**
 	 *	Hírlevelek elküldése
@@ -311,26 +279,22 @@ class Newsletter_model extends Admin_model {
 	 */
 	public function send_newsletter()
 	{
-		$debug = false;
+		// newsletter_id visszaadás a a session-ból
+		$newsletter_id = (int)Session::get('newsletter_id');
 		
-		$x = Session::get('newsletter_id');
-		$id = (isset($x)) ? $x : 'rossz';
-		
-		/*
-		if(isset($_POST['newsletter_id'])){
-			$id = $_POST['newsletter_id'];
-		} else {
-			$id = 'nincsen!!!';
+		if (!isset($newsletter_id)) {
+			$this->send_msg('CLOSE', 'Hibas newsletter_id!');
+			return false;
 		}
-		*/
 
+		$debug = true;
 		
 		if($debug){
-			
+		
 			$success = 0;
 			$fail = 0;
 			
-			$max = 5;
+			$max = 14;
 			
 			for($i = 1; $i <= $max; $i++){
 				
@@ -343,12 +307,12 @@ class Newsletter_model extends Admin_model {
 
 				if($number > 4000){
 					$success += 1;
-					$this->send_msg($i, 'Sikeres   | id:' . $id .  '|   küldés a ' . $number . '@mail.hu címre', $progress);				
+					$this->send_msg($i, 'Sikeres   | id:' . $newsletter_id .  '|   küldés a ' . $number . '@mail.hu címre', $progress);				
 					
 				}
 				else{
 					$fail += 1;
-					$this->send_msg($i, 'Sikertelen   | id: ' . $id .  '|   küldés a ' . $number . '@mail.hu címre', $progress);				
+					$this->send_msg($i, 'Sikertelen   | id: ' . $newsletter_id .  '|   küldés a ' . $number . '@mail.hu címre', $progress);				
 				}
 
 			}
@@ -358,7 +322,7 @@ class Newsletter_model extends Admin_model {
 	
 				// adatok beírása a stats_newsletters táblába
 				$data['sent_date'] = date('Y-m-d-G:i');
-				$data['newsletter_id'] = $newsletter_id = $this->request->get_post('newsletter_id', 'integer');
+				$data['newsletter_id'] = $newsletter_id;
 				$data['recepients'] = $success + $fail;
 				$data['send_success'] = $success;
 				$data['send_fail'] = $fail;
@@ -373,16 +337,14 @@ class Newsletter_model extends Admin_model {
 
 			
 		} // debug vége
+
+
+
 		else {
 			$error = array();
 			$success = array();
 
-	// id megadása	
-	$x = Session::get('newsletter_id');
-	$newsletter_id = (isset($x)) ? $x : null;
-	//$newsletter_id = $this->request->get_post('newsletter_id', 'integer');
-			
-			
+		// id megadása	
 		$data['newsletter_id'] = $newsletter_id;
 		$data['sent_date'] = date('Y-m-d-G:i');
 		$data['error'] = 1;
