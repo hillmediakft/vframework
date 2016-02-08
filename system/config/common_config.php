@@ -83,4 +83,10 @@ $config['session'] = array(
         // 'last_activity_name_admin' => 'user_last_activity', // A $_SESSION['last_activity'] elem fogja tárolni az utolsó aktivitás idejét
         // 'last_activity_name_site' => 'user_site_last_activity' // A $_SESSION['last_activity'] elem fogja tárolni az utolsó aktivitás idejét
 );
+$config['blogphoto'] = array(
+    'width' => 600,
+    'height' => 400,
+    'thumb_width' => 150,
+    'upload_path' => UPLOADS . 'blog_photo/',
+);
 ?>
