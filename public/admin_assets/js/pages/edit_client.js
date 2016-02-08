@@ -29,7 +29,7 @@ var editClient = function () {
             e.preventDefault();
             currentForm = this;
             // a submit() nem küldi el a gomb name értékét, ezért be kell rakni egy hidden elemet
-            $('#update_client').append($("<input>").attr("type", "hidden").attr("name", "submit_update_client").val("submit_update_client"));
+            //$('#update_client').append($("<input>").attr("type", "hidden").attr("name", "submit_update_client").val("submit_update_client"));
             Metronic.blockUI({
                 boxed: true,
                 message: 'Feldolgozás...'

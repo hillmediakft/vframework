@@ -27,8 +27,8 @@ class Clients_model extends Model {
      * 	Egy partner minden "nyers" adatát lekérdezi
      * 	A partner módosításához kell (itt az id-kre van szükség, és nem a hozzájuk tartozó névre)	
      */
-    public function all_client_query() {
-
+    public function all_client_query()
+    {
         $this->query->reset();
         $this->query->set_table(array('clients'));
         $this->query->set_columns('*');
@@ -40,7 +40,11 @@ class Clients_model extends Model {
      */
     public function insert_client() {
         $data = $this->request->get_post();
-        unset($data['submit_new_client']);
+    
+        if(isset($data['submit_new_client'])){
+            unset($data['submit_new_client']);
+        }
+
         $error_counter = 0;
         //megnevezés ellenőrzése	
         if (empty($data['client_name'])) {
@@ -53,7 +57,7 @@ class Clients_model extends Model {
         }
 
         if (isset($data['img_url']) && $data['img_url'] != '') {
-            $data['client_photo'] = $data['img_url'];
+            $data['client_photo'] = str_replace(Config::get('clientphoto.upload_path'), '', $data['img_url']);
         }
         unset($data['img_url']);
 
@@ -99,12 +103,12 @@ class Clients_model extends Model {
         if ($error_counter == 0) {
             if (isset($data['img_url']) && $data['img_url'] != '') {
                 // új képet töltöttünk fel
-                $data['client_photo'] = $data['img_url'];
+                $data['client_photo'] = str_replace(Config::get('clientphoto.upload_path'), '', $data['img_url']);
                 $old_img = $data['old_img'];
                 $img_to_delete = true;
             } else {
                 // nincs úf feltöltött kép
-                $data['client_photo'] = $data['old_img'];
+                $data['client_photo'] = str_replace(Config::get('clientphoto.upload_path'), '', $data['old_img']);
                 $img_to_delete = false;
             }
             unset($data['img_url']);
@@ -133,18 +137,16 @@ class Clients_model extends Model {
         }
     }
 
+
     /**
-     * 	Partner törlése
+     *  Partner törlése AJAX-al
      */
-    public function delete_client($id) {
-        // a sikeres törlések számát tárolja
-        $success_counter = 0;
-        // a sikertelen törlések számát tárolja
-        $fail_counter = 0;
+    public function delete_client_AJAX($id)
+    {
+        // törlendő kép elérési útja
+        $image_to_delete = Config::get('clientphoto.upload_path') . $this->get_client_image_name($id);
 
-        $image_to_delete = $this->get_client_image_name($id);
-
-        //felhasználó törlése	
+        // adatok törlése az adatbázisból   
         $this->query->reset();
         $this->query->set_table(array('clients'));
         //a delete() metódus integert (lehet 0 is) vagy false-ot ad vissza
@@ -153,32 +155,32 @@ class Clients_model extends Model {
         if ($result !== false) {
             // ha a törlési sql parancsban nincs hiba
             if ($result > 0) {
-                //sikeres törlés
-                if (!Util::del_file($image_to_delete['client_photo'])) {
-                    Message::set('error', 'Kép nem törölhető!');
+                // kép törlése (hiba esetén logfájlba ír)
+                if (!Util::del_file($image_to_delete)) {
+                    Message::log('Kép nem törölhető! - ' . $image_to_delete);
                 }
-                $success_counter += $result;
+                //sikeres törlés
+                return array(
+                    'status' => 'success', 
+                    'message' => 'A partner törlése sikerült.', 
+                );
+
             } else {
                 //sikertelen törlés
-                $fail_counter += 1;
+                return array(
+                    'status' => 'error', 
+                    'message' => 'A partner törlése nem sikerült!', 
+                );
             }
         } else {
             // ha a törlési sql parancsban hiba van
-            throw new Exception('Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!');
-            return false;
+            return array(
+                'status' => 'error', 
+                'message' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!', 
+            );
         }
-
-        // üzenetek eltárolása
-        if ($success_counter > 0) {
-            Message::set('success', $success_counter . ' partner törlése sikerült.');
-        }
-        if ($fail_counter > 0) {
-            Message::set('error', $fail_counter . ' partner törlése nem sikerült!');
-        }
-
-        // default visszatérési érték (akkor tér vissza false-al ha hibás az sql parancs)	
-        return true;
     }
+
 
     /**
      * Crew member képének vágása és feltöltése
@@ -220,7 +222,6 @@ class Clients_model extends Model {
 
                         $response = array(
                             "status" => 'success',
-                            //"url" => $handle->file_dst_name,
                             "url" => $imagePath . $handle->file_dst_name,
                             "width" => $handle->image_dst_x,
                             "height" => $handle->image_dst_y
@@ -302,7 +303,6 @@ class Clients_model extends Model {
 
                         $response = array(
                             "status" => 'success',
-                            //"url" => $handle->file_dst_name
                             "url" => $imagePath . $handle->file_dst_name
                         );
                         return json_encode($response);
@@ -325,9 +325,9 @@ class Clients_model extends Model {
     }
 
     /**
-     * 	Partnerhez tartozó kép elérési útvonalának lekérdezése - partner törléséhez
-     * 	@para   integer $id partner id-je
-     * @return string törlendő kép elérési útvonala	
+     * Partnerhez tartozó kép elérési útvonalának lekérdezése - partner törléséhez
+     * @para   integer      $id partner id-je
+     * @return string       törlendő kép elérési útvonala	
      */
     public function get_client_image_name($id) {
         $id = (int) $id;
@@ -336,9 +336,8 @@ class Clients_model extends Model {
         $this->query->set_columns('client_photo');
         $this->query->set_where('client_id', '=', $id);
         $result = $this->query->select();
-        return $result[0];
+        return $result[0]['client_photo'];
     }
 
 }
-
 ?>

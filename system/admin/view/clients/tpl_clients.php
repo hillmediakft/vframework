@@ -21,14 +21,13 @@
         <!-- BEGIN PAGE CONTENT-->
         <div class="row">
             <div class="col-md-12">
-
 	
-
                 <div id="ajax_message"></div> 						
+                
                 <!-- echo out the system feedback (error and success messages) -->
                 <?php $this->renderFeedbackMessages(); ?>				
 
-                <form class="horizontal-form" id="del_client_form" method="POST" action="admin/clients/delete_client">	
+                <form class="horizontal-form" id="del_client_form" method="POST" action="">	
 
                     <div class="portlet">
                         <div class="portlet-title">
@@ -53,7 +52,7 @@
                                     <?php foreach ($all_client as $value) { ?>
                                         <tr class="odd gradeX">
 
-                                            <td style="width:155px;"><img src="<?php echo (!empty($value['client_photo'])) ? $value['client_photo'] : 'uploads/client_photo/client_placeholder.jpg';?>"/></td>
+                                            <td style="width:155px;"><img src="<?php echo (!empty($value['client_photo'])) ? Config::get('clientphoto.upload_path') . $value['client_photo'] : Config::get('clientphoto.default_photo'); ?>"/></td>
                                             <td><?php echo $value['client_name'];?></td>
                                             <td><?php echo $value['client_link']; ?></td>
                                             <td>									
@@ -70,7 +69,7 @@
                                                             <?php }; ?>
 
                                                             <?php if ((Session::get('user_role_id') < 3)) { ?>	
-                                                                <li><a href="<?php echo 'admin/clients/delete_client/' . $value['client_id']; ?>" id="delete_client_<?php echo $value['client_id']; ?>"> <i class="fa fa-trash"></i> Töröl</a></li>
+                                                                <li><a id="delete_client_<?php echo $value['client_id']; ?>" data-id="<?php echo $value['client_id']; ?>"> <i class="fa fa-trash"></i> Töröl</a></li>
                                                             <?php }; ?>
 
 

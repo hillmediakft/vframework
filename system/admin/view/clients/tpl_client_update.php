@@ -69,7 +69,7 @@
                                         <div id="client_image"></div>	
 
                                         <input type="hidden" name="img_url" id="OutputId" >
-                                        <input type="hidden" id="old_img"  value="<?php echo $actual_client['client_photo']; ?>" name="old_img">
+                                        <input type="hidden" id="old_img"  value="<?php echo Config::get('clientphoto.upload_path') . $actual_client['client_photo']; ?>" name="old_img">
 
                                         <div class="space10"></div>
                                         <div class="clearfix"></div>

@@ -22,12 +22,12 @@ var newClient = function () {
             e.preventDefault();
             currentForm = this;
             // a submit() nem küldi el a gomb name értékét, ezért be kell rakni egy hidden elemet
-            $('#new_client').append($("<input>").attr("type", "hidden").attr("name", "submit_new_client").val("submit_new_client"));
+            // $('#new_client').append($("<input>").attr("type", "hidden").attr("name", "submit_new_client").val("submit_new_client"));
             Metronic.blockUI({
                 boxed: true,
                 message: 'Feldolgozás...'
             });
-            currentForm.submit();
+            setTimeout(function(){ currentForm.submit(); },300);
         });
     }
 

@@ -91,29 +91,76 @@ var Clients = function () {
         tableWrapper.find('.dataTables_length select').addClass("form-control input-sm input-inline"); // modify table per page dropdown
     }
 
-    var deleteClientConfirm = function () {
+    /**
+     * Kliens törlése ajax-al
+     */
+    var deleteClient = function () {
         $('[id*=delete_client]').on('click', function (e) {
             e.preventDefault();
-            var deleteLink = $(this).attr('href');
-            //var jobName = $(this).closest("tr").find('td:nth-child(3)').text();
+            
+            // a törlendő elem id-je
+            var deleteID = $(this).attr('data-id');
+            // a deleteHtml változóhoz rendeljük a html táblázat törlendő sorát <tr>
+            var deleteHtml = $(this).closest("tr");
+            // üzenet elem
+            var message = $('#ajax_message');
+            
             bootbox.setDefaults({
                 locale: "hu",
             });
             bootbox.confirm("Biztosan törölni akarja a partnert?", function (result) {
                 if (result) {
-                    Metronic.blockUI({
-                        boxed: true,
-                        message: 'Feldolgozás...'
-                    });
-                    window.location.href = deleteLink;
-                }
+
+                    $.ajax({
+                        url: 'admin/clients/delete_client_AJAX',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            client_id: deleteID
+                        },
+                        beforeSend: function() {
+                            Metronic.blockUI({
+                                boxed: true,
+                                message: 'Feldolgozás...'
+                            });
+                        },
+                        complete: function(){
+                            Metronic.unblockUI();
+                        },
+                        success: function (result) {
+                            if(result.status == 'success') {
+                                message.append('<div class="alert alert-success">' + result.message + '</div>');
+                                $('#ajax_message .alert-success').delay( 2500 ).slideUp( 750, function(){
+                                    $(this).remove();
+                                } );
+                                deleteHtml.remove();
+
+                            }
+                            if(result.status == 'error') {
+                                message.append('<div class="alert alert-danger">' + result.message + '</div>');
+                                $('#ajax_message .alert-danger').delay( 2500 ).slideUp( 750, function(){
+                                    $(this).remove();
+                                } );
+                            }
+                        },
+                        error: function(result, status, e){
+                            alert(e);
+                        } 
+
+                    }); // ajax end
+
+                } // bootbox confirm end
+            
             });
         });
+
     }
+
 
     var hideAlert = function () {
         $('div.alert.alert-success, div.alert.alert-danger').delay(3000).slideUp(750);
     }
+
     return {
         //main function to initiate the module
         init: function () {
@@ -121,7 +168,7 @@ var Clients = function () {
                 return;
             }
             clientsTable();
-            deleteClientConfirm();
+            deleteClient();
             hideAlert();
         }
     };

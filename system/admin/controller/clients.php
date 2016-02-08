@@ -1,8 +1,8 @@
 <?php
+class Clients extends Admin_controller {
 
-class Clients extends Controller {
-
-    function __construct() {
+    function __construct()
+    {
         parent::__construct();
         Auth::handleLogin();
         $this->loadModel('clients_model');
@@ -11,7 +11,8 @@ class Clients extends Controller {
     /**
      * 	Partnerek kilistázása
      */
-    public function index() {
+    public function index()
+    {
         $this->view->title = 'Partnereink oldal';
         $this->view->description = 'Partnereink description';
 
@@ -29,12 +30,12 @@ class Clients extends Controller {
         $this->view->render('clients/tpl_clients');
     }
 
-     /**
+    /**
      * 	Új partner hozzáadása
      */
-    public function new_client() {
-
-        if ($this->request->has_post('submit_new_client')) {
+    public function new_client()
+    {
+        if ( $this->request->has_post() ) {
             $result = $this->clients_model->insert_client();
             if ($result) {
                 Util::redirect('clients');
@@ -61,21 +62,23 @@ class Clients extends Controller {
     }
 
     /**
-     * 	partner törlése
-     *
+     * 	partner törlése AJAX
      */
-    public function delete_client() {
-        $id = $this->request->get_params('id');
-        $this->clients_model->delete_client($id);
-        Util::redirect('clients');
+    public function delete_client_AJAX()
+    {
+        if($this->request->is_ajax()){
+            $id = $this->request->get_post('client_id', 'integer');
+            $result = $this->clients_model->delete_client_AJAX($id);
+            echo json_encode($result);
+        }
     }
 
     /**
-     * 	Pertner módosítása
-     *
+     * 	Partner módosítása
      */
-    public function update_client() {
-        if ($this->request->has_post('submit_update_client')) {
+    public function update_client()
+    {
+        if ($this->request->has_post()) {
             $result = $this->clients_model->update_client($this->request->get_params('id'));
 
             if ($result) {
@@ -91,16 +94,13 @@ class Clients extends Controller {
         $this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.css');
         $this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/croppic/croppic.css');
 
-
         // js linkek generálása
         $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/croppic/croppic.min.js');
         $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.js');
         $this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/edit_client.js');
 
-
         // a módosítandó kolléga adatai
         $this->view->actual_client = $this->clients_model->one_client_query($this->request->get_params('id'));
-
 
         // template betöltése
         $this->view->render('clients/tpl_client_update');
@@ -117,12 +117,12 @@ class Clients extends Controller {
      *
      * 	Az user_img_upload() model metódus JSON adatot ad vissza (ezt "echo-za" vissza ez a metódus a kérelmező javascriptnek). 
      */
-    public function client_img_upload() {
+    public function client_img_upload()
+    {
         if ($this->request->is_ajax()) {
             echo $this->clients_model->client_img_upload();
         }
     }
 
 }
-
 ?>
