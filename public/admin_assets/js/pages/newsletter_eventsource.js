@@ -165,8 +165,8 @@ var Newsletter = function () {
 					
 					// paraméter az <a> elem amire klikkeltünk
 					//submit_newsletter_AJAX(newsletter_id);						
-					submit_newsletter_id(newsletter_id);						
-					startTask();
+					//submit_newsletter_id(newsletter_id);						
+					startTask(newsletter_id);
 				}
 			}); 
 		});	
@@ -279,125 +279,25 @@ var Newsletter = function () {
             } 
         });		
 	
-	}	
+	}
+
+
+
+
 /*--------------------------------------------------*/	
-
-
-
-
-								/**
-								 *	Hírlevél küldés AJAX (jQuery)
-								 *
-								 */
-								var submit_newsletter_AJAX = function(newsletter_id) {
-								
-										//var lastsent = $(this).closest("tr").find('td:nth-child(5)').text();
-										//var lastsent = link.closest("tr").find('td:nth-child(5)');
-
-										//var data = "newsletter_id="+newsletter_id;
-										
-										
-										//végrehajtjuk az AJAX hívást
-							            $.ajax({
-							                type: "POST",
-							                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-							                data: {
-							                   newsletter_id: newsletter_id
-							                },
-							                // a feldolgozó url-je
-							                //url: "admin/newsletter/eventsource",
-							                url: "admin/newsletter/setid_2",
-							                // kész a hívás... utána ez történjen
-							                dataType: "json",
-											beforeSend: function(){
-												console.log('before send');
-												//megjelenítjük a loading animációt
-												//$('#loadingDiv').html('<img src="public/admin_assets/img/loader.gif">');
-												//$('#loadingDiv').show();
-											},
-											complete: function(){
-												console.log('complete');
-							                    $('#loadingDiv').hide();
-							                },
-							                // itt kapjuk meg (és dolgozzuk fel) a feldolgozó php által visszadott adatot 
-							                success: function(result){
-												console.log('success');
-												console.log(result.status);
-												startTask();
-												//JSON string elemeinek elhelyezése egy objektumba
-											},
-							                done: function(){
-												console.log('ez a done');
-											},
-											error: function(result, status, e){
-												console.log('error!!!');
-							                    
-												//alert(e);
-							                } 
-							            });		
-									
-									//});
-								
-									
-								} // Hírlevél küldés AJAX (jQuery)
-
-	
 	
 	/**
-	 *	Elküldjük a hírlevél küldés megkezdése előtt (a setid() metódusnak), hogy melyik id-vel rendelkező hírlevelet kell elküldeni
-	 *
+	 * Változó az eventsource objektumnak
 	 */
-	var submit_newsletter_id = function(newsletter_id) {
-	
-        $.ajax({
-            type: "POST",
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            data: {
-                newsletter_id: newsletter_id
-            },
-			dataType: "json",
-            // a feldolgozó url-je
-            url: "admin/newsletter/setid",
-            //url: "admin/newsletter/eventsource",
-            // kész a hívás... utána ez történjen
-            beforeSend: function(){
-				console.log('before send');
-				//startTask();
-			},
-			complete: function(){
-				console.log('complete');
-            },
-            // itt kapjuk meg (és dolgozzuk fel) a feldolgozó php által visszadott adatot 
-            success: function(result){
-				//console.log('success');
-				console.log(result.status);
-
-			},
-            error: function(result, status, e){
-				console.log('error!!!');
-                
-				//alert(e);
-            } 
-        });		
-		
-	} // Hírlevél küldés AJAX (jQuery)	
-
-
-
-
-
-
-
-
-	
-	
-/*--------------------------------------------------*/	
-	
 	var es;
-	  
-	var startTask = function() {
 	
-	
+	/**
+	 * Hírlevél küldését végző metódus
+	 *
+	 * @param  newsletter_id  az elküldendő hírlevél id-je
+	 */  
+	var startTask = function(newsletter_id) {
+		
 		var progress_bar = document.getElementById('progress_bar');
 		var progress_pc = document.getElementById('progress_pc');
 		var message_done = document.getElementById('message_done');
@@ -406,9 +306,10 @@ var Newsletter = function () {
 		message_box.style.display = 'block';
 		progress_bar.style.display = 'block';
 	
-		//var query_string = '?newsletter_id='+newsletter_id;
+		var query_string = 'admin/newsletter/send_newsletter?newsletter_id=' + newsletter_id;
 	
-		es = new EventSource('admin/newsletter/send_newsletter');
+		//es = new EventSource('admin/newsletter/send_newsletter');
+		es = new EventSource(query_string);
 		
 		console.log(es);
 

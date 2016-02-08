@@ -139,7 +139,11 @@ class Newsletter extends Admin_controller {
 		set_time_limit(0); 
 		//ob_implicit_flush(true);
 
-		$this->newsletter_model->send_newsletter();
+//$this->request->get_query('newsletter_id');
+$newsletter_id = $this->request->get_query('newsletter_id');
+
+
+		$this->newsletter_model->send_newsletter($newsletter_id);
 	}
 /*--------- EVENTSOURCE END--------------------*/	
 	

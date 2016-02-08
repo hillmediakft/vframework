@@ -277,69 +277,68 @@ class Newsletter_model extends Model {
 	 *	$_POST['message_id']
 	 *
 	 */
-	public function send_newsletter()
+	public function send_newsletter($newsletter_id = null)
 	{
-		// newsletter_id visszaadás a a session-ból
-		$newsletter_id = (int)Session::get('newsletter_id');
 		
 		if (!isset($newsletter_id)) {
 			$this->send_msg('CLOSE', 'Hibas newsletter_id!');
 			return false;
+		} else {
+			$newsletter_id = (int)$newsletter_id;
 		}
 
 		$debug = true;
 		
-		if($debug){
-		
-			$success = 0;
-			$fail = 0;
-			
-			$max = 14;
-			
-			for($i = 1; $i <= $max; $i++){
-				
-				$number = rand(1000,11000);
-			
-				$progress = round(($i/$max)*100); //Progress
-			
-				//Hard work!!
-				sleep(1);
-
-				if($number > 4000){
-					$success += 1;
-					$this->send_msg($i, 'Sikeres   | id:' . $newsletter_id .  '|   küldés a ' . $number . '@mail.hu címre', $progress);				
+					if($debug){
 					
-				}
-				else{
-					$fail += 1;
-					$this->send_msg($i, 'Sikertelen   | id: ' . $newsletter_id .  '|   küldés a ' . $number . '@mail.hu címre', $progress);				
-				}
+						$success = 0;
+						$fail = 0;
+						
+						$max = 14;
+						
+						for($i = 1; $i <= $max; $i++){
+							
+							$number = rand(1000,11000);
+						
+							$progress = round(($i/$max)*100); //Progress
+						
+							//Hard work!!
+							sleep(1);
 
-			}
+							if($number > 4000){
+								$success += 1;
+								$this->send_msg($i, 'Sikeres   | id:' . $newsletter_id .  '|   küldés a ' . $number . '@mail.hu címre', $progress);				
+								
+							}
+							else{
+								$fail += 1;
+								$this->send_msg($i, 'Sikertelen   | id: ' . $newsletter_id .  '|   küldés a ' . $number . '@mail.hu címre', $progress);				
+							}
 
-			sleep(1);
+						}
 
-	
-				// adatok beírása a stats_newsletters táblába
-				$data['sent_date'] = date('Y-m-d-G:i');
-				$data['newsletter_id'] = $newsletter_id;
-				$data['recepients'] = $success + $fail;
-				$data['send_success'] = $success;
-				$data['send_fail'] = $fail;
-				$this->query->reset();
-				$this->query->set_table(array('stats_newsletters'));
-				$this->query->insert($data);			
+						sleep(1);
 
-			
-			//utolsó válasz
-			$this->send_msg('CLOSE', '<br />Sikeres küldések száma: ' . $success . '<br />' . 'Sikertelen küldések száma: ' . $fail. '<br />');
+				
+							// adatok beírása a stats_newsletters táblába
+							$data['sent_date'] = date('Y-m-d-G:i');
+							$data['newsletter_id'] = $newsletter_id;
+							$data['recepients'] = $success + $fail;
+							$data['send_success'] = $success;
+							$data['send_fail'] = $fail;
+							$this->query->reset();
+							$this->query->set_table(array('stats_newsletters'));
+							$this->query->insert($data);			
 
-
-			
-		} // debug vége
+						
+						//utolsó válasz
+						$this->send_msg('CLOSE', '<br />Sikeres küldések száma: ' . $success . '<br />' . 'Sikertelen küldések száma: ' . $fail. '<br />');
 
 
+						
+					} // debug vége
 
+		// éles küldés!!			
 		else {
 			$error = array();
 			$success = array();
@@ -364,7 +363,7 @@ class Newsletter_model extends Model {
 
 
 			// elküldendő hírlevél eleminek lekérdezése	
-			$newsletter_temp = $this->newsletter_query((int)$newsletter_id);
+			$newsletter_temp = $this->newsletter_query($newsletter_id);
 			// e-mail címek, és hozzájuk tartozó user nevek (akiknek küldeni kell)
 			$email_temp = $this->user_email_query();
 			
