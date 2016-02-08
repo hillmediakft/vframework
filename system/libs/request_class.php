@@ -154,11 +154,17 @@ class Request {
 
 	/**
 	 * Ellenőrzi, hogy létezik-e a paraméterként kapott index a $_POST szuperglobális tömbben
+	 * Ha nem adunk paramétert a metódusnak, akkor azt vizsgálja, hogy üres-e a $_POST tömb
+	 * (ha a $_POST tömb üres, akkor false-t ad vissza, ha nem üres, akkor true)
 	 *
 	 * @return boolean
 	 */
-	public function has_post($index)
+	public function has_post($index = null)
 	{
+		if(is_null($index)){
+			return !empty($_POST);
+		}
+
 		return isset($_POST[$index]);
 	}
 
