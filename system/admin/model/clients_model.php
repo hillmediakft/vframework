@@ -188,9 +188,9 @@ class Clients_model extends Model {
      *
      */
     public function client_img_upload() {
-        if (null !== $this->request->get_params('id')) {
+        if ($this->request->has_params('id')) {
 
-            include(LIBS . "/upload_class.php");
+            //include(LIBS . "/upload_class.php");
 
             // Kiválasztott kép feltöltése
             if ($this->request->get_params('id') == 'upload') {
