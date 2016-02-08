@@ -20,7 +20,7 @@
 								<a href="admin/blog">Blogok kezelése</a>
 								<i class="fa fa-angle-right"></i>
 							</li>
-							<li><a href="admin/blog/update">Blogbejegyzés módosítása</a></li>
+							<li><span>Blogbejegyzés módosítása</span></li>
 						</ul>
 					</div>
 	
@@ -31,29 +31,35 @@
 			<div class="row">
 				<div class="col-md-12">
 
-						<!-- echo out the system feedback (error and success messages) -->
-						<?php $this->renderFeedbackMessages(); ?>			
+					<!-- echo out the system feedback (error and success messages) -->
+					<?php $this->renderFeedbackMessages(); ?>			
 
+					<form action="" method="POST" id="update_blog_form" enctype="multipart/form-data">	
 						<!-- BEGIN EXAMPLE TABLE PORTLET-->
 						<div class="portlet">
-					
-							<div class="portlet-title">
-								<div class="caption"><i class="fa fa-film"></i>Blog bejegyzés módosítása</div>
-							</div>
-			
+
+	                        <div class="portlet-title">
+	                            <div class="caption">
+	                                <i class="fa fa-film"></i> 
+	                                Blog bejegyzés módosítása
+	                            </div>
+	                            <div class="actions">
+	                                <button class="btn green btn-sm" type="submit" name="submit_update_blog"><i class="fa fa-check"></i> Mentés</button>
+	                                <a class="btn default btn-sm" href="admin/blog"><i class="fa fa-close"></i> Mégsem</a>
+	                            </div>
+	                        </div>
+
 							<div class="portlet-body">
 
-
-							<div class="space10"></div>							
-							<div class="row">	
-								<div class="col-md-12">						
-									<form action="" method="POST" id="update_blog" enctype="multipart/form-data">	
-								
+								<div class="space10"></div>							
+								<div class="row">	
+									<div class="col-md-12">						
+									
 									<!-- bootstrap file upload -->
 										<div class="form-group">
 											<label class="control-label">Kép</label>
 											<div class="fileupload fileupload-new" data-provides="fileupload">
-												<div class="fileupload-new thumbnail" style="width: 200px; height: 150px;"><img src="<?php echo ADMIN_IMAGE . 'no_user_image.jpg';?>" alt=""/></div>
+												<div class="fileupload-new thumbnail" style="width: 200px; height: 150px;"><img src="<?php echo Config::get('blogphoto.upload_path') . $content[0]['blog_picture'];?>" alt=""/></div>
 												<div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
 												<div>
 													<span class="btn default btn-file"><span class="fileupload-new">Kiválasztás</span><span class="fileupload-exists">Módosít</span><input id="uploadprofile" class="img" type="file" name="upload_blog_picture"></span>
@@ -72,10 +78,8 @@
 											<div class="space10"></div>
 										</div>
 									<!-- bootstrap file upload END -->
-									
 
 									<?php foreach($content as $value) { ?>
-									
 										<div class="form-group">
 											<label for="blog_title" class="control-label">Cím</label>
 											<input type="text" name="blog_title" id="blog_title" value="<?php echo $value['blog_title'];?>" class="form-control input-xlarge" />
@@ -95,25 +99,24 @@
 										
 										<div class="form-group">
 											<label for="blog_add_date" class="control-label">Hozzáadás dátuma</label>
-											<input type="text" name="blog_add_date" id="blog_add_date" value="<?php echo $value['blog_add_date'];?>" class="form-control input-xlarge" />
+											<input type="text" name="blog_add_date" id="blog_add_date" value="<?php echo $value['blog_add_date'];?>" class="form-control form-control-inline input-medium date-picker" />
 										</div>
-
-
 									<?php } ?>
 
-										
-										<div class="space10"></div>
-										<button class="btn green submit" type="submit" value="submit" name="submit_update_blog">Bejegyzés módosítása <i class="fa fa-check"></i></button>
-									</form>
-								</div>
-							</div>	
+										<!-- régi kép elérési útja-->
+                                    	<input type="hidden" name="old_img" id="old_img" value="<?php echo $content[0]['blog_picture']; ?>">
 
+										<div class="space10"></div>
+									</div>
+								</div>	
 
 <div id="message"></div> 
-									
 
 							</div> <!-- END USER GROUPS PORTLET BODY-->
 						</div> <!-- END USER GROUPS PORTLET-->
+
+					</form>
+
 				</div> <!-- END COL-MD-12 -->
 			</div> <!-- END ROW -->	
 		</div> <!-- END PAGE CONTENT-->    

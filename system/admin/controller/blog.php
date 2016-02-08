@@ -35,8 +35,10 @@ class Blog extends Admin_controller {
     
     public function insert()
 	{
-		if($this->request->has_post('submit_add_blog')){
+		if( $this->request->has_post() ){
+
 			$result = $this->blog_model->insert();
+			
 			if($result){
 				Util::redirect('blog');
 			} else {
@@ -46,8 +48,15 @@ class Blog extends Admin_controller {
 
 		$this->view->title = 'Admin blog oldal';
 		$this->view->description = 'Admin blog oldal description';	
+
+        //datepicker	
+		$this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/bootstrap-datepicker/css/datepicker.css');
+		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-datepicker/js/bootstrap-datepicker.js');
+		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-datepicker/js/locales/bootstrap-datepicker.hu.js');
+		// fileupload
        	$this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.css');
 		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.js');
+		
 		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/ckeditor/ckeditor.js');
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/new_blog.js');	   
 
@@ -59,7 +68,8 @@ class Blog extends Admin_controller {
     
 	public function update()
 	{
-		if($this->request->has_post('submit_update_blog')){
+		if( $this->request->has_post() ){
+
 			$result = $this->blog_model->update($this->request->get_params('id'));
 			if($result){
 				Util::redirect('blog');
@@ -71,14 +81,21 @@ class Blog extends Admin_controller {
 		$this->view->title = 'Admin blog oldal';
 		$this->view->description = 'Admin blog oldal description';	
 
+        //datepicker	
+		$this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/bootstrap-datepicker/css/datepicker.css');
+		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-datepicker/js/bootstrap-datepicker.js');
+		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-datepicker/js/locales/bootstrap-datepicker.hu.js');
+		// fileupload
        	$this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.css');
 		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.js');
+		
+		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/ckeditor/ckeditor.js');
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/edit_blog.js');		
         
 		$this->view->category_list = $this->blog_model->blog_category_query();
 		$this->view->content = $this->blog_model->blog_query2($this->request->get_params('id'));
 		
-// $this->view->debug(true);		
+//$this->view->debug(true);		
 
 		$this->view->render('blog/tpl_blog_update');
 	}  

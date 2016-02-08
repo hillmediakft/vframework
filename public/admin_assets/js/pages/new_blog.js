@@ -1,5 +1,48 @@
 var newBlog = function () {
 
+	/**
+	 *	Form adatok elküldése
+	 */
+	var send_form = function(){
+
+		$("#new_blog_form").submit(function (e){
+			e.preventDefault();
+
+			Metronic.blockUI({
+	            boxed: true,
+	            message: 'Feldolgozás...'
+	        });	
+
+			currentForm = this;
+
+			setTimeout(function(){
+				currentForm.submit();
+			}, 300);
+
+		});
+	}
+
+
+	/**
+	 * Datepicker indító script
+	 */
+	var handleDatePickers = function () {
+
+		if (jQuery().datepicker) {
+			$('.date-picker').datepicker({
+				rtl: Metronic.isRTL(),
+				orientation: "left",
+				autoclose: true,
+				format:"yyyy-mm-dd",
+				language: "hu-HU",
+                                startDate: '0d',
+                                endDate: '+2m'
+			});
+			//$('body').removeClass("modal-open"); // fix bug when inline picker is used in modal
+		}
+	}
+
+
 	var hideAlert = function () {
 		$('div.alert').delay( 2500 ).slideUp( 750 );						 		
 	}
@@ -11,6 +54,8 @@ var newBlog = function () {
     return {
         //main function to initiate the module
         init: function () {
+			send_form();
+			handleDatePickers();
 			hideAlert();
 			ckeditorInit();
         }

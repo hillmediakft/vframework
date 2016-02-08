@@ -27,7 +27,7 @@ class blog_model extends Admin_model {
 	}
 
 	/**
-	 *	Visszaadja a blog tábla tartalmát
+	 *	Visszaadja a blog tábla egy kategóriájának elemeit
 	 *	Ha kap egy id paramétert (integer), akkor csak egy sort ad vissza a táblából
 	 *
 	 *	@param $id Integer 
@@ -84,9 +84,9 @@ class blog_model extends Admin_model {
 		// kép feltöltése
 		if(isset($_FILES['upload_blog_picture'])) {
 			// kép feltöltése, upload_slider_picture() metódussal (visszatér a feltöltött kép elérési útjával, vagy false-al)
-			$dest_imagePath = $this->upload_blog_picture($_FILES['upload_blog_picture']);
+			$dest_image = $this->upload_blog_picture($_FILES['upload_blog_picture']);
 			
-			if($dest_imagePath === false){
+			if($dest_image === false){
 				return false;
 			}
 		}
@@ -96,9 +96,9 @@ class blog_model extends Admin_model {
 		}
 
 	// az adatbázisba kerülő adatok
-		$data['blog_title'] = htmlentities($this->request->get_post('blog_title'), ENT_QUOTES, "UTF-8");
-		$data['blog_body'] = $this->request->get_post('blog_body');
-		$data['blog_picture'] = $dest_imagePath;
+		$data['blog_title'] = $this->request->get_post('blog_title');
+		$data['blog_body'] = $this->request->get_post('blog_body', 'remove_danger_tags');
+		$data['blog_picture'] = $dest_image;
 		$data['blog_category'] = $this->request->get_post('blog_category');
 		$data['blog_add_date'] = empty( $this->request->get_post('blog_add_date') ) ? date('Y-m-d-G:i') : $this->request->get_post('blog_add_date');
 
@@ -123,11 +123,14 @@ class blog_model extends Admin_model {
 		// kép feltöltése
 		if(isset($_FILES['upload_blog_picture']) && $_FILES['upload_blog_picture']['error'] != 4) {
 			// kép feltöltése, upload_slider_picture() metódussal (visszatér a feltöltött kép elérési útjával, vagy false-al)
-			$dest_imagePath = $this->upload_blog_picture($_FILES['upload_blog_picture']);
+			$dest_image = $this->upload_blog_picture($_FILES['upload_blog_picture']);
 			
-			if($dest_imagePath === false){
+			$new_picture = true;
+			
+			if($dest_image === false){
 				return false;
 			}
+
 		}
 		/*
 		else {
@@ -136,12 +139,17 @@ class blog_model extends Admin_model {
 		}
 		*/
 
+
 	// az adatbázisba kerülő adatok
-		$data['blog_title'] = htmlentities($this->request->get_post('blog_title'), ENT_QUOTES, "UTF-8");
-		$data['blog_body'] = $this->request->get_post('blog_body');
+		$data['blog_title'] = $this->request->get_post('blog_title');
+		$data['blog_body'] = $this->request->get_post('blog_body', 'remove_danger_tags');
 		
-		if(isset($dest_imagePath)){
-			$data['blog_picture'] = $dest_imagePath;
+		// ha van új feltöltött kép
+		if(isset($new_picture)){
+			$data['blog_picture'] = $dest_image;
+            // régi kép adatai (ezt használjuk a régi kép törléséhez, ha új kép lett feltöltve)
+            $old_img_path = Config::get('blogphoto.upload_path') . $this->request->get_post('old_img');
+            $old_thumb_path = Util::thumb_path($old_img_path);
 		}
 		
 		$data['blog_category'] = $this->request->get_post('blog_category');
@@ -153,8 +161,18 @@ class blog_model extends Admin_model {
 		$this->query->set_where('blog_id','=', $id);
 		$result = $this->query->update($data);
 	
-	// ha sikeres az insert visszatérési érték true
-		if($result) {
+		if($result >= 0) {
+            // megvizsgáljuk, hogy létezik-e új feltöltött kép
+            if (isset($new_picture)) {
+                //régi képek törlése
+                if (!Util::del_file($old_img_path)) {
+                    Message::log('A ' . $old_img_path . ' kép nem törlődött!');
+                };
+                if (!Util::del_file($old_thumb_path)) {
+                    Message::log('A ' . $old_thumb_path . ' kép nem törlődött!');
+                };
+            }
+
 			Message::set('success', 'Bejegyzés módosítása sikerült!');
 			return true;
 		}
@@ -219,8 +237,8 @@ class blog_model extends Admin_model {
 					//ha van feltöltött képe a bloghoz (az adatbázisban szerepel elérési út és filenév)
 					if(!empty($photo_name[0]['blog_picture'])){
 					
-						$picture_path = $photo_name[0]['blog_picture'];
-						$thumb_picture_path = Util::thumb_path($picture_path, true);
+						$picture_path = Config::get('blogphoto.upload_path') . $photo_name[0]['blog_picture'];
+						$thumb_picture_path = Util::thumb_path($picture_path);
 					
 						$del_result = Util::del_file($picture_path);
 						$del_thumb_result = Util::del_file($thumb_picture_path);
@@ -336,7 +354,15 @@ class blog_model extends Admin_model {
 	{
 		//include(LIBS . "/upload_class.php");
 		// feltöltés helye
-		$imagePath = UPLOADS . "images/";
+		$imagePath = Config::get('blogphoto.upload_path');
+		// kép szélesség
+		$width = Config::get('blogphoto.width', 600);
+		// kép magasság
+		$height = Config::get('blogphoto.height', 400);
+		// nézőképkép szélesség
+		$width_thumb = Config::get('blogphoto.thumb_width', 150);
+
+		
 		//képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül)	
 		$handle = new Upload($files_array);
 					
@@ -348,8 +374,8 @@ class blog_model extends Admin_model {
 			$handle->allowed = array('image/*');
 			$handle->file_new_name_body   	 = "blog_" . rand();
 			$handle->image_resize            = true;
-			$handle->image_x                 = 600;
-			$handle->image_y                 = 400;
+			$handle->image_x                 = $width;
+			$handle->image_y                 = $height;
 			//$handle->image_ratio_y           = true;
 			
 			//képarány meghatározása a nézőképhez
@@ -358,22 +384,20 @@ class blog_model extends Admin_model {
 		// Blog kép készítése
 			$handle->Process($imagePath);
 			if ($handle->processed) {
-				//kép elérési útja és új neve (ezzel tér vissza a metódus, ha nincs hiba!)
-				$dest_imagePath = $imagePath . $handle->file_dst_name;
+				//kép új neve (ezzel tér vissza a metódus, ha nincs hiba!)
+				$dest_image = $handle->file_dst_name;
 			} else {
                 Message::set('error', $handle->error);
 				return false;
 			}
 			
 		// Nézőkép készítése
-			// thumb mappába kerül a nézőkép
-			$imagePath = UPLOADS . "images/thumb";
 			//nézőkép nevének megadása (kép új neve utána _thumb)	
 			$handle->file_new_name_body		 = $handle->file_dst_name_body;
 			$handle->file_name_body_add   	 = '_thumb';
 			
 			$handle->image_resize            = true;
-			$handle->image_x                 = 150;
+			$handle->image_x                 = $width_thumb;
 			$handle->image_y           		 = round($handle->image_x / $ratio);
 			//$handle->image_ratio_y           = true;
 
@@ -390,8 +414,8 @@ class blog_model extends Admin_model {
 			return false;	
 		}
 		
-		// ha nincs hiba visszadja a feltöltött kép elérési útját
-		return $dest_imagePath;	
+		// ha nincs hiba visszadja a feltöltött kép nevét
+		return $dest_image;	
 	}	
 }
 ?>
