@@ -129,18 +129,35 @@ var Clients = function () {
                         },
                         success: function (result) {
                             if(result.status == 'success') {
-                                message.append('<div class="alert alert-success">' + result.message + '</div>');
-                                $('#ajax_message .alert-success').delay( 2500 ).slideUp( 750, function(){
-                                    $(this).remove();
-                                } );
+   
+                                Metronic.alert({
+                                    type: 'success',
+                                    //icon: 'warning',
+                                    message: result.message,
+                                    container: $('#ajax_message'),
+                                    place: 'append',
+                                    close: true, // make alert closable
+                                    //reset: true, // close all previouse alerts first
+                                    //focus: true, // auto scroll to the alert after shown
+                                    closeInSeconds: 3 // auto close after defined seconds
+                                });                                
+                              
                                 deleteHtml.remove();
 
                             }
                             if(result.status == 'error') {
-                                message.append('<div class="alert alert-danger">' + result.message + '</div>');
-                                $('#ajax_message .alert-danger').delay( 2500 ).slideUp( 750, function(){
-                                    $(this).remove();
-                                } );
+                                
+                                Metronic.alert({
+                                    type: 'danger',
+                                    //icon: 'warning',
+                                    message: result.message,
+                                    container: $('#ajax_message'),
+                                    place: 'append',
+                                    close: true, // make alert closable
+                                    //reset: true, // close all previouse alerts first
+                                    //focus: true, // auto scroll to the alert after shown
+                                    closeInSeconds: 3 // auto close after defined seconds
+                                });
                             }
                         },
                         error: function(result, status, e){
@@ -178,6 +195,6 @@ $(document).ready(function () {
     Metronic.init(); // init metronic core componets
     Layout.init(); // init layout
     QuickSidebar.init(); // init quick sidebar
-    Demo.init(); // init demo features 
+    //Demo.init(); // init demo features 
     Clients.init(); // init clients page
 });
