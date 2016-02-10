@@ -91,76 +91,181 @@ var Users = function () {
             jQuery(set).each(function () {
                 if (checked) {
                     $(this).attr("checked", true);
-                    $(this).parents('tr').addClass("active");
+                    // $(this).parents('tr').addClass("active");
                 } else {
                     $(this).attr("checked", false);
-                    $(this).parents('tr').removeClass("active");
+                    // $(this).parents('tr').removeClass("active");
                 }
             });
             jQuery.uniform.update(set);
         });
-
+/*
         table.on('change', 'tbody tr .checkboxes', function () {
             $(this).parents('tr').toggleClass("active");
         });
-
+*/
         tableWrapper.find('.dataTables_length select').addClass("form-control input-sm input-inline"); // modify table per page dropdown
     }
-	
+
+	/**
+	 * Egy user törlése ajax-al confirm
+	 */
 	var deleteOneUserConfirm = function () {
-	 		$('[id*=delete_user]').on('click', function(e){
-               	e.preventDefault();
-				var deleteLink = $(this).attr('href');
-				var userName = $(this).closest("tr").find('td:nth-child(4)').text();
-				
-				bootbox.setDefaults({
-					locale: "hu", 
-				});
-				bootbox.confirm("Biztosan törölni akarja " + userName + " felhasználót?", function(result) {
-					if (result) {
-						window.location.href = deleteLink; 	
-					}
-                }); 
-            });	
-	 
-	}
-	
-	var deleteUsersConfirm = function () {
-			$('#del_user_form').submit(function(e){
-                e.preventDefault();
-				currentForm = this;
-				bootbox.setDefaults({
-					locale: "hu", 
-				});
-				bootbox.confirm("Biztosan törölni akarja a felhasználókat?", function(result) {
-					if (result) {
-						// a submit() nem küldi el a gomb name értékét, ezért be kell rakni egy hidden elemet
-						$('#del_user_form').append($("<input>").attr("type", "hidden").attr("name", "delete_user").val("submit_delete_user"));
-						currentForm.submit(); 	
-					}
-                }); 
-            });	 		
+ 		$('[id*=delete_user]').on('click', function(e){
+           	e.preventDefault();
+
+           	// A törlendő user neve
+			var userName = $(this).closest("tr").find('td:nth-child(4)').text();
+            // a törlendő elem id-je
+            var deleteID = $(this).attr('data-id');
+            // a deleteHtml változóhoz rendeljük a html táblázat törlendő sorát <tr>
+            var deleteRow = $(this).closest("tr");
+            // üzenet elem
+            var message = $('#ajax_message');
+			
+			bootbox.setDefaults({
+				locale: "hu", 
+			});
+			bootbox.confirm("Biztosan törölni akarja " + userName + " felhasználót?", function(result) {
+				if (result) {
+					deleteUser(deleteID, deleteRow);
+				}
+            }); 
+        });	
 	}
 
-	var enableDisableButtons = function () {
-		
-		var deleteUserSubmit = $('button[name="del_user_submit"]');
-		var checkAll = $('input.group-checkable');
-		var checkboxes = $('input.checkboxes');
-			
-		deleteUserSubmit.attr('disabled', true);
-			
-		checkboxes.change(function(){
-			$(this).closest("tr").find('.btn-group a').attr('disabled', $(this).is(':checked'));
-			deleteUserSubmit.attr('disabled', !checkboxes.is(':checked'));
-        });		
-		checkAll.change(function(){
-			checkboxes.closest("tr").find('.btn-group a').attr('disabled', $(this).is(':checked'));
-			deleteUserSubmit.attr('disabled', !checkboxes.is(':checked'));
-        });	
-		
+	/**
+	 * Userek csoportos törlése ajax-al confirm
+	 */
+	var deleteGroupUserConfirm = function () {
+		$('#del_user_group').on('click', function(){
+
+			bootbox.setDefaults({
+				locale: "hu", 
+			});
+			bootbox.confirm("Biztosan törölni akarja felhasználókat?", function(result) {
+				if (result) {
+
+					// tömb, ami azokat az id-ket fogja tartalmazni, ahol be van kapcsolva a checkbox
+					var id_array = new Array(); // a törlendő id-ket tartalamzó tömb
+					// checkbox objektumok
+					var checkboxes = $('input.checkboxes');
+
+					// bejárjuk a checkboxokat tartalmazó objektumot
+					$.each(checkboxes, function(index, val) {
+						if( $(this).is(':checked') ){
+							// ha be van kapcsolva az aktuális checkbox, akkor a value értékét berakjuk a id_array tömbbe
+							id_array.push($(this).val());
+						}
+					});
+					
+					// átalakítjuk a tömböt felsorolás stringre pl. 12,54,65
+					var id_string = id_array.toString();
+					// a második paraméter a törlendő html elem, de csoportos törlésnél 
+					deleteUser(id_string, null);
+				}
+			});
+		});
+	}	
+
+	/**
+	 * User(ek) törlése ajax-al
+	 *
+	 * @param array 				id_string 	törlendő id-ket tartalamzó string: "12,45,78" vagy "23"
+	 * @param objektum vagy null 	deleteRow 	HTML elem, amit törölni kell a dom-ból (csoportos törlésnél null az értéke!)
+	 */
+	var deleteUser = function (id_string, deleteRow) {
+
+        // üzenet elem
+        var message = $('#ajax_message');
+		// törlendő HTML elem
+        var deleteTR;
+
+        $.ajax({
+            url: 'admin/users/teszt_delete_user',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                user_id: id_string
+            },
+            beforeSend: function() {
+                Metronic.blockUI({
+                    boxed: true,
+                    message: 'Feldolgozás...'
+                });
+            },
+            complete: function(){
+                Metronic.unblockUI();
+            },
+            success: function (result) {
+                if(result.message_success) {
+
+                	if(deleteRow != null){
+						// HTML <tr> törlése
+                    	deleteRow.remove();
+                	}
+                	else {
+                      	var checkboxes = $('input.checkboxes');
+                        $.each(checkboxes, function(index, val) {
+							if( $(this).is(':checked') ){
+								// a deleteTR változóhoz rendeljük a html táblázat törlendő sorát <tr>
+    							deleteTR = $(this).closest("tr");
+								// HTML <tr> törlése
+								deleteTR.remove();
+							}
+                        });	
+                	}
+
+                    Metronic.alert({
+                        type: 'success',
+                        //icon: 'warning',
+                        message: result.message_success,
+                        container: $('#ajax_message'),
+                        place: 'append',
+                        close: true, // make alert closable
+                        //reset: true, // close all previouse alerts first
+                        //focus: true, // auto scroll to the alert after shown
+                        closeInSeconds: 3 // auto close after defined seconds
+                    });                                
+                }
+                if(result.message_error) {
+
+                    Metronic.alert({
+                        type: 'danger',
+                        //icon: 'warning',
+                        message: result.message_error,
+                        container: $('#ajax_message'),
+                        place: 'append',
+                        close: true, // make alert closable
+                        //reset: true, // close all previouse alerts first
+                        //focus: true, // auto scroll to the alert after shown
+                        closeInSeconds: 3 // auto close after defined seconds
+                    });                                
+                }
+                if(result.status) {
+                	if(result.status == 'error') {
+                        Metronic.alert({
+                            type: 'danger',
+                            //icon: 'warning',
+                            message: result.message,
+                            container: $('#ajax_message'),
+                            place: 'append',
+                            close: true, // make alert closable
+                            //reset: true, // close all previouse alerts first
+                            //focus: true, // auto scroll to the alert after shown
+                            closeInSeconds: 3 // auto close after defined seconds
+                        });
+                	}
+                }
+            },
+            error: function(xhr, textStatus, errorThrown){
+                console.log(errorThrown);
+                console.log("Hiba történt: " + textStatus);
+				console.log("Rendszerválasz: " + xhr.responseText); 
+            } 
+        }); // ajax end
 	}
-	
+
 	var resetSearchForm = function () {
 		$('#reset_search_form').on('click', function(){
 		$(':input', '#users_search_form')
@@ -173,10 +278,6 @@ var Users = function () {
 
 	var hideAlert = function () {
 		$('div.alert').delay( 2500 ).slideUp( 750 );						 		
-	}
-
-	var hideSearchPortlet = function () {
-		$('#search-portlet').hide();						 		
 	}
 
     var makeActiveConfirm = function () {
@@ -200,9 +301,8 @@ var Users = function () {
 	}
 	
 	var makeActive = function (userId, action, elem) {
-		//üzeneteket megjelenítő elemek
-		var success_div = $("#ajax_message .alert-success");
-		var error_div = $("#ajax_message .alert-danger");
+		//üzeneteket tartalamzó elem
+		var ajax_message = $("#ajax_message");
 		
 		$.ajax({
 			type: "POST",
@@ -213,10 +313,13 @@ var Users = function () {
 			url: "admin/users/change_status",
 			dataType: "json",
 			beforeSend: function() {
-				$('#loadingDiv').show();
+                Metronic.blockUI({
+                    boxed: true,
+                    message: 'Feldolgozás...'
+                });
 			},
 			complete: function(){
-				$('#loadingDiv').hide();
+				Metronic.unblockUI();
 			},
 			success: function (result) {
 				if(result.status == 'success') {
@@ -225,26 +328,57 @@ var Users = function () {
 						$(elem).html('<i class="fa fa-check"></i> Aktivál');
 						$(elem).attr('data-action', 'make_active');
 						$(elem).closest('td').prev().html('<span class="label label-sm label-danger">Inaktív</span>');
-						success_div.html(result.message).show();
+						
+                        Metronic.alert({
+                            type: 'success',
+                            //icon: 'warning',
+                            message: result.message,
+                            container: $('#ajax_message'),
+                            place: 'append',
+                            close: true, // make alert closable
+                            //reset: true, // close all previouse alerts first
+                            //focus: true, // auto scroll to the alert after shown
+                            closeInSeconds: 3 // auto close after defined seconds
+                        });
+
 					}
 					else if(action == 'make_active') {
 						$(elem).html('<i class="fa fa-ban"></i> Blokkol');
 						$(elem).attr('data-action', 'make_inactive');
 						$(elem).closest('td').prev().html('<span class="label label-sm label-success">Aktív</span>');
-						success_div.html(result.message).show();
+						
+						Metronic.alert({
+                            type: 'success',
+                            //icon: 'warning',
+                            message: result.message,
+                            container: $('#ajax_message'),
+                            place: 'append',
+                            close: true, // make alert closable
+                            //reset: true, // close all previouse alerts first
+                            //focus: true, // auto scroll to the alert after shown
+                            closeInSeconds: 3 // auto close after defined seconds
+                        });
 					}
 				
 				}
 				if(result.status == 'error') {
-					//console.log('Hiba: az adatbázis művelet nem történt meg!');
-					error_div.html(result.message).show();
-				}
-				//üzenet elem elrejtése
-				hideAlert();
+					console.log('Hiba: az adatbázis művelet nem történt meg!');
+					Metronic.alert({
+	                            type: 'danger',
+	                            //icon: 'warning',
+	                            message: result.message,
+	                            container: $('#ajax_message'),
+	                            place: 'append',
+	                            close: true, // make alert closable
+	                            closeInSeconds: 5 // auto close after defined seconds
+	                        });
+					}
 			},
-			error: function(result, status, e){
-				alert(e);
-			} 
+            error: function(xhr, textStatus, errorThrown){
+                console.log(errorThrown);
+                console.log("Hiba történt: " + textStatus);
+				console.log("Rendszerválasz: " + xhr.responseText); 
+            } 
 		});
 
 	}	
@@ -276,14 +410,11 @@ var Users = function () {
 
             usersTable();
 			deleteOneUserConfirm();
-			deleteUsersConfirm();
-			enableDisableButtons();
+            deleteGroupUserConfirm();
+			makeActiveConfirm();
 			resetSearchForm();
 			hideAlert();
-			//hideSearchPortlet();
-			makeActiveConfirm();
 			printTable();
-			
         }
 
     };

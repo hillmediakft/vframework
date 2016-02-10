@@ -29,12 +29,8 @@
                 <!-- BEGIN EXAMPLE TABLE PORTLET-->
 
                 <!-- ÜZENETEK -->
-                <div id="ajax_message">
-                    <div class="alert alert-success" style="display:none;"></div>
-                    <div class="alert alert-danger" style="display:none;"></div>
-                </div> 						
+                <div id="ajax_message"></div> 						
                 <?php $this->renderFeedbackMessages(); ?>				
-
 
                 <form class="horizontal-form" id="del_user_form" method="POST" action="admin/users/delete_user">	
 
@@ -51,7 +47,7 @@
                                     ?>
                                     <a href="admin/users/new_user" class="btn blue-steel btn-sm"><i class="fa fa-plus"></i> Új felhasználó</a>
 <?php } ?>
-                                <button class="btn red btn-sm" name="del_user_submit" type="submit"><i class="fa fa-trash"></i> Csoportos törlés</button>
+                                <button class="btn red btn-sm" id="del_user_group" type="button"><i class="fa fa-trash"></i> Csoportos törlés</button>
                                 <div class="btn-group">
                                     <a data-toggle="dropdown" class="btn btn-sm default">
                                         <i class="fa fa-wrench"></i> Eszközök <i class="fa fa-angle-down"></i>
@@ -123,7 +119,7 @@
                                                             <?php if (isset($user_ref[$value['user_id']])) { ?>
                                                                 <li class="disabled-link"><a class="disable-target" title="A felhsználó nem törölhető amíg van munka hozzárendelve"><i class="fa fa-trash"></i> Töröl</a></li>
                                                             <?php } elseif (($loggedin_user_role == 1) && ($loggedin_user_id != $value['user_id']) && ($value['user_role_id'] == 2)) { ?>
-                                                                <li><a href="<?php echo $this->registry->site_url . 'users/delete_user/' . $value['user_id']; ?>" id="delete_user_<?php echo $value['user_id']; ?>"> <i class="fa fa-trash"></i> Töröl</a></li>
+                                                                <li><a id="delete_user_<?php echo $value['user_id']; ?>" data-id="<?php echo $value['user_id']; ?>"> <i class="fa fa-trash"></i> Töröl</a></li>
                                                             <?php } else { ?>
                                                                 <li class="disabled-link"><a class="disable-target" title="Nem törölhető"><i class="fa fa-trash"></i> Töröl</a></li>
                                                             <?php } ?>
@@ -153,7 +149,6 @@
             </div>
         </div>
 
-        <div id="loadingDiv" style="display:none;"><img src="public/admin_assets/img/loader.gif"></div>	
     </div><!-- END PAGE CONTAINER-->    
 </div><!-- END PAGE CONTENT WRAPPER -->
 </div><!-- END CONTAINER -->

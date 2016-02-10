@@ -65,8 +65,8 @@ class Users extends Admin_controller {
 		// js linkek generálása
 		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/croppic/croppic.min.js');
 		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.js');
-		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/jquery-validation/dist/jquery.validate.js');
-		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/jquery-validation/dist/additional-methods.min.js');
+		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/jquery-validation/jquery.validate.js');
+		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/jquery-validation/additional-methods.min.js');
 		//$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'form-validation.js');
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/new_user.js');
 		
@@ -103,8 +103,8 @@ class Users extends Admin_controller {
 		// js linkek generálása
 		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/croppic/croppic.min.js');
 		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.js');
-		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/jquery-validation/dist/jquery.validate.js');
-		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/jquery-validation/dist/additional-methods.min.js');
+		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/jquery-validation/jquery.validate.js');
+		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/jquery-validation/additional-methods.min.js');
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/profile.js');
         
 		// visszadja a bejelentkezett user adatait egy tömbbe (id, név, telefon, password... stb.)
@@ -158,20 +158,59 @@ class Users extends Admin_controller {
         $this->view->render('users/tpl_edit_roles');
     }
 	
+				/**
+				 *	User törlése
+				 *
+				 */
+				public function delete_user()
+				{
+			        if(Session::get('user_role_id') == 1){
+			            $this->users_model->delete_user();
+			        } else {
+			            Message::set('error', 'Nincs engedélye a művelet végrehajtásához!');
+			        }
+			        
+			        Util::redirect('users');
+				}
+
 	/**
-	 *	User törlése
-	 *
+	 *	User törlése AJAX-al
 	 */
-	public function delete_user()
+	public function delete_user_AJAX()
 	{
-        if(Session::get('user_role_id') == 1){
-            $this->users_model->delete_user();
-        } else {
-            Message::set('error', 'Nincs engedélye a művelet végrehajtásához!');
+        if($this->request->is_ajax()){
+	        if(Session::get('user_role_id') == 1){
+
+	        	$id = $this->request->get_post('user_id');
+            	$result = $this->users_model->delete_user_AJAX($id);
+        		echo json_encode($result);
+
+	        } else {
+	            echo json_encode(array(
+	            	'status' => 'error',
+	            	'message' => 'Nincs engedélye a művelet végrehajtásához!'
+	            ));
+	        }
         }
-        
-        Util::redirect('users');
 	}
+
+	/**
+	 *	User törlése AJAX-al
+	 */
+	public function teszt_delete_user()
+	{
+        if($this->request->is_ajax()){
+
+        	$id = $this->request->get_post('user_id');
+        	$result = $this->users_model->delete_user_AJAX($id);
+    		echo json_encode($result);
+        }
+	}
+
+
+
+
+
 
 	
     /**

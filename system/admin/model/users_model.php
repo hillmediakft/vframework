@@ -11,7 +11,8 @@ class Users_model extends Admin_model {
     /**
      * Constructor, létrehozza az adatbáziskapcsolatot
      */
-    function __construct() {
+    function __construct()
+    {
         parent::__construct();
 
         //regisztráció email-es ellenőrzésének be- vagy kikapcsolása
@@ -23,7 +24,8 @@ class Users_model extends Admin_model {
      * Felhsználók adatainak lekérdezése
      */
 
-    public function all_user() {
+    public function all_user()
+    {
         // a query tulajdonság ($this->query) tartalmazza a query objektumot
         $this->query->reset();
         $this->query->set_table(array('users'));
@@ -43,7 +45,8 @@ class Users_model extends Admin_model {
         return $this->query->select();
     }
 
-    public function new_user() {
+    public function new_user()
+    {
         $error_counter = 0;
 
         // User név ellenőrzés
@@ -145,7 +148,7 @@ class Users_model extends Admin_model {
             $last_name = $this->request->get_post('last_name');
 
             if (!empty($this->request->get_post('email'))) {
-                $user_email = htmlentities($this->request->get_post('email'), ENT_QUOTES, "UTF-8");
+                $user_email = $this->request->get_post('email');
             } else {
                 $user_email = null;
             }
@@ -176,18 +179,18 @@ class Users_model extends Admin_model {
                 return false;
             }
 
-            /*
-              if(!is_null($user_email)){
+/*
+            if(!is_null($user_email)){
               // check if email already exists
               $query = $this->connect->prepare("SELECT user_id FROM users WHERE user_email = :user_email");
               $query->execute(array(':user_email' => $user_email));
               $count =  $query->rowCount();
               if ($count == 1) {
-              Message::set('error', 'user_email_already_taken');
-              return false;
+                Message::set('error', 'user_email_already_taken');
+                return false;
               }
-              }
-             */
+            }
+*/
 
 
             // ha be van állítva e-mail ellenőrzéses regisztráció
@@ -208,7 +211,8 @@ class Users_model extends Admin_model {
 
             $query = $this->connect->prepare($sql);
 
-            $query->execute(array(':user_name' => $user_name,
+            $query->execute(array(
+                ':user_name' => $user_name,
                 ':user_first_name' => $first_name,
                 ':user_last_name' => $last_name,
                 ':user_phone' => $_POST['phone'],
@@ -265,56 +269,27 @@ class Users_model extends Admin_model {
     }
 
     /**
-     * 	Admin user törlése
+     * Admin user törlése AJAX-al
      *
-     * 	@return integer or false
+     * @param string $id     ez lehet egy szám, vagy felsorolás pl: 23 vagy 12,14,36
      */
-    public function delete_user() {
+    public function delete_user_AJAX($id)
+    {
         // a sikeres törlések számát tárolja
         $success_counter = 0;
+        // a sikeresen törölt id-ket tartalmazó tömb
+        $success_id = array();
+        
         // a sikertelen törlések számát tárolja
         $fail_counter = 0;
 
-        // Több user törlése
-        if ($this->request->has_post('delete_user')) {
-
-            $data_arr = $this->request->get_post();
-
-            //eltávolítjuk a tömbből a felesleges elemeket	
-            if (isset($data_arr['delete_user'])) {
-                unset($data_arr['delete_user']);
-            }
-            if (isset($data_arr['users_length'])) {
-                unset($data_arr['users_length']);
-            }
-        } else {
-            // egy user törlése (nem POST adatok alapján)
-            if (!$this->request->has_params('id')) {
-                throw new Exception('Nincs id-t tartalmazo parameter az url-ben (ezert nem tudunk torolni id alapjan)!');
-                return false;
-            }
-            //berakjuk a $data_arr tömbbe a törlendő felhasználó id-jét
-            $data_arr = array($this->request->get_params('id'));
-        }
+        // a paraméterként kapott stringből tömböt csinálunk a , karakter mentén
+        $data_arr = explode(',', $id);
 
         // bejárjuk a $data_arr tömböt és minden elemen végrehajtjuk a törlést
         foreach ($data_arr as $value) {
             //átalakítjuk a integer-ré a kapott adatot
             $value = (int) $value;
-
-            // lekérdezzük, hogy kapcsolódik-e hozzá bevitt munka
-            $this->query->reset();
-            $this->query->set_table('jobs');
-            $this->query->set_columns('COUNT(*)');
-            $this->query->set_where('job_ref_id', '=', $value);
-            $job_number = $this->query->select();
-
-            //ha nem 0 a visszadott érték, akkor van munkája a usernek és nem törölhető
-            if ($job_number[0]['COUNT(*)'] != '0') {
-                Message::set('error', 'A felhasználó nem törölhető, mert kapcsolódik hozzá munka.');
-                continue;
-            }
-
 
             //lekérdezzük a törlendő user avatar képének a nevét, hogy törölhessük a szerverről
             $this->query->reset();
@@ -323,8 +298,7 @@ class Users_model extends Admin_model {
             $this->query->set_where('user_id', '=', $value);
             $photo_name = $this->query->select();
 
-
-            //felhasználó törlése	
+            //felhasználó törlése 
             $this->query->reset();
             $this->query->set_table(array('users'));
             //a delete() metódus integert (lehet 0 is) vagy false-ot ad vissza
@@ -343,6 +317,7 @@ class Users_model extends Admin_model {
                     }
                     //sikeres törlés
                     $success_counter += $result;
+                    $success_id[] = $value;
                 } else {
                     //sikertelen törlés
                     $fail_counter += 1;
@@ -350,21 +325,26 @@ class Users_model extends Admin_model {
                 //continue;
             } else {
                 // ha a törlési sql parancsban hiba van
-                throw new Exception('Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!');
-                return false;
+                return array(
+                    'status' => 'error',                  
+                    'message' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!',                  
+                );
             }
         }
 
-        // üzenetek eltárolása
+
+        // üzenetek visszaadása
+        $respond = array();
         if ($success_counter > 0) {
-            Message::set('success', $success_counter . ' felhasználó törölve.');
+            $respond['message_success'] = $success_counter . ' felhasználó törölve.';
+            $respond['success_id'] = $success_id;
         }
         if ($fail_counter > 0) {
-            Message::set('error', $fail_counter . ' felhasználót nem sikerült törölni!');
+            $respond['message_error'] = $fail_counter . ' felhasználót nem sikerült törölni!';
         }
 
-        // default visszatérési érték (akkor tér vissza false-al ha hibás az sql parancs)	
-        return true;
+        // respond tömb visszaadása
+        return $respond;
     }
 
     /**
@@ -372,7 +352,8 @@ class Users_model extends Admin_model {
      *
      * @param  integer $user_id
      */
-    public function edit_user($user_id) {
+    public function edit_user($user_id)
+    {
         $error_counter = 0;
 
         // User név ellenőrzés
@@ -578,7 +559,8 @@ class Users_model extends Admin_model {
      * 	@param	$user_id String or Integer
      * 	@return	Array or false
      */
-    public function user_data_query($user_id) {
+    public function user_data_query($user_id)
+    {
         $this->query->reset();
         $this->query->set_table(array('users'));
         $this->query->set_columns(array('users.user_id', 'users.user_name', 'users.user_first_name', 'users.user_last_name', 'users.user_phone', 'users.user_email', 'users.user_role_id', 'users.user_photo', 'roles.role_name'));
@@ -595,7 +577,8 @@ class Users_model extends Admin_model {
      * 		crop paraméter esetén: megvágja a kiválasztott képet és feltölti	
      *
      */
-    public function user_img_upload() {
+    public function user_img_upload()
+    {
         if ($this->request->has_params('id')) {
 
             include(LIBS . "/upload_class.php");
@@ -739,7 +722,8 @@ class Users_model extends Admin_model {
      * 	@param	integer	$data (0 vagy 1)	
      * 	@return bool
      */
-    public function change_status_query($id, $data) {
+    public function change_status_query($id, $data)
+    {
         $this->query->reset();
         $this->query->set_table(array('users'));
         $this->query->set_where('user_id', '=', $id);
