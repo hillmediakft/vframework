@@ -32,7 +32,7 @@
                 <div id="ajax_message"></div> 						
                 <?php $this->renderFeedbackMessages(); ?>				
 
-                <form class="horizontal-form" id="del_user_form" method="POST" action="admin/users/delete_user">	
+                <form class="horizontal-form" id="del_user_form" method="POST" action="">	
 
                     <div class="portlet">
                         <div class="portlet-title">
@@ -43,10 +43,9 @@
                                 $loggedin_user_role = Session::get('user_role_id');
                                 $loggedin_user_id = Session::get('user_id');
 
-                                if ($loggedin_user_role == 1) {
-                                    ?>
+                                if ($loggedin_user_role == 1) { ?>
                                     <a href="admin/users/new_user" class="btn blue-steel btn-sm"><i class="fa fa-plus"></i> Új felhasználó</a>
-<?php } ?>
+                                <?php } ?>
                                 <button class="btn red btn-sm" id="del_user_group" type="button"><i class="fa fa-trash"></i> Csoportos törlés</button>
                                 <div class="btn-group">
                                     <a data-toggle="dropdown" class="btn btn-sm default">

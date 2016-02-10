@@ -158,21 +158,6 @@ class Users extends Admin_controller {
         $this->view->render('users/tpl_edit_roles');
     }
 	
-				/**
-				 *	User törlése
-				 *
-				 */
-				public function delete_user()
-				{
-			        if(Session::get('user_role_id') == 1){
-			            $this->users_model->delete_user();
-			        } else {
-			            Message::set('error', 'Nincs engedélye a művelet végrehajtásához!');
-			        }
-			        
-			        Util::redirect('users');
-				}
-
 	/**
 	 *	User törlése AJAX-al
 	 */
@@ -180,11 +165,10 @@ class Users extends Admin_controller {
 	{
         if($this->request->is_ajax()){
 	        if(Session::get('user_role_id') == 1){
-
+	        	// a POST-ban kapott user_id egy string ami egy szám vagy számok felsorolása pl.: "23" vagy "12,45,76" 
 	        	$id = $this->request->get_post('user_id');
-            	$result = $this->users_model->delete_user_AJAX($id);
-        		echo json_encode($result);
-
+            	$respond = $this->users_model->delete_user_AJAX($id);
+        		echo json_encode($respond);
 	        } else {
 	            echo json_encode(array(
 	            	'status' => 'error',
@@ -194,25 +178,6 @@ class Users extends Admin_controller {
         }
 	}
 
-	/**
-	 *	User törlése AJAX-al
-	 */
-	public function teszt_delete_user()
-	{
-        if($this->request->is_ajax()){
-
-        	$id = $this->request->get_post('user_id');
-        	$result = $this->users_model->delete_user_AJAX($id);
-    		echo json_encode($result);
-        }
-	}
-
-
-
-
-
-
-	
     /**
 	 *	A felhasználó képét tölti fel a szerverre, és készít egy kisebb méretű képet is.
 	 *

@@ -198,7 +198,7 @@ var Users = function () {
         var deleteTR;
 
         $.ajax({
-            url: 'admin/users/teszt_delete_user',
+            url: 'admin/users/delete_user_AJAX',
             type: 'POST',
             dataType: 'json',
             data: {
