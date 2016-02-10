@@ -140,31 +140,47 @@ var Users = function () {
 	var deleteGroupUserConfirm = function () {
 		$('#del_user_group').on('click', function(){
 
-			bootbox.setDefaults({
-				locale: "hu", 
-			});
-			bootbox.confirm("Biztosan törölni akarja felhasználókat?", function(result) {
-				if (result) {
+			// tömb, ami azokat az id-ket fogja tartalmazni, ahol be van kapcsolva a checkbox
+			var id_array = new Array(); // a törlendő id-ket tartalamzó tömb
+			// checkbox objektumok
+			var checkboxes = $('input.checkboxes');
 
-					// tömb, ami azokat az id-ket fogja tartalmazni, ahol be van kapcsolva a checkbox
-					var id_array = new Array(); // a törlendő id-ket tartalamzó tömb
-					// checkbox objektumok
-					var checkboxes = $('input.checkboxes');
-
-					// bejárjuk a checkboxokat tartalmazó objektumot
-					$.each(checkboxes, function(index, val) {
-						if( $(this).is(':checked') ){
-							// ha be van kapcsolva az aktuális checkbox, akkor a value értékét berakjuk a id_array tömbbe
-							id_array.push($(this).val());
-						}
-					});
-					
-					// átalakítjuk a tömböt felsorolás stringre pl. 12,54,65
-					var id_string = id_array.toString();
-					// a második paraméter a törlendő html elem, de csoportos törlésnél 
-					deleteUser(id_string, null);
+			// bejárjuk a checkboxokat tartalmazó objektumot
+			$.each(checkboxes, function(index, val) {
+				if( $(this).is(':checked') ){
+					// ha be van kapcsolva az aktuális checkbox, akkor a value értékét berakjuk a id_array tömbbe
+					id_array.push($(this).val());
 				}
 			});
+
+			// ellenőrizzük, hogy be van-e jelölve checkbox (ha az id_array tömb üres nincs bejelölve semmi)
+			if(id_array.length == 0){
+                Metronic.alert({
+                    type: 'warning',
+                    icon: 'warning',
+                    message: "Jelöljön ki felhasználót!",
+                    container: $('#ajax_message'),
+                    place: 'append',
+                    close: true, // make alert closable
+                    //reset: true, // close all previouse alerts first
+                    //focus: true, // auto scroll to the alert after shown
+                    closeInSeconds: 3 // auto close after defined seconds
+                });
+			}
+			else {
+				bootbox.setDefaults({
+					locale: "hu", 
+				});
+				bootbox.confirm("Biztosan törölni akarja felhasználókat?", function(result) {
+					if (result) {
+						// átalakítjuk a tömböt felsorolás stringre pl. 12,54,65
+						var id_string = id_array.toString();
+						// a második paraméter a törlendő html elem, de csoportos törlésnél 
+						deleteUser(id_string, null);
+					}
+				});
+			}
+
 		});
 	}	
 
