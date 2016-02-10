@@ -69,16 +69,17 @@ var Clients = function () {
 
         var tableWrapper = jQuery('#clients_wrapper');
 
+/*
         table.find('.group-checkable').change(function () {
             var set = jQuery(this).attr("data-set");
             var checked = jQuery(this).is(":checked");
             jQuery(set).each(function () {
                 if (checked) {
                     $(this).attr("checked", true);
-                    $(this).parents('tr').addClass("active");
+                    //$(this).parents('tr').addClass("active");
                 } else {
                     $(this).attr("checked", false);
-                    $(this).parents('tr').removeClass("active");
+                    //$(this).parents('tr').removeClass("active");
                 }
             });
             jQuery.uniform.update(set);
@@ -87,7 +88,7 @@ var Clients = function () {
         table.on('change', 'tbody tr .checkboxes', function () {
             $(this).parents('tr').toggleClass("active");
         });
-
+*/
         tableWrapper.find('.dataTables_length select').addClass("form-control input-sm input-inline"); // modify table per page dropdown
     }
 
