@@ -9,6 +9,32 @@ class File_manager extends Admin_controller {
 
 	public function index()
 	{
+
+
+
+/*
+		$acl = new Teszt_acl(2);
+
+		//var_dump($acl);
+
+		$result = $acl->_get_permissions();
+		var_dump($result);
+
+		if ($acl->hasPerm('delete_user')) {
+			exit('van hozzaferese');
+		} 
+		else {
+			exit('nincs hozzaferese');
+		}
+
+
+		die('stop');
+*/
+
+
+
+
+
 /*		Auth::handleLogin();
 
 		if (!Acl::create()->userHasAccess('home_menu')) {
@@ -16,6 +42,33 @@ class File_manager extends Admin_controller {
 		}
 
 */
+		//var_dump($_SESSION);
+
+
+
+		// var_dump(Teszt_acl::check('home_menu'));
+		//Teszt_acl::check('menu_slider');
+		//Teszt_acl::check('delete_user');
+		if(Teszt_acl::check('delete_user')) {
+			echo "siker!!!";
+		}
+
+		//var_dump(Teszt_acl::check('delete_user'));
+
+
+		die('stop');
+		/*
+
+		if () {
+			exit('van hozzaferese');
+		} 
+		else {
+			exit('nincs hozzaferese');
+		}
+*/
+
+/*
+
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Fájlkezelő oldal';
 		$this->view->description = 'Fájlkezelő oldal description';
@@ -32,7 +85,7 @@ class File_manager extends Admin_controller {
 		
 		$this->view->render('file_manager/tpl_file_manager');
 		
-		
+*/		
 
 	}
 }

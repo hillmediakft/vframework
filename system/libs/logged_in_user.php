@@ -16,7 +16,12 @@ class Logged_in_user  {
         $this->user_name = Session::get('user_name');
         $this->user_email = Session::get('user_email');
         $this->user_role_id = Session::get('user_role_id');
+        
+
         $this->initRoles();
+
+//var_dump($this->roles);
+//die();
     }
 
     // populate roles with their associated permissions
