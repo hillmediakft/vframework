@@ -332,7 +332,6 @@ class Users_model extends Admin_model {
             }
         }
 
-
         // üzenetek visszaadása
         $respond = array();
         if ($success_counter > 0) {
@@ -340,7 +339,7 @@ class Users_model extends Admin_model {
             $respond['success_id'] = $success_id;
         }
         if ($fail_counter > 0) {
-            $respond['message_error'] = $fail_counter . ' felhasználót nem sikerült törölni!';
+            $respond['message_error'] = $fail_counter . ' felhasználót már töröltek!';
         }
 
         // respond tömb visszaadása

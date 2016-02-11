@@ -214,24 +214,25 @@ var Users = function () {
                 Metronic.unblockUI();
             },
             success: function (result) {
+                
+                // HTML elemek törlése a DOM-ból
+            	if(deleteRow != null){
+					// HTML <tr> törlése
+                	deleteRow.remove();
+            	}
+            	else {
+                  	var checkboxes = $('input.checkboxes');
+                    $.each(checkboxes, function(index, val) {
+						if( $(this).is(':checked') ){
+							// a deleteTR változóhoz rendeljük a html táblázat törlendő sorát <tr>
+							deleteTR = $(this).closest("tr");
+							// HTML <tr> törlése
+							deleteTR.remove();
+						}
+                    });	
+            	}
+
                 if(result.message_success) {
-
-                	if(deleteRow != null){
-						// HTML <tr> törlése
-                    	deleteRow.remove();
-                	}
-                	else {
-                      	var checkboxes = $('input.checkboxes');
-                        $.each(checkboxes, function(index, val) {
-							if( $(this).is(':checked') ){
-								// a deleteTR változóhoz rendeljük a html táblázat törlendő sorát <tr>
-    							deleteTR = $(this).closest("tr");
-								// HTML <tr> törlése
-								deleteTR.remove();
-							}
-                        });	
-                	}
-
                     Metronic.alert({
                         type: 'success',
                         //icon: 'warning',
@@ -239,27 +240,27 @@ var Users = function () {
                         container: $('#ajax_message'),
                         place: 'append',
                         close: true, // make alert closable
-                        //reset: true, // close all previouse alerts first
+                        reset: false, // close all previouse alerts first
                         //focus: true, // auto scroll to the alert after shown
                         closeInSeconds: 3 // auto close after defined seconds
                     });                                
                 }
                 if(result.message_error) {
-
                     Metronic.alert({
-                        type: 'danger',
+                        type: 'warning',
                         //icon: 'warning',
                         message: result.message_error,
                         container: $('#ajax_message'),
                         place: 'append',
                         close: true, // make alert closable
-                        //reset: true, // close all previouse alerts first
+                        reset: false, // close all previouse alerts first
                         //focus: true, // auto scroll to the alert after shown
                         closeInSeconds: 3 // auto close after defined seconds
-                    });                                
+                    });  
                 }
                 if(result.status) {
                 	if(result.status == 'error') {
+                    	console.log(result.message);
                         Metronic.alert({
                             type: 'danger',
                             //icon: 'warning',
@@ -267,9 +268,9 @@ var Users = function () {
                             container: $('#ajax_message'),
                             place: 'append',
                             close: true, // make alert closable
-                            //reset: true, // close all previouse alerts first
+                            //reset: false, // close all previouse alerts first
                             //focus: true, // auto scroll to the alert after shown
-                            closeInSeconds: 3 // auto close after defined seconds
+                            //closeInSeconds: 3 // auto close after defined seconds
                         });
                 	}
                 }

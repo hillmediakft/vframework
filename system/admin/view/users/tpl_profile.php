@@ -52,7 +52,7 @@
 					<?php $this->renderFeedbackMessages(); ?>
 																				
 					<!-- BEGIN FORM-->			
-					<form action="admin/users/profile/<?php echo $this->registry->params['id']; ?>" method="POST" id="edit_user">
+					<form action="admin/users/profile/<?php echo $this->request->get_params('id'); ?>" method="POST" id="edit_user">
 	
 						<!-- ÜZENETEK 2 -->
 						<div class="alert alert-danger display-hide">
