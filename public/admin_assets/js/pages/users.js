@@ -6,12 +6,8 @@ var Users = function () {
     var usersTable = function () {
 
         var table = $('#users');
-        // var table = $('#users').dataTable();
-		// begin first table
-        
 	
 		table.dataTable({
-
             // Internationalisation. For more info refer to http://datatables.net/manual/i18n
             "language": {
                 //"decimal":        "",
@@ -69,9 +65,9 @@ var Users = function () {
             "columnDefs": [
                 {'searchable': false, 'targets': 0},
                 {'searchable': false, 'targets': 1},
-                {'searchable': false, 'targets': 2},
-                {'searchable': false, 'targets': 3},
-                {'searchable': false, 'targets': 4},
+                {'searchable': true, 'targets': 2},
+                {'searchable': true, 'targets': 3},
+                {'searchable': true, 'targets': 4},
                 {'searchable': false, 'targets': 5},
                 {'searchable': false, 'targets': 6},
                 {'searchable': false, 'targets': 7},
@@ -159,7 +155,7 @@ var Users = function () {
                 Metronic.alert({
                     type: 'warning',
                     icon: 'warning',
-                    message: "Jelöljön ki felhasználót!",
+                    message: "&nbsp;Jelöljön ki felhasználót!",
                     container: $('#ajax_message'),
                     place: 'append',
                     close: true, // make alert closable
@@ -192,9 +188,6 @@ var Users = function () {
 	 * @param objektum vagy null 	deleteRow 	HTML elem, amit törölni kell a dom-ból (csoportos törlésnél null az értéke!)
 	 */
 	var deleteUser = function (id_string, deleteRow) {
-
-        // üzenet elem
-        var message = $('#ajax_message');
 
         $.ajax({
             url: 'admin/users/delete_user_AJAX',
@@ -272,7 +265,7 @@ var Users = function () {
                             close: true, // make alert closable
                             //reset: false, // close all previouse alerts first
                             //focus: true, // auto scroll to the alert after shown
-                            //closeInSeconds: 3 // auto close after defined seconds
+                            closeInSeconds: 5 // auto close after defined seconds
                         });
                 	}
                 }
@@ -283,16 +276,6 @@ var Users = function () {
 				console.log("Rendszerválasz: " + xhr.responseText); 
             } 
         }); // ajax end
-	}
-
-	var resetSearchForm = function () {
-		$('#reset_search_form').on('click', function(){
-		$(':input', '#users_search_form')
-		.not(':button, :submit, :reset, :hidden')
-		.val('')
-		.removeAttr('checked')
-		.removeAttr('selected');
-    }); 								 		
 	}
 
 	var hideAlert = function () {
@@ -320,8 +303,6 @@ var Users = function () {
 	}
 	
 	var makeActive = function (userId, action, elem) {
-		//üzeneteket tartalamzó elem
-		var ajax_message = $("#ajax_message");
 		
 		$.ajax({
 			type: "POST",
@@ -470,7 +451,6 @@ $(divToPrint).not('td .actions'); */
 			deleteOneUserConfirm();
             deleteGroupUserConfirm();
 			makeActiveConfirm();
-			resetSearchForm();
 			hideAlert();
 			printTable();
         }
@@ -483,6 +463,6 @@ $(document).ready(function() {
 	Metronic.init(); // init metronic core componets
 	Layout.init(); // init layout
 	QuickSidebar.init(); // init quick sidebar
-	Demo.init(); // init demo features 
+	//Demo.init(); // init demo features 
 	Users.init(); // init users page
 });
