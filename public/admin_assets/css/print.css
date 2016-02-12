@@ -1,0 +1,14 @@
+table > thead tr.filter {
+    display: none;
+}
+table tr td:first-child, table tr th:first-child, table tr td:last-child, table tr th:last-child {
+    display: none;
+}
+
+table td {
+    font-size: 14px;
+}
+table td img {
+    width: 150px !important;
+}
+

@@ -401,8 +401,47 @@ var Users = function () {
 		});
 
 	}	
-	
-	
+
+    var printTable = function () {
+        $('#print_users').on('click', function (e) {
+            e.preventDefault();
+            var divToPrint = $('#users');
+  /*          $(divToPrint).find('tr.hidden-print').remove();
+$(divToPrint).find('div.checker').remove();
+$(divToPrint).not('tr.heading th:first');
+$(divToPrint).not('tr.heading th:last');
+$(divToPrint).not('div.checker');
+$(divToPrint).not('td .actions'); */
+            console.log(divToPrint.html());
+
+            //        console.log(divToPrint.html());
+            newWin = window.open("");
+            newWin.document.write('\
+<html>\n\
+<head>\n\
+<title>Admin felhasználók</title>\n\
+<link href="public/admin_assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>\n\
+<link href="public/admin_assets/css/components.css" id="style_components" rel="stylesheet" type="text/css"/>\n\
+<link href="public/admin_assets/css/print.css" rel="stylesheet" type="text/css"/>\n\
+</head>\n\
+<body>\n\
+<div class="container">\n\
+<div class="row">\n\
+<h3>Admin felhasználók</h3\n\
+><table class="table table-striped table-bordered">');
+            newWin.document.write(divToPrint.html());
+            newWin.document.write('\
+</table>\n\
+</div>\n\
+</div>\n\
+</body></html>');
+          newWin.print();
+           newWin.close();
+        })
+
+    }
+	    
+/*	
 	var printTable = function () {
 		$('#print_users').on('click', function(e){
 		e.preventDefault();
@@ -416,7 +455,7 @@ var Users = function () {
 		})
 	
 	}
-	
+*/	
 
 	
     return {
