@@ -6,6 +6,7 @@ var Users = function () {
     var usersTable = function () {
 
         var table = $('#users');
+        // var table = $('#users').dataTable();
 		// begin first table
         
 	
@@ -111,7 +112,7 @@ var Users = function () {
 	 * Egy user törlése ajax-al confirm
 	 */
 	var deleteOneUserConfirm = function () {
- 		$('[id*=delete_user]').on('click', function(e){
+ 		$('table#users').on('click', '[id*=delete_user]', function(e){
            	e.preventDefault();
 
            	// A törlendő user neve
@@ -194,8 +195,6 @@ var Users = function () {
 
         // üzenet elem
         var message = $('#ajax_message');
-		// törlendő HTML elem
-        var deleteTR;
 
         $.ajax({
             url: 'admin/users/delete_user_AJAX',
@@ -215,20 +214,23 @@ var Users = function () {
             },
             success: function (result) {
                 
-                // HTML elemek törlése a DOM-ból
+            	// datatable objektum hozzárendelése a table változóhoz
+            	var table = $('#users').DataTable();
+
+                // HTML elemek törlése a DOM-ból (csoportos törlésnél a deleteRow-nak null az értéke)
             	if(deleteRow != null){
-					// HTML <tr> törlése
-                	deleteRow.remove();
+					// HTML táblázat sorának kiválasztása, törlése, és a táblázat újrarajzolása
+					table.row( deleteRow ).remove().draw();
             	}
             	else {
                   	var checkboxes = $('input.checkboxes');
                     $.each(checkboxes, function(index, val) {
 						if( $(this).is(':checked') ){
-							// a deleteTR változóhoz rendeljük a html táblázat törlendő sorát <tr>
-							deleteTR = $(this).closest("tr");
-							// HTML <tr> törlése
-							deleteTR.remove();
+							// HTML táblázat aktuális sorának kiválasztása, törlése
+							table.row( $(this).closest("tr") ).remove();
 						}
+						// A táblázat újrarajzolása
+						table.draw();
                     });	
             	}
 
