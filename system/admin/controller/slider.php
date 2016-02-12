@@ -5,9 +5,7 @@ class Slider extends Admin_controller {
     function __construct()
     {
         parent::__construct();
-        Auth::handleLogin();
-        $this->check_access("menu_slider", $this->request->get_httpreferer());
-        $this->view->user = $this->user;
+        Acl::check("menu_slider", $this->request->get_httpreferer());
         $this->loadModel('slider_model');
     }
 

@@ -4,7 +4,6 @@ class Pages extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
-        Auth::handleLogin();
         $this->loadModel('pages_model');
 	}
 
@@ -28,7 +27,6 @@ class Pages extends Admin_controller {
 	{
 		$id = (int)$this->request->get_params('id');
 
-		//if(isset($_POST['submit_update_page'])) {
 		if($this->request->has_post('submit_update_page')) {
 			
 			$result = $this->pages_model->update_page($id);
@@ -59,8 +57,6 @@ class Pages extends Admin_controller {
 	
 	public function content()
 	{
-		Auth::handleLogin();
-
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Admin egyéb tartalom oldal';
 		$this->view->description = 'Admin egyéb tartalom oldal description';

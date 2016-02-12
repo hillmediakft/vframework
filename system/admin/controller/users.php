@@ -4,14 +4,11 @@ class Users extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
-        Auth::handleLogin();
 		$this->loadModel('users_model');
 	}
 
 	public function index()
 	{
-	// adatok bevitele a view objektumba
-        
 		$this->view->title = 'Users oldal';
 		$this->view->description = 'Users oldal description';
 		
@@ -32,8 +29,6 @@ class Users extends Admin_controller {
         $this->view->all_user = $this->users_model->all_user();	
 		
 //$this->view->debug(true);	
-
-		// template betöltése
 		$this->view->render('users/tpl_users');
 	}
 
@@ -247,7 +242,10 @@ class Users extends Admin_controller {
 					
 				}
 			} else {
-				throw new Exception('Nincs $_POST["action"] es $_POST["id"]!!!');
+				echo json_encode(array(
+					"status" => 'error',
+					"message" => 'Adatbázis lekérdezési hiba!'
+				));
 			}
 		} else {
 			Util::redirect('error');

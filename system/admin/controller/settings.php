@@ -4,18 +4,11 @@ class Settings extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
-        Auth::handleLogin();
 		$this->loadModel('settings_model');
 	}
 
 	public function index()
 	{
-/*
-		if (!Acl::create()->userHasAccess('home_menu')) {
-		exit('nincs hozzáférése');
-		}
-*/
-
 		if($this->request->has_post('submit_settings')) {
 			$result = $this->settings_model->update_settings();
 			Util::redirect('settings');

@@ -4,7 +4,6 @@ class Content extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
-		Auth::handleLogin();
 		$this->loadModel('content_model');
 	}
 

@@ -4,13 +4,11 @@ class Blog extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
-        Auth::handleLogin();
 		$this->loadModel('blog_model');
 	}
     
 	public function index()
 	{
-		
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Admin blog oldal';
 		$this->view->description = 'Admin blog oldal description';	

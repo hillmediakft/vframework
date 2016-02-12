@@ -4,18 +4,11 @@ class Languages extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
-		Auth::handleLogin();
 		$this->loadModel('languages_model');
 	}
 
 	public function index()
 	{
-/*		Auth::handleLogin();
-
-		if (!Acl::create()->userHasAccess('home_menu')) {
-		exit('nincs hozzáférése');
-		}
-*/
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Nyelvek oldal';
 		$this->view->description = 'Nyelvek oldal description';
@@ -43,16 +36,6 @@ class Languages extends Admin_controller {
 				$this->languages_model->save_language_text();
 			}
 		}
-
-
-/*
-		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-			if (isset($_POST["name"])) {
-				$this->languages_model->save_language_text();
-			}
-		}
-*/		
-		
 	}
 }
 ?>

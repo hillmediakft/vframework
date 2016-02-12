@@ -4,15 +4,12 @@ class Newsletter extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
-        Auth::handleLogin();
 		$this->loadModel('newsletter_model');
 	}
 
 	public function index()
 	{
-
 	// adatok bevitele a view objektumba
-		
 		$this->view->title = 'Hírlevél oldal';
 		$this->view->description = 'Hírlevél oldal description';
 		
@@ -101,22 +98,7 @@ class Newsletter extends Admin_controller {
 		}
 	}
 
-	
-	/**
-	 *	Hírlevelek elküldése AJAX-al
-	 *	Az echo $result megy vissza a javascriptnek
-	public function send_newsletter()
-	{
-		if( $this->request->is_ajax() ) {
-			$result = $this->newsletter_model->send_newsletter();
-			//echo $result;
-		}
-	}
-	 */
-
-
-
-
+/*
 	public function setid()
 	{
 		if($this->request->has_post('newsletter_id')) {
@@ -126,7 +108,7 @@ class Newsletter extends Admin_controller {
 			echo json_encode(array('status' => 'fail'));
 		}
 	}
-
+*/
 	
 /*--------- EVENTSOURCE --------------------*/	
 	

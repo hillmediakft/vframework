@@ -4,18 +4,10 @@ class Video_gallery extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
-        Auth::handleLogin();
 	}
 
 	public function index()
 	{
-/*		Auth::handleLogin();
-
-		if (!Acl::create()->userHasAccess('home_menu')) {
-		exit('nincs hozzáférése');
-		}
-
-*/
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Videógalériák oldal';
 		$this->view->description = 'Videógalériák oldal description';

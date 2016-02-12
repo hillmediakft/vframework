@@ -4,7 +4,6 @@ class Clients extends Admin_controller {
     function __construct()
     {
         parent::__construct();
-        Auth::handleLogin();
         $this->loadModel('clients_model');
     }
      

@@ -4,19 +4,11 @@ class Photo_gallery extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
-        Auth::handleLogin();
 		$this->loadModel('photo_gallery_model');
 	}
 
 	public function index()
 	{
-/*		Auth::handleLogin();
-
-		if (!Acl::create()->userHasAccess('home_menu')) {
-		exit('nincs hozzáférése');
-		}
-
-*/
 		// adatok bevitele a view objektumba
 		$this->view->title = 'Fotó galériák oldal';
 		$this->view->description = 'Fotó galériák oldal description';

@@ -4,19 +4,11 @@ class Testimonials extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
-        Auth::handleLogin();
 		$this->loadModel('testimonials_model');
 	}
 
 	public function index()
 	{
-/*		Auth::handleLogin();
-
-		if (!Acl::create()->userHasAccess('home_menu')) {
-		exit('nincs hozzáférése');
-		}
-
-*/
 		// adatok bevitele a view objektumba
 		$this->view->title = 'testimonials oldal';
 		$this->view->description = 'testimonials oldal description';
@@ -50,12 +42,10 @@ class Testimonials extends Admin_controller {
 		
 		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootbox/bootbox.min.js');
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/new_testimonial.js');
-		
 	
 //		$this->view->testimonials = $this->testimonials_model->get_testimonials_data();	
 		
 		$this->view->render('testimonials/tpl_new_testimonial');	
-		
 	}
 	
 	/**
