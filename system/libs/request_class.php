@@ -10,7 +10,7 @@ class Request {
 	/**
 	 * Az engedélyezett szűrőket tartalamzó tömb
 	 */
-	private $allowed_filters = array('int', 'integer', 'bool', 'boolean', 'remove_danger_tags');
+	private $allowed_filters = array('integer', 'boolean', 'remove_danger_tags');
 
 
 	public function __construct($uri, $router)
@@ -90,10 +90,10 @@ class Request {
 	 * @param string $default_value
 	 * @return mixed	 
 	 */
-	public function get_post($key = NULL, $filter = NULL, $default_value = NULL)
+	public function get_post($key = NULL, $filter = NULL, $default_value = '')
 	{
 		if(!is_null($filter) && !in_array($filter, $this->allowed_filters)){
-			throw new Exception("Nem megengedett filter a request class get_post metodusaban");
+			throw new Exception('Nem megengedett filter a request class get_post metodusaban');
 			exit();
 		}
 
@@ -111,10 +111,10 @@ class Request {
 	 * @param string $default_value
 	 * @return mixed	 
 	 */
-	public function get_query($key, $filter = NULL, $default_value = NULL)
+	public function get_query($key = NULL, $filter = NULL, $default_value = '')
 	{
 		if(!is_null($filter) && !in_array($filter, $this->allowed_filters)){
-			throw new Exception("Nem megengedett filter a request class get_query metodusaban");
+			throw new Exception('Nem megengedett filter a request class get_query metodusaban');
 			exit();
 		}
 
@@ -249,13 +249,17 @@ class Request {
 				if (isset($value[$key])) {
 					$value = $value[$key];
 				} else {
-					return NULL;
+					throw new Exception('Nincs ' . $index . ' indexu elem a $_POST, vagy $_GET es $_REQUEST tombben');
+					exit();
+					//return NULL;
 				}
 			}
 
 		}
 		else {
-			return NULL;
+			throw new Exception('Nincs ' . $index . ' indexu elem a $_POST, vagy $_GET es $_REQUEST tombben');
+			exit();
+			//return NULL;
 		}
 
 		return $value;
@@ -267,44 +271,44 @@ class Request {
 	 */				
 	private function _filter($filter, $value, $default_value)
 	{
-		// ha nincs filter, és üres a value
-		if (is_null($filter) && empty($value)) {
-			$value = $default_value;
-		}
-		// ha nincs filter és nem üres a value - alap szűrések
-		elseif (is_null($filter) && !empty($value)) {
-			
-			// ha működik a magic_quotes_gpc (csak régi PHP-nál) hozzáadott /-ek eltávolítása
-			if (get_magic_quotes_gpc() && ($this->is_post() || $this->is_get())) {
-				$value = $this->_stripSlashes($value);
+		if(is_null($filter)){
+			// ha nem üres a value - alap szűrések
+			if(!empty($value)){
+				// ha működik a magic_quotes_gpc (csak régi PHP-nál) hozzáadott /-ek eltávolítása
+				if (get_magic_quotes_gpc() && ($this->is_post() || $this->is_get())) {
+					$value = $this->_stripSlashes($value);
+				}
+				// html tag-ek eltávolítása 
+				$value = $this->_stripTags($value);
 			}
-
-			// html tag-ek eltávolítása 
-			$value = $this->_stripTags($value);
-		}
-
-		// veszélyes html tag-ek eltávolítása pl: <script>
-		elseif($filter == 'remove_danger_tags'){
-
-			$value = $this->_strip_dangertags($value, array('script')); 
-		}
-
-		// ha a filter integer
-		elseif (($filter == 'int' || $filter == 'integer') && is_string($value)) {
-			$default_value = (is_null($default_value)) ? 0 : $default_value;
-			$value = (empty($value)) ? $default_value : (int) $value;
-		}
-		// ha a filter boolean
-		elseif ($filter == 'bool' || $filter == 'boolean') {
-			//$value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);	
-			$value = strtolower($value);
-			if (($value == 'f') || ($value == 'false') || ($value == 'no') || ($value == 'off') || !$value) {
-				$value = FALSE;
-			} else {
-				$value = TRUE;
+			else {
+				// ha üres a value
+				$value = $default_value;
 			}
-
 		}
+		else {
+			switch($filter){
+
+				case 'integer':
+					$default_value = (empty($default_value)) ? 0 : (int)$default_value;
+					$value = (empty($value)) ? $default_value : (int)$value;
+					break;
+
+				case 'boolean':
+					//$value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);	
+					$value = strtolower($value);
+					if (($value == 'f') || ($value == 'false') || ($value == 'no') || ($value == 'off') || !$value) {
+						$value = FALSE;
+					} else {
+						$value = TRUE;
+					}
+					break;
+
+				case 'remove_danger_tags':
+					$value = (!empty($value)) ? $this->_strip_dangertags($value, array('script')) : $default_value; 
+					break;
+			}
+		}	
 
 		return $value; 
 	}
