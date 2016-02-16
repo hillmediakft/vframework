@@ -16,7 +16,7 @@ $msg['userfirstname_field_empty'] = 'User firstname field was empty.';
 $msg['userlastname_field_empty'] = 'User lastname field was empty.';
 $msg['userphone_field_empty'] = 'User phone field was empty.';
 $msg['password_field_empty'] = 'Password field was empty.';
-$msg['email_field_empty'] = 'Email and passwords fields were empty.';
+$msg['email_field_empty'] = 'Email fields were empty.';
 
 $msg['email_and_password_fields_empty'] = 'Email field was empty.';
 $msg['username_same_as_old_one'] = 'Sorry, that username is the same as your current one. Please choose another one.';
