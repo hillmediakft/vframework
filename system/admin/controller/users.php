@@ -26,7 +26,7 @@ class Users extends Admin_controller {
 		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/users.js');
 		
         // userek adatainak lekérdezése
-        $this->view->all_user = $this->users_model->all_user();	
+        $this->view->all_user = $this->users_model->user_data_query();	
 		
 //$this->view->debug(true);	
 		$this->view->render('users/tpl_users');
@@ -40,7 +40,8 @@ class Users extends Admin_controller {
 	{
 		// új user hozzáadása
 		if($this->request->has_post('submit_new_user')) {
-			$result = $this->users_model->new_user();
+			// $result = $this->users_model->new_user();
+			$result = $this->users_model->insert_user();
 			
 			if($result) {
 				Util::redirect('users');
@@ -79,7 +80,7 @@ class Users extends Admin_controller {
 	{
 		if($this->request->has_post('submit_edit_user')) {
             
-			$result = $this->users_model->edit_user($this->request->get_params('id'));
+			$result = $this->users_model->update_user($this->request->get_params('id'));
 			
 			if($result) {
 				Util::redirect('users');
@@ -129,7 +130,7 @@ class Users extends Admin_controller {
 	
  public function edit_roles() {
         
-   //     $this->check_access('action_users_edit_roles');
+   //     Acl::check('action_users_edit_roles');
         
         $role_id = $this->request->get_params('id');
         
@@ -159,7 +160,7 @@ class Users extends Admin_controller {
 	public function delete_user_AJAX()
 	{
         if($this->request->is_ajax()){
-	        if(Session::get('user_role_id') == 1){
+	        if(Acl::check('delete_user')){
 	        	// a POST-ban kapott user_id egy string ami egy szám vagy számok felsorolása pl.: "23" vagy "12,45,76" 
 	        	$id = $this->request->get_post('user_id');
             	$respond = $this->users_model->delete_user_AJAX($id);
@@ -196,7 +197,8 @@ class Users extends Admin_controller {
      *
      * @return void
      */
-    public function change_status() {
+    public function change_status()
+    {
         if ( $this->request->is_ajax() ) {
             if ( $this->request->has_post('action') && $this->request->has_post('id') ) {
 			

@@ -21,22 +21,20 @@ class Users_model extends Admin_model {
     }
 
     /*
-     * Felhsználók adatainak lekérdezése
+     * Felhasználók adatainak lekérdezése
      */
-
-    public function all_user()
+/*    public function all_user()
     {
-        // a query tulajdonság ($this->query) tartalmazza a query objektumot
         $this->query->reset();
         $this->query->set_table(array('users'));
         $this->query->set_columns(array(
             'users.user_id',
             'users.user_name',
-            'users.user_email',
-            'users.user_active',
-            'users.user_role_id',
             'users.user_first_name',
             'users.user_last_name',
+            'users.user_active',
+            'users.user_email',
+            'users.user_role_id',
             'users.user_phone',
             'users.user_photo',
             'roles.role_name'
@@ -44,215 +42,172 @@ class Users_model extends Admin_model {
         $this->query->set_join('left', 'roles', 'users.user_role_id', '=', 'roles.role_id');
         return $this->query->select();
     }
+*/    
 
-    public function new_user()
+    /**
+     *  Felhasználók adatainak lekérdezése
+     *
+     *  @param  string|integer    $user_id (csak ennek a felhasználónak az adatait adja vissza
+     *  @return array|false
+     */
+    public function user_data_query($user_id = null)
     {
-        $error_counter = 0;
-
-        // User név ellenőrzés
-        if (empty($_POST['name'])) {
-            Message::set('error', 'username_field_empty');
-            $error_counter += 1;
-        }
-        /*
-          if (strlen($_POST['name']) > 64 OR strlen($_POST['name']) < 2) {
-          Message::set('error', 'username_too_short_or_too_long');
-          $error_counter += 1;
-          }
-          if (!preg_match('/^[\_\sa-záöőüűóúéíÁÖŐÜŰÓÚÉÍ\d]{2,64}$/i', $_POST['name'])) {
-          Message::set('error', 'username_does_not_fit_pattern');
-          $error_counter += 1;
-          }
-         */
-
-        // Vezetéknév ellenőrzés	
-        if (empty($_POST['first_name'])) {
-            Message::set('error', 'userfirstname_field_empty');
-            $error_counter += 1;
-        }
-        /*
-          if (strlen($_POST['first_name']) > 64 OR strlen($_POST['first_name']) < 2) {
-          Message::set('error', 'userfirstname_too_short_or_too_long');
-          $error_counter += 1;
-          }
-          if (!preg_match('/^[\_\sa-záöőüűóúéíÁÖŐÜŰÓÚÉÍ]{2,64}$/i', $_POST['first_name'])) {
-          Message::set('error', 'userfirstname_does_not_fit_pattern');
-          $error_counter += 1;
-          }
-         */
-
-        // Utónév ellenőrzés
-        if (empty($_POST['last_name'])) {
-            Message::set('error', 'userlastname_field_empty');
-            $error_counter += 1;
-        }
-        /*
-          if (strlen($_POST['last_name']) > 64 OR strlen($_POST['last_name']) < 2) {
-          Message::set('error', 'userlastname_too_short_or_too_long');
-          $error_counter += 1;
-          }
-          if (!preg_match('/^[\_\sa-záöőüűóúéíÁÖŐÜŰÓÚÉÍ]{2,64}$/i', $_POST['last_name'])) {
-          Message::set('error', 'userlastname_does_not_fit_pattern');
-          $error_counter += 1;
-          }
-
-          // Telefonszám ellenőrzés
-
-          if(empty($_POST['phone'])){
-          Message::set('error', 'userphone_field_empty');
-          $error_counter += 1;
-          }
-          if (!preg_match('~^(36)[\s-]?([0-9]{1,2})[\s-]?([0-9]{3})[\s-]?([0-9]{4})$~', $_POST['phone'])) {
-          Message::set('error', 'userphone_does_not_fit_pattern');
-          $error_counter += 1;
-          }
-         */
-
-        // Jelszó ellenőrzés
-        if (empty($_POST['password']) OR empty($_POST['password_again'])) {
-            Message::set('error', 'password_field_empty');
-            $error_counter += 1;
-        }
-        if (strlen($_POST['password']) < 6) {
-            Message::set('error', 'password_too_short');
-            $error_counter += 1;
-        }
-        if ($_POST['password'] !== $_POST['password_again']) {
-            Message::set('error', 'password_repeat_wrong');
-            $error_counter += 1;
+        $this->query->reset();
+        $this->query->set_table(array('users'));
+        $this->query->set_columns(array(
+            'users.user_id',
+            'users.user_name',
+            'users.user_first_name',
+            'users.user_last_name',
+            'users.user_active',
+            'users.user_email',
+            'users.user_role_id',
+            'users.user_phone',
+            'users.user_photo',
+            'roles.role_name'
+        ));
+        $this->query->set_join('left', 'roles', 'users.user_role_id', '=', 'roles.role_id');
+        
+        if(!is_null($user_id)){
+            $this->query->set_where('user_id', '=', $user_id);
         }
 
-        // E-mail ellenőrzés
-        if (empty($_POST['email'])) {
-            Message::set('error', 'email_field_empty');
-            $error_counter += 1;
-        }
-        /*
-          if (strlen($_POST['email']) > 64) {
-          Message::set('error', 'email_too_long');
-          $error_counter += 1;
-          }
-          if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-          Message::set('error', 'email_does_not_fit_pattern');
-          $error_counter += 1;
-          }
-         */
+        return $this->query->select();
+    }
 
-        // végrehajtás, ha nincs hiba	
-        if ($error_counter == 0) {
+    /**
+     * Új felhasználó létrehozása
+     */
+    public function insert_user()
+    {
+        // adatok a $_POST tömbből
+        $post_data = $this->request->get_post();
 
-            // clean the input
-            //$user_name = htmlentities($_POST['name'], ENT_QUOTES, "UTF-8");
-            $user_name = $this->request->get_post('name');
-            $first_name = $this->request->get_post('first_name');
-            $last_name = $this->request->get_post('last_name');
+        // validátor objektum létrehozása
+        $validate = new Validate();
 
-            if (!empty($this->request->get_post('email'))) {
-                $user_email = $this->request->get_post('email');
-            } else {
-                $user_email = null;
+        // szabályok megadása az egyes mezőkhöz (mező neve, label, szabály)
+        $validate->add_rule('name', 'username', array(
+            'required' => true,
+            'min' => 2
+        ));
+        $validate->add_rule('first_name', 'userfirstname', array(
+            'required' => true,
+            'min' => 2
+        ));
+        $validate->add_rule('last_name', 'userlastname', array(
+            'required' => true,
+            'min' => 2
+        ));
+        $validate->add_rule('password', 'password', array(
+            'required' => true,
+            'min' => 6
+        ));
+        $validate->add_rule('password_again', 'password_again', array(
+            'required' => true,
+            'matches' => 'password'
+        ));
+        $validate->add_rule('email', 'email', array(
+            'required' => true,
+            'email' => true
+            // 'max' => 64
+        ));        
+
+        // üzenetek megadása az egyes szabályokhoz (szabály_neve, üzenet)
+        $validate->set_message('required', ':label_field_empty');
+        $validate->set_message('min', ':label_too_short');
+        $validate->set_message('matches', ':label_repeat_wrong');
+        $validate->set_message('email', ':label_does_not_fit_pattern');
+        //$validate->set_message('max', ':label_too_long');
+
+        // mezők validálása
+        $validate->check($post_data);
+
+        // HIBAELLENŐRZÉS - ha valamilyen hiba van a form adataiban
+        if(!$validate->passed()){
+            foreach ($validate->get_error() as $value) {
+                Message::set('error', $value);
             }
+            return false;
+        }
+        else {
+        // végrehajtás, ha nincs hiba 
+            $data = array();
+            $data['user_name'] = $this->request->get_post('name');
+            $data['user_first_name'] = $this->request->get_post('first_name');
+            $data['user_last_name'] = $this->request->get_post('last_name');
+            $data['user_email'] = $this->request->get_post('email');
+            $data['user_phone'] = $this->request->get_post('phone');
 
             if (empty($this->request->get_post('img_url'))) {
-                $img_url = Config::get('user.default_photo');
+                $data['user_photo'] = Config::get('user.default_photo');
             } else {
                 $path_parts = pathinfo($this->request->get_post('img_url'));
-                $img_url = htmlentities($path_parts['filename'] . '.' . $path_parts['extension'], ENT_QUOTES, "UTF-8");
+                $data['user_photo'] = $path_parts['filename'] . '.' . $path_parts['extension'];
             }
 
-            $user_group = $this->request->get_post('user_group', 'integer');
+            $data['user_role_id'] = $this->request->get_post('user_group', 'integer');
 
-            // crypt the user's password with the PHP 5.5's password_hash() function, results in a 60 character
-            // hash string. the PASSWORD_DEFAULT constant is defined by the PHP 5.5, or if you are using PHP 5.3/5.4,
-            // by the password hashing compatibility library. the third parameter looks a little bit shitty, but that's
-            // how those PHP 5.5 functions want the parameter: as an array with, currently only used with 'cost' => XX
-            $hash_cost_factor = (Config::get('hash_cost_factor') !== null) ? Config::get('hash_cost_factor') : null;
+                // crypt the user's password with the PHP 5.5's password_hash() function, results in a 60 character
+                // hash string. the PASSWORD_DEFAULT constant is defined by the PHP 5.5, or if you are using PHP 5.3/5.4,
+                // by the password hashing compatibility library. the third parameter looks a little bit shitty, but that's
+                // how those PHP 5.5 functions want the parameter: as an array with, currently only used with 'cost' => XX
+                $hash_cost_factor = (Config::get('hash_cost_factor') !== null) ? Config::get('hash_cost_factor') : null;
 
-            $user_password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT, array('cost' => $hash_cost_factor));
+            $data['user_password_hash'] = password_hash($this->request->get_post('password'), PASSWORD_DEFAULT, array('cost' => $hash_cost_factor));
 
-            // check if username already exists
-            $query = $this->connect->prepare("SELECT * FROM users WHERE user_name = :user_name");
-            $query->execute(array(':user_name' => $user_name));
-            $count = $query->rowCount();
-            if ($count == 1) {
-                Message::set('error', 'username_already_taken');
-                return false;
-            }
+                // ellenőrzés, hogy létezik-e már ilyen felhasználói név az adatbázisban
+                $sth = $this->connect->prepare("SELECT COUNT(*) FROM users WHERE user_name = :user_name");
+                $sth->execute(array(':user_name' => $data['user_name']));
+                if ($sth->fetchColumn() == 1) {
+                    Message::set('error', 'username_already_taken');
+                    return false;
+                }
 
-/*
-            if(!is_null($user_email)){
-              // check if email already exists
-              $query = $this->connect->prepare("SELECT user_id FROM users WHERE user_email = :user_email");
-              $query->execute(array(':user_email' => $user_email));
-              $count =  $query->rowCount();
-              if ($count == 1) {
-                Message::set('error', 'user_email_already_taken');
-                return false;
-              }
-            }
-*/
-
+                // ellenőrzés, hogy létezik-e már ilyen email cím az adatbázisban
+                if(!is_null($data['user_email'])){
+                  $sth = $this->connect->prepare("SELECT COUNT(*) FROM users WHERE user_email = :user_email");
+                  $sth->execute(array(':user_email' => $data['user_email']));
+                  if ($sth->fetchColumn() == 1) {
+                    Message::set('error', 'user_email_already_taken');
+                    return false;
+                  }
+                }
 
             // ha be van állítva e-mail ellenőrzéses regisztráció
             if ($this->email_verify === true) {
                 // generate random hash for email verification (40 char string)
-                $user_activation_hash = sha1(uniqid(mt_rand(), true));
-                $user_active = 0;
+                $data['user_activation_hash'] = sha1(uniqid(mt_rand(), true));
+                $data['user_active'] = 0;
             } else {
-                $user_activation_hash = null;
-                $user_active = 1;
+                $data['user_activation_hash'] = null;
+                $data['user_active'] = 1;
             }
             // generate integer-timestamp for saving of account-creating date
-            $user_creation_timestamp = time();
+            $data['user_creation_timestamp'] = time();
 
-            // write new users data into database
-            $sql = "INSERT INTO users (user_name, user_first_name, user_last_name, user_phone, user_password_hash, user_email, user_active, user_role_id, user_photo, user_creation_timestamp, user_activation_hash, user_provider_type)
-                    VALUES (:user_name, :user_first_name, :user_last_name, :user_phone, :user_password_hash, :user_email, :user_active, :user_role_id, :user_photo, :user_creation_timestamp, :user_activation_hash, :user_provider_type)";
 
-            $query = $this->connect->prepare($sql);
-
-            $query->execute(array(
-                ':user_name' => $user_name,
-                ':user_first_name' => $first_name,
-                ':user_last_name' => $last_name,
-                ':user_phone' => $_POST['phone'],
-                ':user_password_hash' => $user_password_hash,
-                ':user_email' => $user_email,
-                ':user_active' => $user_active,
-                ':user_role_id' => $user_group,
-                ':user_photo' => $img_url,
-                ':user_creation_timestamp' => $user_creation_timestamp,
-                ':user_activation_hash' => $user_activation_hash,
-                ':user_provider_type' => 'DEFAULT'
-            ));
-            $count = $query->rowCount();
-            if ($count != 1) {
+            // Új felhasználó adatainak beírása az adatbázisba
+            $this->query->reset();
+            $this->query->set_table(array('users'));
+            $last_inserted_id = $this->query->insert($data);
+            if (!$last_inserted_id) {
                 Message::set('error', 'account_creation_failed');
                 return false;
             }
 
-            // get user_id of the user that has been created, to keep things clean we DON'T use lastInsertId() here
-            $query = $this->connect->prepare("SELECT user_id FROM users WHERE user_name = :user_name");
-            $query->execute(array(':user_name' => $user_name));
-            if ($query->rowCount() != 1) {
-                Message::set('error', 'unknown_error');
-                return false;
-            }
-
-
             // Ezután jön az ellenörző email küldés (ha az $email_verify tulajdonság értéke true)
             // ha sikeres az ellenőrzés, visszatér true-val, ellenkező esetben a visszatér false-al
             if ($this->email_verify === true) {
-                $result_user_row = $query->fetch(PDO::FETCH_OBJ);
-                $user_id = $result_user_row->user_id;
 
-                // send verification email, if verification email sending failed: instantly delete the user
-                if ($this->sendVerificationEmail($user_id, $user_email, $user_activation_hash)) {
+                // ellenőrző email küldése, ha az ellenőrző email küldése sikertelen: felhasználó törlése az databázisból
+                if ($this->sendVerificationEmail($last_inserted_id, $data['user_email'], $data['user_activation_hash'])) {
                     Message::set('success', 'account_successfully_created');
                     return true;
                 } else {
-                    $query = $this->connect->prepare("DELETE FROM users WHERE user_id = :last_inserted_id");
-                    $query->execute(array(':last_inserted_id' => $user_id));
+                    $this->query->reset();
+                    $this->query->set_table(array('users'));
+                    $this->query->delete('user_id', '=', $last_inserted_id);
                     Message::set('error', 'verification_mail_sending_failed');
                     return false;
                 }
@@ -261,12 +216,16 @@ class Users_model extends Admin_model {
             // ha nincs email ellenőrzés, és minden ellenőrzés sikeres, akkor visszatér true-val
             Message::set('success', 'user_successfully_created');
             return true;
-        } else {
-            // ha valamilyen hiba volt a form adataiban
-            return false;
         }
-//            Message::set('error', 'unknown_error');
     }
+
+
+
+
+
+
+
+
 
     /**
      * Admin user törlése AJAX-al
@@ -351,108 +310,67 @@ class Users_model extends Admin_model {
      *
      * @param  integer $user_id
      */
-    public function edit_user($user_id)
+    public function update_user($user_id)
     {
-        $error_counter = 0;
+        // adatok a $_POST tömbből
+        $post_data = $this->request->get_post();
 
-        // User név ellenőrzés
-        if (empty($this->request->get_post('name'))) {
-            Message::set('error', 'username_field_empty');
-            $error_counter += 1;
-        }
-        /*
-          if (strlen($_POST['name']) > 64 OR strlen($_POST['name']) < 2) {
-          Message::set('error', 'username_too_short_or_too_long');
-          $error_counter += 1;
-          }
-          if (!preg_match('/^[\_a-záöőüűóúéíÁÖŐÜŰÓÚÉÍ\d]{2,64}$/i', $_POST['name'])) {
-          Message::set('error', 'username_does_not_fit_pattern');
-          $error_counter += 1;
-          }
-         */
+        // validátor objektum létrehozása
+        $validate = new Validate();
 
-        // Vezetéknév ellenőrzés	
-        if (empty($this->request->get_post('first_name'))) {
-            Message::set('error', 'userfirstname_field_empty');
-            $error_counter += 1;
-        }
-        /*
-          if (strlen($_POST['first_name']) > 64 OR strlen($_POST['first_name']) < 2) {
-          Message::set('error', 'userfirstname_too_short_or_too_long');
-          $error_counter += 1;
-          }
-          if (!preg_match('/^[a-záöőüűóúéíÁÖŐÜŰÓÚÉÍ]{2,64}$/i', $_POST['first_name'])) {
-          Message::set('error', 'userfirstname_does_not_fit_pattern');
-          $error_counter += 1;
-          }
-         */
-
-        // Utónév ellenőrzés
-        if (empty($this->request->get_post('last_name'))) {
-            Message::set('error', 'userlastname_field_empty');
-            $error_counter += 1;
-        }
-        /*
-          if (strlen($_POST['last_name']) > 64 OR strlen($_POST['last_name']) < 2) {
-          Message::set('error', 'userlastname_too_short_or_too_long');
-          $error_counter += 1;
-          }
-          if (!preg_match('/^[a-záöőüűóúéíÁÖŐÜŰÓÚÉÍ]{2,64}$/i', $_POST['last_name'])) {
-          Message::set('error', 'userlastname_does_not_fit_pattern');
-          $error_counter += 1;
-          }
-
-          // Telefonszám ellenőrzés
-          if(empty($_POST['phone'])){
-          Message::set('error', 'userphone_field_empty');
-          $error_counter += 1;
-          }
-          if (!preg_match('~^(36)[\s-]?([0-9]{1,2})[\s-]?([0-9]{3})[\s-]?([0-9]{4})$~', $_POST['phone'])) {
-          Message::set('error', 'userphone_does_not_fit_pattern');
-          $error_counter += 1;
-          }
-         */
-
-        // Jelszó ellenőrzés
-        // ha üres a password és az ellenőrző password mezö
-        if (empty($this->request->get_post('password')) AND empty($this->request->get_post('password_again'))) {
+        // szabályok megadása az egyes mezőkhöz (mező neve, label, szabály)
+        $validate->add_rule('name', 'username', array(
+            'required' => true,
+            'min' => 2
+        ));
+        $validate->add_rule('first_name', 'userfirstname', array(
+            'required' => true,
+            'min' => 2
+        ));
+        $validate->add_rule('last_name', 'userlastname', array(
+            'required' => true,
+            'min' => 2
+        ));
+        
+        // Jelszó ellenőrzés ha üres a password és az ellenőrző password mezö
+        if (empty($this->request->get_post('password')) && empty($this->request->get_post('password_again'))) {
             $password_empty = true;
         } else {
-            if (empty($this->request->get_post('password')) OR empty($this->request->get_post('password_again'))) {
-                Message::set('error', 'password_field_empty');
-                $error_counter += 1;
-            }
-            if (strlen($this->request->get_post('password')) < 6) {
-                Message::set('error', 'password_too_short');
-                $error_counter += 1;
-            }
-            if ($this->request->get_post('password') !== $this->request->get_post('password_again')) {
-                Message::set('error', 'password_repeat_wrong');
-                $error_counter += 1;
-            }
+            $validate->add_rule('password', 'password', array(
+                'required' => true,
+                'min' => 6
+            ));
+            $validate->add_rule('password_again', 'password_again', array(
+                'required' => true,
+                'matches' => 'password'
+            ));
         }
 
-        // E-mail ellenőrzés
-        if (empty($this->request->get_post('email'))) {
-            Message::set('error', 'email_field_empty');
-            $error_counter += 1;
+        $validate->add_rule('email', 'email', array(
+            'required' => true,
+            'email' => true
+            // 'max' => 64
+        ));        
+
+        // üzenetek megadása az egyes szabályokhoz (szabály_neve, üzenet)
+        $validate->set_message('required', ':label_field_empty');
+        $validate->set_message('min', ':label_too_short');
+        $validate->set_message('matches', ':label_repeat_wrong');
+        $validate->set_message('email', ':label_does_not_fit_pattern');
+        //$validate->set_message('max', ':label_too_long');
+
+        // mezők validálása
+        $validate->check($post_data);
+
+        // HIBAELLENŐRZÉS - ha valamilyen hiba van a form adataiban
+        if(!$validate->passed()){
+            foreach ($validate->get_error() as $value) {
+                Message::set('error', $value);
+            }
+            return false;
         }
-        /*
-          if (strlen($_POST['email']) > 64) {
-          Message::set('error', 'email_too_long');
-          $error_counter += 1;
-          }
-          if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-          Message::set('error', 'email_does_not_fit_pattern');
-          $error_counter += 1;
-          }
-         */
-
-
+        else {
         // végrehajtás, ha nincs hiba	
-        if ($error_counter == 0) {
-
-            // clean the input
             $data['user_name'] = $this->request->get_post('name');
             $data['user_first_name'] = $this->request->get_post('first_name');
             $data['user_last_name'] = $this->request->get_post('last_name');
@@ -465,23 +383,19 @@ class Users_model extends Admin_model {
                 // by the password hashing compatibility library. the third parameter looks a little bit shitty, but that's
                 // how those PHP 5.5 functions want the parameter: as an array with, currently only used with 'cost' => XX
                 $hash_cost_factor = (Config::get('hash_cost_factor') !== null) ? Config::get('hash_cost_factor') : null;
-                $data['user_password_hash'] = password_hash($_POST['password'], PASSWORD_DEFAULT, array('cost' => $hash_cost_factor));
+                $data['user_password_hash'] = password_hash($this->request->get_post('password'), PASSWORD_DEFAULT, array('cost' => $hash_cost_factor));
             }
 
-            if (!empty($this->request->get_post('email'))) {
-                $data['user_email'] = htmlentities($this->request->get_post('email'), ENT_QUOTES, "UTF-8");
-            } else {
-                $data['user_email'] = null;
-            }
+            $data['user_email'] = $this->request->get_post('email');
 
             if ($this->request->has_post('user_group')) {
-                $data['user_role_id'] = $this->request->get_post('user_group');
+                $data['user_role_id'] = $this->request->get_post('user_group', 'integer');
             }
 
             //ha van feltöltve user kép
             if (!empty($this->request->get_post('img_url'))) {
                 $path_parts = pathinfo($this->request->get_post('img_url'));
-                $data['user_photo'] = htmlentities($path_parts['filename'] . '.' . $path_parts['extension'], ENT_QUOTES, "UTF-8");
+                $data['user_photo'] = $path_parts['filename'] . '.' . $path_parts['extension'];
             }
 
             // Megvizsgáljuk, hogy van-e már ilyen nevű user (de nem az amit módosítani akarunk)
@@ -501,7 +415,7 @@ class Users_model extends Admin_model {
 
             /* 			
               if(!is_null($data['user_email'])){
-              // Megvizsgáljuk, hogy van-e már ilyen email cím user (de nem az amit módosítani akarunk)
+              // Megvizsgáljuk, hogy van-e már ilyen email cím (de nem az amit módosítani akarunk)
               $this->query->reset();
               $this->query->set_table(array('users'));
               $this->query->set_columns(array('user_email'));
@@ -526,7 +440,7 @@ class Users_model extends Admin_model {
             $result = $this->query->update($data);
 
             if ($result >= 0) {
-                // ha a bejelentkezett user adatait módosítjuk, akkor a session adataokat is frissíteni kell
+                // ha a bejelentkezett user adatait módosítjuk, akkor a session adatokat is frissíteni kell
                 if (Session::get('user_id') == $user_id) {
                     // Módosítjuk a $_SESSION tömben is a user adatait!
                     Session::set('user_name', $data['user_name']);
@@ -544,29 +458,7 @@ class Users_model extends Admin_model {
                 Message::set('error', 'unknown_error');
                 return false;
             }
-        } else {
-            // ha valamilyen hiba volt a form adataiban
-            // a hibaüzenetek beíródnak a session-be a metódus elején
-            return false;
-        }
-    }
-
-    /**
-     * 	Egy user (bizonyos) adatait kérdezi le az adatbázisból
-     * 	(user_id, user_name, user_first_name, user_last_name, user_phone, user_email, user_role_id és a role táblából: role_name)
-     *
-     * 	@param	$user_id String or Integer
-     * 	@return	Array or false
-     */
-    public function user_data_query($user_id)
-    {
-        $this->query->reset();
-        $this->query->set_table(array('users'));
-        $this->query->set_columns(array('users.user_id', 'users.user_name', 'users.user_first_name', 'users.user_last_name', 'users.user_phone', 'users.user_email', 'users.user_role_id', 'users.user_photo', 'roles.role_name'));
-        $this->query->set_join('left', 'roles', 'users.user_role_id', '=', 'roles.role_id');
-        $this->query->set_where('user_id', '=', $user_id);
-
-        return $this->query->select();
+        } 
     }
 
     /**
@@ -574,14 +466,11 @@ class Users_model extends Admin_model {
      * 	Az $this->registry->params['id'] paraméter értékétől függően feltölti a kiválasztott képet
      * 		upload paraméter esetén: feltölti a kiválasztott képet
      * 		crop paraméter esetén: megvágja a kiválasztott képet és feltölti	
-     *
      */
     public function user_img_upload()
     {
         if ($this->request->has_params('id')) {
-
-            include(LIBS . "/upload_class.php");
-
+            //include(LIBS . "/upload_class.php");
             // Kiválasztott kép feltöltése
             if ($this->request->get_params('id') == 'upload') {
 
@@ -610,7 +499,6 @@ class Users_model extends Admin_model {
 
                         $response = array(
                             "status" => 'success',
-                            //"url" => $handle->file_dst_name,
                             "url" => $imagePath . $handle->file_dst_name,
                             "width" => $handle->image_dst_x,
                             "height" => $handle->image_dst_y
@@ -692,7 +580,6 @@ class Users_model extends Admin_model {
 
                         $response = array(
                             "status" => 'success',
-                            //"url" => $handle->file_dst_name
                             "url" => $imagePath . $handle->file_dst_name
                         );
                         return json_encode($response);
