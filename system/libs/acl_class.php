@@ -20,9 +20,9 @@ class Acl {
      *
      * @param string $permission    egy művelet neve pl.: delete_user 
      * @param string $target_url    egy átirányítási hely, ha nincs engedély 
-     * @return  az Acl objektumot adja vissza
+     * @return void
      */
-    public static function check($permission, $target_url = 'home')
+    public static function check($permission, $target_url = null)
     {
         static $_instance = null;
         if ($_instance === null) {
@@ -32,11 +32,13 @@ class Acl {
 
             if($_instance->_check_access($permission)){
                 return true;
-            } else{
-                //return false;
-                $_instance->_access_denied($permission, $target_url);
             }
-
+            else {
+                if(!is_null($target_url)) {
+                    $_instance->_access_denied($permission, $target_url);
+                }
+                return false;
+            }
 
         //return $_instance->_get_permissions();
         //return $_instance;
@@ -80,7 +82,9 @@ class Acl {
         // return in_array($permission, $this->permissions);
     }
 
-
+    /**
+     * Ha nincs engedély, akkor lekérdezi az engedélyhez tartozó hibaüzenetet és átirányit a $target_url címre
+     */
     private function _access_denied($permission, $target_url)
     {
         $sql = "SELECT perm_message FROM permissions WHERE perm_key = :perm";
@@ -96,7 +100,7 @@ class Acl {
             throw new Exception('Nincs ilyen muvelet az adatbazisban!');
             exit;
         }
-        $target_url = str_replace(BASE_URL . "admin/", "", $target_url);
+        //$target_url = str_replace(BASE_URL . "admin/", "", $target_url);
         Util::redirect($target_url);
     }
 
