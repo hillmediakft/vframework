@@ -11,7 +11,7 @@
  *		Message::get(); - üzenetek visszaadása
  *		Message::clear(); - üzenetek törlése a $msg_all  és a $_SESSION tömbből
  *		Message::log(); - üzenetek naplózása log file-ba
- *		Message::send(); - üzenetek küldése egyszerű visszaadása
+ *		Message::show(); - üzenetek egyszerű visszaadása
  *
  *  Az üzenetek modulhoz rendelése: paraméter a modul neve pl.: admin vagy site
  *  Az üzenetek a $_SESSION['message_modulneve'] elembe fognak kerülni)
@@ -38,8 +38,8 @@
  *		Message::clear('notice');
  *
  *  Visszaadja a paraméterként kapott üzenetet
- *      echo Message::send('unknown_error'); - kulcs az üzenetek tömbből
- *      echo Message::send('Bármilyen üzenet amit vissza akarunk küldeni a javascriptnek!');
+ *      echo Message::show('unknown_error'); - kulcs az üzenetek tömbből
+ *      echo Message::show('Bármilyen üzenet amit vissza akarunk küldeni a javascriptnek!');
  *
  */
 class Message {
@@ -242,7 +242,7 @@ class Message {
      *  @param  string  $key    a betöltött üzenetek tömbben létező kulcs, vagy bármilyen üzenet
      *  @return string
      */
-    public static function send($key)
+    public static function show($key)
     {
         return (isset(self::$msg_all[$key])) ? self::$msg_all[$key] : $key;
     }
