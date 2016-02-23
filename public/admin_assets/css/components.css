@@ -3011,8 +3011,8 @@ UI Loading
   vertical-align: middle;
 }
 .loading-message.loading-message-boxed {
-  border: 1px solid #ddd;
-  background-color: #eee;
+  border: 1px solid #1fc5ae;
+  background-color: rgba(188, 216, 212, 0.7);
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
