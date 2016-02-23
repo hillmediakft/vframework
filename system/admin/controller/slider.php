@@ -102,6 +102,7 @@ class Slider extends Admin_controller {
         if ($this->request->is_ajax()) {
             if ($this->request->has_post('action') && $this->request->get_post('action') == 'update_slider_order') {
                 $this->slider_model->slider_order();
+                echo Message::show('A sorrend módosítva!');
             }
         }
     }

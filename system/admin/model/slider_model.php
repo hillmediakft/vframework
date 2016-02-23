@@ -140,7 +140,6 @@ class Slider_model extends Admin_model {
                 $this->query->update(array('slider_order' => $order));
             }
         }
-        echo Message::send('A sorrend módosítva!');
     }
 
     /**
