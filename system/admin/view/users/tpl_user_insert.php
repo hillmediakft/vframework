@@ -22,22 +22,12 @@
 				<div class="col-md-12">
 
 				<!-- ÜZENETEK -->
+				<div id="ajax_message"></div>	
 				<?php $this->renderFeedbackMessages();?>			
-				
 				
 					<!-- BEGIN FORM-->			
 					<form action="admin/users/new_user" method="POST" id="new_user_form" name="new_user_form">	
-							
-						<!-- ÜZENETEK 2 -->
-						<div class="alert alert-danger display-hide">
-							<button class="close" data-close="alert"></button>
-							<span><!-- ide jön az üzenet--></span>
-						</div>
-						<div class="alert alert-success display-hide">
-							<button class="close" data-close="alert"></button>
-							<span><!-- ide jön az üzenet--></span>
-						</div>							
-						
+
 						<div class="portlet">
 							<div class="portlet-title">
 								<div class="caption">

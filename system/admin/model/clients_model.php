@@ -139,48 +139,86 @@ class Clients_model extends Model {
 
 
     /**
-     *  Partner törlése AJAX-al
+     * Partner törlése AJAX-al
+     *
+     * @param string $id     ez lehet egy szám, vagy felsorolás pl: 23 vagy 12,14,36
      */
     public function delete_client_AJAX($id)
     {
-        // törlendő kép elérési útja
-        $image_to_delete = Config::get('clientphoto.upload_path') . $this->get_client_image_name($id);
+        // a sikeres törlések számát tárolja
+        $success_counter = 0;
+        // a sikeresen törölt id-ket tartalmazó tömb
+        $success_id = array();      
+        // a sikertelen törlések számát tárolja
+        $fail_counter = 0; 
 
-        // adatok törlése az adatbázisból   
-        $this->query->reset();
-        $this->query->set_table(array('clients'));
-        //a delete() metódus integert (lehet 0 is) vagy false-ot ad vissza
-        $result = $this->query->delete('client_id', '=', $id);
+        // a paraméterként kapott stringből tömböt csinálunk a , karakter mentén
+        $data_arr = explode(',', $id);
+        
+        // bejárjuk a $data_arr tömböt és minden elemen végrehajtjuk a törlést
+        foreach($data_arr as $value) {
+            //átalakítjuk a integer-ré a kapott adatot
+            $value = (int)$value;
 
-        if ($result !== false) {
-            // ha a törlési sql parancsban nincs hiba
-            if ($result > 0) {
-                // kép törlése (hiba esetén logfájlba ír)
-                if (!Util::del_file($image_to_delete)) {
-                    Message::log('Kép nem törölhető! - ' . $image_to_delete);
+            //lekérdezzük a törlendő kép nevét, hogy törölhessük a szerverről
+            $this->query->reset();
+            $this->query->set_table('clients');
+            $this->query->set_columns(array('client_photo'));
+            $this->query->set_where('client_id', '=', $value);
+            $photo_name = $this->query->select();           
+
+            //rekord törlése  
+            $this->query->reset();
+            $this->query->set_table(array('clients'));
+            //a delete() metódus integert (lehet 0 is) vagy false-ot ad vissza
+            $result = $this->query->delete('client_id', '=', $value);
+            
+            if($result !== false) {
+                // ha a törlési sql parancsban nincs hiba
+                if($result > 0){
+                    //ha van feltöltött képe (az adatbázisban szerepel a file-név)
+                    if(!empty($photo_name[0]['client_photo'])){
+                    
+                        $picture_path = Config::get('clientphoto.upload_path') . $photo_name[0]['client_photo'];
+                        $del_result = Util::del_file($picture_path);
+                    
+                        //kép file törlése a szerverről (ha az Util::del_file() falsot ad vissza nem tudtuk törölni a képet... hibaüzenet)
+                        if(!$del_result){
+                            Message::log('Kép nem törölhető! - ' . $picture_path);
+                        }
+                    }               
+                    //sikeres törlés
+                    $success_counter += $result;
+                    $success_id[] = $value;
                 }
-                //sikeres törlés
+                else {
+                    //sikertelen törlés
+                    $fail_counter++;
+                }
+            }
+            else {
+                // ha a törlési sql parancsban hiba van
                 return array(
-                    'status' => 'success', 
-                    'message' => 'A partner törlése sikerült.', 
-                );
-
-            } else {
-                //sikertelen törlés
-                return array(
-                    'status' => 'error', 
-                    'message' => 'A partner törlése nem sikerült!', 
+                    'status' => 'error',
+                    'message_error' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!',                  
                 );
             }
-        } else {
-            // ha a törlési sql parancsban hiba van
-            return array(
-                'status' => 'error', 
-                'message' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!', 
-            );
         }
-    }
 
+        // üzenetek visszaadása
+        $respond = array();
+        $respond['status'] = 'success';
+        
+        if ($success_counter > 0) {
+            $respond['message_success'] = 'Partner törölve.';
+        }
+        if ($fail_counter > 0) {
+            $respond['message_error'] = 'A partnert már töröltek!';
+        }
+
+        // respond tömb visszaadása
+        return $respond;    
+    }
 
     /**
      * Crew member képének vágása és feltöltése
@@ -322,21 +360,6 @@ class Clients_model extends Model {
                 }
             }
         }
-    }
-
-    /**
-     * Partnerhez tartozó kép elérési útvonalának lekérdezése - partner törléséhez
-     * @para   integer      $id partner id-je
-     * @return string       törlendő kép elérési útvonala	
-     */
-    public function get_client_image_name($id) {
-        $id = (int) $id;
-        $this->query->reset();
-        $this->query->set_table(array('clients'));
-        $this->query->set_columns('client_photo');
-        $this->query->set_where('client_id', '=', $id);
-        $result = $this->query->select();
-        return $result[0]['client_photo'];
     }
 
 }

@@ -34,11 +34,8 @@
 	<!-- END GLOBAL SCRIPTS --> 
 	
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
-	<?php
-		foreach($this->js_link as $value) {
-			echo $value;
-		} 
-	?>
+	<?php $this->get_js_link(); ?>
+	
 	<!-- END PAGE LEVEL SCRIPTS -->
 	<!-- END JAVASCRIPTS -->
 </body>

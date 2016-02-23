@@ -28,19 +28,10 @@
             <div class="col-md-12">
 
                 <!-- ÜZENETEK -->
-                <div id="message"></div> 
+                <div id="ajax_message"></div> 
                 <?php $this->renderFeedbackMessages(); ?>			
 
-                <form action="" method="POST" id="new_client">	
-
-                    <div class="alert alert-danger display-hide">
-                        <button class="close" data-close="alert"></button>
-                        <span><!-- ide jön az üzenet--></span>
-                    </div>
-                    <div class="alert alert-success display-hide">
-                        <button class="close" data-close="alert"></button>
-                        <span><!-- ide jön az üzenet--></span>
-                    </div>	
+                <form action="" method="POST" id="client_insert_form">	
 
                     <!-- BEGIN EXAMPLE TABLE PORTLET-->
                     <div class="portlet">
@@ -61,8 +52,6 @@
                             <div class="space10"></div>							
                             <div class="row">	
                                 <div class="col-md-12">
-                                    
-                                    
                                     
                                     <label>Partner logó</label>
 

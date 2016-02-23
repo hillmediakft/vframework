@@ -41,7 +41,7 @@ class Testimonials_model extends Admin_model {
 	}
 	
 	/**
-	 *	Egy oldal adatait kérdezi le az adatbázisból (pages tábla)
+	 *	A testimonial táblából kérdez le adatokat
 	 *
 	 *	@param	$id String or Integer
 	 *	@return	az adatok tömbben
@@ -61,7 +61,7 @@ class Testimonials_model extends Admin_model {
 	 *	@param	$id String or Integer
 	 *	@return	az adatok tömbben
 	 */
-	public function new_testimonial()
+	public function insert_testimonial()
 	{
 		$data['name'] = $this->request->get_post('testimonial_name');
 		$data['title'] = $this->request->get_post('testimonial_title');
@@ -71,7 +71,6 @@ class Testimonials_model extends Admin_model {
 		$this->query->set_table(array('testimonials'));
 		$result = $this->query->insert($data);
 
-		// ha sikeres az insert visszatérési érték true
 		if($result) {
             Message::set('success', 'new_testimonial_success');
 			return true;

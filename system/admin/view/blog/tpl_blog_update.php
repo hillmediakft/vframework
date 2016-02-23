@@ -110,8 +110,6 @@
 									</div>
 								</div>	
 
-<div id="message"></div> 
-
 							</div> <!-- END USER GROUPS PORTLET BODY-->
 						</div> <!-- END USER GROUPS PORTLET-->
 

@@ -4,7 +4,6 @@ class Content extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
-		$this->loadModel('content_model');
 	}
 
 	public function index()
@@ -13,7 +12,7 @@ class Content extends Admin_controller {
 		$this->view->title = 'Egyéb tartalom oldal';
 		$this->view->description = 'Egyéb tartalom oldal description';
 		
-		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/content.js');
+		$this->view->add_links('js', ADMIN_JS . 'pages/content.js');
 		
 		$this->view->all_content = $this->content_model->all_content();
 		
@@ -38,15 +37,13 @@ class Content extends Admin_controller {
 		$this->view->title = 'Tartalom szerkesztése';
 		$this->view->description = 'Tartalom szerkesztése description';
 		
-		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootbox/bootbox.min.js');
-		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/ckeditor/ckeditor.js');
-		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/edit_content.js');
-		
+		$this->view->add_links(array('bootbox', 'ckeditor'));
+		$this->view->add_link('js', ADMIN_JS . 'pages/edit_content.js');
+
 		// visszadja a szerkesztendő oldal adatait egy tömbben (page_id, page_title ... stb.)
 		$this->view->data_arr = $this->content_model->content_data_query($id);
 		
 		$this->view->render('content/tpl_edit_content');
-	
 	}
 
 }

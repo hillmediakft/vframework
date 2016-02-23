@@ -31,10 +31,10 @@
             <div class="col-md-12">
 
                 <!-- ÜZENETEK -->
-                <div id="message"></div> 				
+                <div id="ajax_message"></div> 				
                 <?php $this->renderFeedbackMessages(); ?>	
 
-                <form action="" method="POST" id="update_slide" enctype="multipart/form-data">	
+                <form action="" method="POST" id="slider_update_form" enctype="multipart/form-data">	
 
                     <!-- BEGIN EXAMPLE TABLE PORTLET-->
                     <div class="portlet">
@@ -68,7 +68,7 @@
                                     <div class="form-group">
                                         <label class="control-label">Slide kép</label>
                                         <div class="fileupload fileupload-new" data-provides="fileupload">
-                                            <div class="fileupload-new thumbnail" style="width: 585px"><img src="<?php echo Config::get('slider.upload_path') . $slider[0]['picture']; ?>" alt=""/></div>
+                                            <div class="fileupload-new thumbnail" style="width: 585px"><img src="<?php echo Config::get('slider.upload_path') . $slider['picture']; ?>" alt=""/></div>
                                             <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 585px; max-height: 210px; line-height: 20px;"></div>
                                             <div>
                                                 <span class="btn default btn-file"><span class="fileupload-new">Kiválasztás</span><span class="fileupload-exists">Módosít</span><input id="uploadprofile" class="img" type="file" name="update_slide_picture"></span>
@@ -92,29 +92,29 @@
 
                                     <div class="form-group">
                                         <label for="slider_title" class="control-label">Slide cím</label>
-                                        <input type="text" name="slider_title" id="slider_title" placeholder="A slide címe" class="form-control input-xlarge" value="<?php echo $slider[0]['title']; ?>"/>
+                                        <input type="text" name="slider_title" id="slider_title" placeholder="A slide címe" class="form-control input-xlarge" value="<?php echo $slider['title']; ?>"/>
                                     </div>
                                     <div class="form-group">
                                         <label for="slider_text" class="control-label">Slide szöveg</label>
-                                        <input type="text" name="slider_text" id="slider_text" placeholder="A slide szövege" class="form-control input-xlarge" value="<?php echo $slider[0]['text']; ?>"/>
+                                        <input type="text" name="slider_text" id="slider_text" placeholder="A slide szövege" class="form-control input-xlarge" value="<?php echo $slider['text']; ?>"/>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="slider_link" class="control-label">Slide link</label>
-                                        <input type="text" name="slider_link" id="slider_link" placeholder="A slide linkje" class="form-control input-xlarge" value="<?php echo $slider[0]['target_url']; ?>"/>
+                                        <input type="text" name="slider_link" id="slider_link" placeholder="A slide linkje" class="form-control input-xlarge" value="<?php echo $slider['target_url']; ?>"/>
                                     </div>											
 
                                     <!--Státusz beállítása-->
                                     <div class="form-group">
                                         <label for="slider_status">Slide státusz</label>
                                         <select name='slider_status' class="form-control input-xlarge">
-                                            <option value="1" <?php echo ($slider[0]['active'] == 1) ? 'selected' : ''; ?>>Aktív</option>
-                                            <option value="0" <?php echo ($slider[0]['active'] == 0) ? 'selected' : ''; ?>>Inaktív</option>
+                                            <option value="1" <?php echo ($slider['active'] == 1) ? 'selected' : ''; ?>>Aktív</option>
+                                            <option value="0" <?php echo ($slider['active'] == 0) ? 'selected' : ''; ?>>Inaktív</option>
                                         </select>
                                     </div>
 
                                     <!-- régi kép elérési útja-->
-                                    <input type="hidden" name="old_img" id="old_img" value="<?php echo $slider[0]['picture']; ?>">				
+                                    <input type="hidden" name="old_img" id="old_img" value="<?php echo $slider['picture']; ?>">				
 
                                 </div>
                             </div>	

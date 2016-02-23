@@ -49,21 +49,12 @@
 					<div class="space10"></div>
 					
 					<!-- ÜZENETEK -->
+					<div id="ajax_message"></div>
 					<?php $this->renderFeedbackMessages(); ?>
 																				
 					<!-- BEGIN FORM-->			
 					<form action="admin/users/profile/<?php echo $this->request->get_params('id'); ?>" method="POST" id="edit_user">
 	
-						<!-- ÜZENETEK 2 -->
-						<div class="alert alert-danger display-hide">
-							<button class="close" data-close="alert"></button>
-							<span><!-- ide jön az üzenet--></span>
-						</div>
-						<div class="alert alert-success display-hide">
-							<button class="close" data-close="alert"></button>
-							<span><!-- ide jön az üzenet--></span>
-						</div>	
-						
 						<div class="portlet">
 							<div class="portlet-title">
 								<div class="caption">
@@ -85,7 +76,7 @@
 										<li class="active"><a data-toggle="tab" href="#tab_1_1"><i class="fa fa-cog"></i>Személyes adatok</a><span class="after"></span></li>
 										<li ><a data-toggle="tab" href="#tab_2_2"><i class="fa fa-picture-o"></i> Profil kép</a></li>
 										<li ><a data-toggle="tab" href="#tab_3_3"><i class="fa fa-lock"></i> Jelszó</a></li>
-										<?php if(Session::get('user_role_id') == 1) { ?>
+										<?php if(Acl::check('update_user_perm')) { ?>
 										<li ><a data-toggle="tab" href="#tab_4_4"><i class="fa fa-wrench"></i> Jogosultságok</a></li>
 										<?php } ?>
 									</ul>
@@ -159,7 +150,7 @@
 										
 	<!-- ****************************** JOGOSULTSÁGOK ***************************** -->										
 										
-                                    <?php if(Session::get('user_role_id') == 1) { ?>
+                                    <?php if(Acl::check('update_user_perm')) { ?>
 										<div id="tab_4_4" class="tab-pane">
 										
 											<h3>Felhasználói jogosultság</h3>

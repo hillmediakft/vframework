@@ -48,29 +48,21 @@
 					<!-- BEGIN PROGRESS BAR EVENTSOURCE -->	
     					
 					
-					
-					
-					
-					
-					
-					
-					
-					
-					
 				</div>
 					<!-- echo out the system feedback (error and success messages) -->
+					<div id="ajax_message"></div>
 					<?php $this->renderFeedbackMessages(); ?>
 								
 
-				<form class="horizontal-form" id="del_newsletter_form" method="POST" action="admin/newsletter/delete_newsletter">	
+				<form class="horizontal-form" id="newsletter_form" method="POST" action="">	
 						
 					<div class="portlet">
 						<div class="portlet-title">
 							<div class="caption"><i class="fa fa-user"></i>Hírlevelek</div>
 							
 								<div class="actions">
-									<a href="admin/newsletter/new_newsletter" class="btn blue btn-sm"><i class="fa fa-plus"></i> Új hírlevél</a>
-									<button class="btn red btn-sm" name="delete_newsletter" type="submit"><i class="fa fa-trash"></i> Csoportos törlés</button>
+									<a href="admin/newsletter/insert" class="btn blue btn-sm"><i class="fa fa-plus"></i> Új hírlevél</a>
+									<button class="btn red btn-sm" id="delete_group" type="button"><i class="fa fa-trash"></i> Csoportos törlés</button>
 									<div class="btn-group">
 										<a data-toggle="dropdown" href="#" class="btn btn-sm default">
 											<i class="fa fa-wrench"></i> Eszközök <i class="fa fa-angle-down"></i>
@@ -100,7 +92,7 @@
 										<th title="Létrehozás dátuma">Létrehozva</th>
 										<th title="Utolsó küldés dátuma">Utolsó küldés</th>
 										<th>Státusz</th>
-										<th></th>
+										<th style="width:0px;"></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -117,43 +109,33 @@
 									<td><?php echo $value['newsletter_subject'];?></td>
 									<td><?php echo $value['newsletter_create_date'];?></td>
 									<td><?php echo (empty($value['newsletter_lastsent_date'])) ? '<span class="label label-info">Nincs elküldve</span>' : $value['newsletter_lastsent_date'];?></td>
-									<td><?php echo $value['newsletter_status'];?></td>
-									
+                                    <?php if ($value['newsletter_status'] == 1) { ?>
+                                        <td><span class="label label-sm label-success">Aktív</span></td>
+                                    <?php } ?>
+                                    <?php if ($value['newsletter_status'] == 0) { ?>
+                                        <td><span class="label label-sm label-danger">Inaktív</span></td>
+                                    <?php } ?>
 									<td>
 										<div class="actions">
 											<div class="btn-group">
-												<a class="btn btn-sm green" href="#" data-toggle="dropdown" <?php echo (Session::get('user_role_id') <= 0) ? 'disabled' : '';?>>
-													<i class="fa fa-cogs"></i> Műveletek
-													<i class="fa fa-angle-down"></i>
+												<a class="btn btn-sm grey-steel" href="#" data-toggle="dropdown"><i class="fa fa-cogs"></i>
 												</a>
 												<ul class="dropdown-menu pull-right">
 													<li>
-														<a id="submit_newsletter_<?php echo $value['newsletter_id'];?>" rel="<?php echo $value['newsletter_id'];?>"><i class="fa fa-trash"></i> Hírlevél elküldése</a>
+														<a class="submit_newsletter" data-id="<?php echo $value['newsletter_id'];?>"><i class="fa fa-trash"></i> Hírlevél elküldése</a>
 													</li>
 													<li>
-														<a href="admin/newsletter/edit_newsletter/<?php echo $value['newsletter_id'];?>"><i class="fa fa-pencil"></i> Szerkeszt</a>
+														<a href="admin/newsletter/update/<?php echo $value['newsletter_id'];?>"><i class="fa fa-pencil"></i> Szerkeszt</a>
 													</li>
-
-													<!--
-													<li><a href="<?php //echo $this->request->get_uri('site_url') . 'newsletter/delete_newsletter/' . $value['newsletter_id'];?>" id="delete_newsletter_<?php //echo $value['newsletter_id'];?>" rel="<?php //echo $value['newsletter_id'];?>"> <i class="fa fa-trash"></i> Töröl</a></li>
-													-->
-													
 													<?php if (empty($value['newsletter_lastsent_date'])) { ?>
 													<li>
-														<a id="delete_newsletter_<?php echo $value['newsletter_id'];?>" rel="<?php echo $value['newsletter_id'];?>"><i class="fa fa-trash"></i> Töröl</a>
+														<a class="delete_item" data-id="<?php echo $value['newsletter_id'];?>"><i class="fa fa-trash"></i> Töröl</a>
 													</li>
 													<?php } ?>
 												</ul>
 											</div>
 										</div>
 									</td>
-									
-									<!--
-									<td>
-										<button type="button" name="submit_newsletter" id="submit_newsletter_<?php //echo $value['newsletter_id'];?>" value="<?php //echo $value['newsletter_id'];?>" class="btn btn-sm default">Hírlevél elküldése</button>
-									</td>
-									-->
-									
 								</tr>
 
 							<?php } ?>	
@@ -166,14 +148,7 @@
 
 			</div>
 		</div>
-	</div>
-		<!-- END PAGE CONTAINER-->    
-		
-		
-
-		
-</div>                                                            
-<!-- END PAGE CONTENT WRAPPER -->
+	</div><!-- END PAGE CONTENT-->    
+</div><!-- END PAGE CONTENT WRAPPER -->
 
 </div><!-- END CONTAINER -->
-<div id="loadingDiv"></div>	

@@ -25,7 +25,7 @@
 			<!-- BEGIN PAGE CONTENT-->
 			<div class="row">
 				<div class="col-md-12">
-                    <form action='' name='update_pages_form' id="update_pages_form" method='POST'>
+                    <form action="" id="update_page_form" name="update_page_form" method='POST'>
 
 						<!-- BEGIN EXAMPLE TABLE PORTLET-->
 						<div class="portlet">
@@ -38,7 +38,6 @@
                                     <div class="actions">
                                         <button class="btn green btn-sm" type="submit" name="submit_update_page"><i class="fa fa-check"></i> Mentés</button>
                                         <a class="btn default btn-sm" href="admin/pages"><i class="fa fa-close"></i> Mégsem</a>
-                                        <!-- <button class="btn default btn-sm" name="cancel" type="button">Mégsem</button>-->
                                     </div>							
                                 </div>                        
                                                 

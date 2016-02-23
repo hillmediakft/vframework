@@ -25,12 +25,8 @@
         <div class="row">
             <div class="col-md-12">
 
-                <div id="loadingDiv" style="display:none;"><img src="public/admin_assets/img/loader.gif"></div>
                 <!-- ÜZENETEK -->	
-                <div id="ajax_message">
-                    <div class="alert alert-success" style="display:none;"></div>
-                    <!-- <div class="alert alert-danger"></div>-->
-                </div> 
+                <div id="ajax_message"></div> 
                 <?php $this->renderFeedbackMessages(); ?>	
 
                 <!-- BEGIN EXAMPLE TABLE PORTLET-->
@@ -41,21 +37,21 @@
                             Kezdőoldali slider kezelése
                         </div>
                         <div class="actions">
-                            <a class="btn blue-steel btn-sm" href="admin/slider/new_slide"><i class="fa fa-plus"></i> Slide hozzáadása</a>
+                            <a class="btn blue-steel btn-sm" href="admin/slider/insert"><i class="fa fa-plus"></i> Slide hozzáadása</a>
                         </div>
                     </div>
                     <div class="portlet-body">
                         <div class="alert alert-info alert-dismissable">
                             <button class="close" aria-hidden="true" data-dismiss="alert" type="button"></button>
                             A sorrend módosításához az egeret azon slide fölé kell vinni, amelyet előre vagy hátra kíván sorolni. A négy irányú nyíl kurzor jelzi, hogy az elem mozgatható. Az új helyre helyezés után a sorrend frissítése azonnal megtörténik.</div>
-                        <table class="table table-hover table-bordered slider_list">
+                        <table class="table table-hover table-bordered slider_list" id="slider_table">
                             <thead>
                                 <tr class="heading">
-                                    <th style="width: 250px">Kép</th>
+                                    <th style="width: 0px">Kép</th>
                                     <th>Slide címe</th>
                                     <th>Slide szövege</th>
                                     <th>Státusz</th>
-                                    <th style="width: 1%"></th>
+                                    <th style="width: 0px"></th>
                                 </tr>
                             </thead>
                             <tbody id="slider_list">						
@@ -80,8 +76,13 @@
                                                         <i class="fa fa-cogs"></i>
                                                     </a>
                                                     <ul class="dropdown-menu pull-right">
-                                                        <li><a href="admin/slider/edit/<?php echo $value['id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
-                                                        <li><a href="admin/slider/delete/<?php echo $value['id']; ?>" id="delete_<?php echo $value['id']; ?>"><i class="fa fa-trash"></i> Töröl</a></li>
+                                                        <?php if (1) { ?>
+                                                        <li><a href="admin/slider/update/<?php echo $value['id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
+                                                        <?php } ?>
+                                                        <?php if (1) { ?>
+                                                            <li><a class="delete_item" data-id="<?php echo $value['id']; ?>"><i class="fa fa-trash"></i> Töröl</a></li>
+                                                        <?php } ?>
+
                                                     </ul>
                                                 </div>
                                             </div>

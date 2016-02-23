@@ -5,8 +5,8 @@ $.extend(true, $.fn.dataTable.defaults, {
     "language": {
         "lengthMenu": " _MENU_ records ",
         "paginate": {
-            "previous": '<i class="fa fa-angle-left"></i>',
-            "next": '<i class="fa fa-angle-right"></i>'
+            "previous": 'Prev',
+            "next": 'Next'
         }
     }
 });

@@ -2,6 +2,7 @@
 class View {
 	
 	private $registry;
+	private $request;
 	
 	/**
 	 *	Az aktuális terület neve (pl.: site vagy admin)
@@ -38,19 +39,24 @@ class View {
 	 *	a set() metódussal adjuk meg az adatokat
 	 *	@var array	 
 	 */
-	public $vars = array();
+	private $vars = array();
 
 	/**
 	 *	Ebbe a tömbbe kerülnek a css linkkek
-	 *	@css_link array	 
+	 *	@var css_link array	 
 	 */
-	public $css_link = array();
+	private $css_link = array();
 
 	/**
 	 *	Ebbe a tömbbe kerülnek a javascript linkek
-	 *	@js_link array	 
+	 *	@var js_link array	 
 	 */
-	public $js_link = array();
+	private $js_link = array();
+
+	/**
+	 * A (linkeket tartalamazó) külső file-ból behívott adatokat tartalamazza
+	 */
+	private $modul_link = array();
 	
 /*-----------------------------------------------------------------------------*/
 
@@ -64,6 +70,8 @@ class View {
 		// request objektum
 		$this->request = $this->registry->request;
 		$this->area = $this->request->get_uri('area');
+		// linkek tömb behívása
+		$this->modul_link = include_once(CONFIG . '/links_' . $this->area . '.php');
 	}
 	
 	/**
@@ -87,8 +95,7 @@ class View {
 
 		/**
 		 * HIBAKERESÉSHEZ!
-		 * Megjeleníti a $vars tömb elemeit, 
-		 * utána megállítja a program futását!
+		 * Megjeleníti a $vars tömb elemeit, a css és javascript linkeket, utána megállítja a program futását!
 		 *
 		 * @param	bool	ha értéke true, akkor csak a tömbelemek nevét írja ki
 		 */
@@ -103,16 +110,20 @@ class View {
 					<title>DEBUG VARS</title>
 				</head>
 				<body>
-				<h2>A template-be helyezhető változók: </h2>
 HTML;
-					
-			echo "<pre style='background:#DDDDDD; border:1px solid #AAAAAA; padding:10px'>";
+			echo "<h2>A template-be helyezhető változók: </h2><pre style='background:#DDDDDD; border:1px solid #AAAAAA; padding:10px'>";
 				if($par1 == true) {
 					print_r($this->vars);
 				} else {
 					print_r(array_keys($this->vars));
 				}
-			echo "</pre></body></html>";
+			echo "</pre>";
+			echo "<h2>CSS linkek: </h2><div style='background:#DDDDDD; border:1px solid #AAAAAA; padding:10px'>";
+					var_dump($this->css_link);
+			echo "</div>";
+			echo "<h2>JS linkek: </h2><div style='background:#DDDDDD; border:1px solid #AAAAAA; padding:10px'>";
+					var_dump($this->js_link);
+			echo "</div></body></html>";
 			die();		
 		}			
  
@@ -174,7 +185,6 @@ HTML;
         }		
     }
 	
-
     /**
      * Üzeneteket tartalmazó template behívása
      */
@@ -230,56 +240,99 @@ HTML;
 		}
 	}
 
+	/**
+	 * modul linkek hozzáadása
+	 *
+	 * @param array $modul_names
+	 */
+	public function add_links($modul_names)
+	{
+		foreach ($modul_names as $modul) {
 
-					/**
-					 * Template menü elem class-t active-ra állítja, ha a controller és az action a megadott paraméterekkel egyezik
-					 *
-					 * @param string $controller 	- vizsgálandó controller neve illetve nevek 
-					 * @param string $action 		- action neve illetve nevek
-					 */		
-					public function menu_active_2($controller, $action = null)
-					{
-						$active_controller = $this->request->get_controller();
-						$active_action = $this->request->get_action();
-
-						// ha csak controller van megadva paraméterként
-						if (!is_null($controller) && is_null($action)) {
-							
-							$controller = (!is_array($controller)) ? array($controller) : $controller;
-							// megnézzük, hogy az aktuális controller neve benne van-e a $controller tömbben 
-							if (in_array($active_controller, $controller)) {
-								echo 'active';
+			if(isset($this->modul_link[$modul])){
+				
+				foreach ($this->modul_link[$modul] as $link_type => $link_value) {
+					// ha a kulcs 'css' és az értéke nem tömb
+					if ($link_type == 'css') {
+						if (!is_array($link_value)) {
+							$this->_set_css_link($link_value);
+						} else {
+							foreach ($link_value as $css_link) {
+								$this->_set_css_link($css_link);
 							}
-							return;
 						}
-
-						// ha csak action van megadva paraméterként
-						elseif (is_null($controller) && !is_null($action)) {
-							
-							$action = (!is_array($action)) ? array($action) : $action;
-							// megnézzük, hogy az aktuális action neve benne van-e a $action tömbben 
-							if (in_array($active_action, $action)) {
-								echo 'active';
+					}
+					// ha a kulcs 'js' és az értéke nem tömb
+					if ($link_type == 'js') {
+						if (!is_array($link_value)) {
+							$this->_set_js_link($link_value);
+						} else {
+							foreach ($link_value as $js_link) {
+								$this->_set_js_link($js_link);
 							}
-							return;
 						}
+					}
+				}
 
-						// ha controller és action is meg van adva
-						elseif (!is_null($controller) && !is_null($action)) {
+			}
 
-							$controller = (!is_array($controller)) ? array($controller) : $controller;
-							$action = (!is_array($action)) ? array($action) : $action;
+		}
+	}
 
-							if (in_array($active_controller, $controller) && in_array($active_action, $action)) {
-								echo 'active';
-							}
-							return;
-						}
+    /**
+     * 	egyedi link hozzáadása
+     *
+     * 	@param	string	$type	a link/script típusa: css vagy js
+     * 	@param	string	$path	a link útvonala, ami állandókban van (pl.: ADMIN_CSS, SITE_ASSETS)
+     * 	@param	string	$link	a link további útvonala (pl.: plugins/data-tables/DT_bootstrap.css)
+     */
+    public function add_link($type, $link)
+    {
+        switch ($type) {
+            case 'css':
+                $this->_set_css_link($link);
+                break;
+            case 'js':
+                $this->_set_js_link($link);
+                break;
+        }
+    }
 
-						// $arr = explode('/', $string);
-					}	
+    /**
+     * link hozzáadása a css_link tömbhöz
+     */
+    private function _set_css_link($link)
+    {
+    	$this->css_link[] = '<link rel="stylesheet" href="' . $link . '" type="text/css" />' . "\r\n";
+    }
 
+    /**
+     * link hozzáadása a js_link tömbhöz
+     */
+    private function _set_js_link($link)
+    {
+    	$this->js_link[] = '<script type="text/javascript" src="' . $link . '"></script>' . "\r\n";
+    }
 
+    /**
+     * js liknek kiíratása
+     */
+    public function get_js_link()
+    {
+        foreach ($this->js_link as $value) {
+            echo $value;
+        }
+    }
+
+    /**
+     * css linkek kiíratása
+     */
+    public function get_css_link()
+    {
+        foreach ($this->css_link as $value) {
+            echo $value;
+        }
+    }
 
 } // end class
 ?>

@@ -1,7 +1,7 @@
-var editNewsletter = function () {
+var Newsletter_update = function () {
 
     var updateNewsletterConfirm = function () {
-        $('#edit_newsletter').submit(function (e) {
+        $('#newsletter_update_form').submit(function (e) {
             e.preventDefault();
             currentForm = this;
             bootbox.setDefaults({
@@ -10,7 +10,7 @@ var editNewsletter = function () {
             bootbox.confirm("Biztosan menti a módosításokat?", function (result) {
                 if (result) {
                     // a submit() nem küldi el a gomb name értékét, ezért be kell rakni egy hidden elemet
-                    $('#edit_newsletter').append($("<input>").attr("type", "hidden").attr("name", "submit_edit_newsletter").val("submit_edit_newsletter"));
+                    //$('#update_newsletter_submit').append($("<input>").attr("type", "hidden").attr("name", "update_newsletter_submit").val("update_newsletter_submit"));
                     Metronic.blockUI({
                         boxed: true,
                         message: 'Feldolgozás...'
@@ -26,11 +26,6 @@ var editNewsletter = function () {
         });
     }
 
-
-	var hideAlert = function () {
-		$('div.alert').delay( 2500 ).slideUp( 750 );						 		
-	}
-
     var ckeditorInit = function () {
         CKEDITOR.replace( 'newsletter_body', {customConfig: 'config_custom3.js'});
     }
@@ -39,8 +34,8 @@ var editNewsletter = function () {
         //main function to initiate the module
         init: function () {
 			updateNewsletterConfirm();
-			hideAlert();
-			ckeditorInit();
+            ckeditorInit();
+			vframework.hideAlert();
         }
     };
 
@@ -50,6 +45,6 @@ jQuery(document).ready(function() {
 	Metronic.init(); // init metronic core componets
 	Layout.init(); // init layout
 	QuickSidebar.init(); // init quick sidebar
-	Demo.init(); // init demo features	
-	editNewsletter.init();
+	// Demo.init(); // init demo features	
+	Newsletter_update.init();
 });

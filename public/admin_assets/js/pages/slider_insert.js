@@ -1,25 +1,27 @@
-/**
- NewSlide oldal
- **/
-var NewSlide = function () {
+var Slider_insert = function () {
 
     var submitSlide = function () {
-        $('#new_slide').submit(function (e) {
+        $('#slider_insert_form').submit(function (e) {
             e.preventDefault();
+            
             currentForm = this;
-            // a submit() nem küldi el a gomb name értékét, ezért be kell rakni egy hidden elemet
-            $('#new_slide').append($("<input>").attr("type", "hidden").attr("name", "submit_new_slide").val("submit_new_slide"));
+
             Metronic.blockUI({
                 boxed: true,
                 message: 'Feldolgozás...'
             });
-            currentForm.submit();
+
+            setTimeout(function(){
+                currentForm.submit();
+            }, 300);
+
         });
-    }
+    };
 
     var ckeditorInit = function () {
         CKEDITOR.replace('slider_text', {customConfig: 'config_minimal1.js'});
-    }
+    };
+
     return {
         //main function to initiate the module
         init: function () {
@@ -33,6 +35,6 @@ $(document).ready(function () {
     Metronic.init(); // init metronic core componets
     Layout.init(); // init layout
     QuickSidebar.init(); // init quick sidebar
-    Demo.init(); // init demo features
-    NewSlide.init();
+    // Demo.init(); // init demo features
+    Slider_insert.init();
 });

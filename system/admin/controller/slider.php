@@ -5,20 +5,15 @@ class Slider extends Admin_controller {
     function __construct()
     {
         parent::__construct();
-        Acl::check("menu_slider", $this->request->get_httpreferer());
-        $this->loadModel('slider_model');
+        Acl::check('menu_slider', $this->request->get_httpreferer());
     }
 
     public function index()
     {
-        // adatok bevitele a view objektumba
         $this->view->title = 'Slider oldal';
         $this->view->description = 'Slider oldal description';
 
-        $this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/jquery-ui/jquery-ui-1.10.3.custom.min.css');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/jquery-ui/jquery-ui-1.10.3.custom.min.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootbox/bootbox.min.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/slider.js');
+        $this->view->add_links(array('jquery-ui', 'bootbox', 'vframework', 'slider'));     
 
         $this->view->slider = $this->slider_model->all_slides_query();
 
@@ -27,31 +22,25 @@ class Slider extends Admin_controller {
 
     /**
      * Új slide hozzáadása
-     *
-     * @return void
      */
-    public function new_slide()
+    public function insert()
     {
-        if ($this->request->has_post('submit_new_slide')) {
+        if ($this->request->has_post()) {
 
-            $result = $this->slider_model->add_slide();
+            $result = $this->slider_model->insert_slide();
             if ($result) {
                 Util::redirect('slider');
             } else {
-                Util::redirect('slider/new_slide');
+                Util::redirect('slider/insert');
             }
         }
 
-        // adatok bevitele a view objektumba
         $this->view->title = 'Új slide oldal';
         $this->view->description = 'Új slide oldal description';
 
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/ckeditor/ckeditor.js');
-        $this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.css');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/new_slide.js');
+        $this->view->add_links(array('ckeditor','bootstrap-fileupload', 'slider_insert'));
 
-        $this->view->render('slider/tpl_new_slide');
+        $this->view->render('slider/tpl_slider_insert');
     }
 
     /**
@@ -60,40 +49,46 @@ class Slider extends Admin_controller {
      * 	@param Int $this->registry->params['id']
      * 	@return void
      */
-    public function edit() {
+    public function update()
+    {
         $id = (int) $this->request->get_params('id');
 
-        if ($this->request->has_post('submit_update_slide')) {
+        if ($this->request->has_post()) {
             $result = $this->slider_model->update_slide($id);
             if ($result) {
                 Util::redirect('slider');
             }
         }
-        // adatok bevitele a view objektumba
         $this->view->title = 'Slider szerkesztése oldal';
         $this->view->description = 'Slider szerkesztése description';
 
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootbox/bootbox.min.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/ckeditor/ckeditor.js');
-        $this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.css');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/edit_slide.js');
+        $this->view->add_links(array('bootbox', 'ckeditor', 'bootstrap-fileupload', 'slider_update'));
 
         $this->view->slider = $this->slider_model->one_slide_query($id);
 
-        $this->view->render('slider/tpl_edit_slide');
+        $this->view->render('slider/tpl_slider_update');
     }
 
     /**
-     * 	Slide törlése
-     *
+     *  Slider törlése AJAX-al
      */
-    public function delete()
+    public function delete_slider_AJAX()
     {
-        $id = (int) $this->request->get_params('id');
-        $this->slider_model->delete_slide($id);
-        Util::redirect('slider');
+        if($this->request->is_ajax()){
+            if(1){
+                // a POST-ban kapott user_id egy string ami egy szám vagy számok felsorolása pl.: "23" vagy "12,45,76" 
+                $id = $this->request->get_post('item_id');
+                $respond = $this->slider_model->delete_slider_AJAX($id);
+                echo json_encode($respond);
+            } else {
+                echo json_encode(array(
+                    'status' => 'error',
+                    'message' => 'Nincs engedélye a művelet végrehajtásához!'
+                ));
+            }
+        }
     }
+
 
     /**
      * A sliderek sorrendjének módosításakor meghívott action (slider/order)

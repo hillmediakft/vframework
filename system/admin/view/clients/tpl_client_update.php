@@ -28,19 +28,10 @@
             <div class="col-md-12">
 
                 <!-- ÜZENETEK -->
-                <div id="message"></div> 
+                <div id="ajax_message"></div> 
                 <?php $this->renderFeedbackMessages(); ?>			
 
-                <form action="" method="POST" id="update_client">	
-
-                    <div class="alert alert-danger display-hide">
-                        <button class="close" data-close="alert"></button>
-                        <span><!-- ide jön az üzenet--></span>
-                    </div>
-                    <div class="alert alert-success display-hide">
-                        <button class="close" data-close="alert"></button>
-                        <span><!-- ide jön az üzenet--></span>
-                    </div>	
+                <form action="" method="POST" id="update_client_form">	
 
                     <!-- BEGIN EXAMPLE TABLE PORTLET-->
                     <div class="portlet">
@@ -69,7 +60,7 @@
                                         <div id="client_image"></div>	
 
                                         <input type="hidden" name="img_url" id="OutputId" >
-                                        <input type="hidden" id="old_img"  value="<?php echo Config::get('clientphoto.upload_path') . $actual_client['client_photo']; ?>" name="old_img">
+                                        <input type="hidden" id="old_img" value="<?php echo Config::get('clientphoto.upload_path') . $actual_client['client_photo']; ?>" name="old_img">
 
                                         <div class="space10"></div>
                                         <div class="clearfix"></div>

@@ -54,7 +54,7 @@ class Newsletter_model extends Model {
 	
 	
 	
-	public function new_newsletter()
+	public function insert_newsletter()
 	{
 		$data['newsletter_name'] = $_POST['newsletter_name'];
 		$data['newsletter_subject'] = $_POST['newsletter_subject'];
@@ -75,11 +75,10 @@ class Newsletter_model extends Model {
 			Message::set('error', 'unknown_error');
 			return false;
 		}
-		
 	}
 
 	
-	public function edit_newsletter($id)
+	public function update_newsletter($id)
 	{
 		$id = (int)$id;
 	
@@ -96,7 +95,7 @@ class Newsletter_model extends Model {
 	
 	// ha sikeres az insert visszatérési érték true
 		if($result) {
-			Message::set('success', 'Új hírlevél módosítva!');
+			Message::set('success', 'Hírlevél módosítva!');
 			return true;
 		}
 		else {
@@ -106,42 +105,29 @@ class Newsletter_model extends Model {
 	
 	}	
 	
-	
-
-	public function delete_newsletter()
+    /**
+     * Hírlevél törlése AJAX-al
+     *
+     * @param string $id     ez lehet egy szám, vagy felsorolás pl: 23 vagy 12,14,36
+     */
+	public function delete_newsletter_AJAX($id)
 	{
 		// a sikeres törlések számát tárolja
 		$success_counter = 0;
+        // a sikeresen törölt id-ket tartalmazó tömb
+        $success_id = array();		
 		// a sikertelen törlések számát tárolja
 		$fail_counter = 0; 
-		
-		// Több user törlése
-		if(isset($_POST['delete_newsletter'])) {
-			$data_arr = $_POST;
-			
-			//eltávolítjuk a tömbből a felesleges elemeket	
-			if(isset($data_arr['delete_newsletter'])) {
-				unset($data_arr['delete_newsletter']);
-			}
-			if(isset($data_arr['newsletter_table_length'])) {
-				unset($data_arr['newsletter_table_length']);
-			}
-		} else {
-		// egy user törlése (nem POST adatok alapján)
-			if(!isset($this->registry->params['id'])){
-				throw new Exception('Nincs id-t tartalmazo parameter az url-ben (ezert nem tudunk torolni id alapjan)!');
-				return false;
-			}
-			//berakjuk a $data_arr tömbbe a törlendő felhasználó id-jét
-			$data_arr = array($this->registry->params['id']);
-		}
 
+        // a paraméterként kapott stringből tömböt csinálunk a , karakter mentén
+        $data_arr = explode(',', $id);
+		
 		// bejárjuk a $data_arr tömböt és minden elemen végrehajtjuk a törlést
 		foreach($data_arr as $value) {
 			//átalakítjuk a integer-ré a kapott adatot
 			$value = (int)$value;
-				
-			//felhasználó törlése	
+			
+			//rekord törlése	
 			$this->query->reset();
 			$this->query->set_table(array('newsletters'));
 			//a delete() metódus integert (lehet 0 is) vagy false-ot ad vissza
@@ -152,112 +138,39 @@ class Newsletter_model extends Model {
 				if($result > 0){
 					//sikeres törlés
 					$success_counter += $result;
+					$success_id[] = $value;
 				}
 				else {
 					//sikertelen törlés
-					$fail_counter += 1;
+					$fail_counter++;
 				}
 			}
 			else {
 				// ha a törlési sql parancsban hiba van
-				throw new Exception('Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!');
-				return false;
+                return array(
+                    'status' => 'error',
+                    'message_error' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!',                  
+                );
 			}
 		}
 
-		// üzenetek eltárolása
-		if($success_counter > 0) {
-			Message::set('success', $success_counter . ' hírlevél törlése sikerült.');
-		}
-		if($fail_counter > 0){
-			Message::set('error', $fail_counter . ' hírlevél törlése nem sikerült!');
-		}
-		
-		// default visszatérési érték (akkor tér vissza false-al ha hibás az sql parancs)	
-		return true;	
+        // üzenetek visszaadása
+        $respond = array();
+        $respond['status'] = 'success';
+        
+        if ($success_counter > 0) {
+            $respond['message_success'] = $success_counter . ' hírlevél törölve.';
+        }
+        if ($fail_counter > 0) {
+            $respond['message_error'] = $fail_counter . ' hírlevelet már töröltek!';
+        }
+
+        // respond tömb visszaadása
+        return $respond;	
 	}
 
-
-
 	/**
-	 *	Hírlevél törlése AJAX-al
-	 *
-	 */
-	public function delete_newsletter_AJAX()
-	{
-		// a sikeres törlések számát tárolja
-		$success_counter = 0;
-		// a sikertelen törlések számát tárolja
-		$fail_counter = 0; 
-		
-		// Több user törlése
-		if(isset($_POST['newsletter_id'])) {
-			$data_arr = $_POST;
-
-			//eltávolítjuk a tömbből a felesleges elemeket	
-			if(isset($data_arr['delete_newsletter'])) {
-				unset($data_arr['delete_newsletter']);
-			}
-			if(isset($data_arr['newsletter_table_length'])) {
-				unset($data_arr['newsletter_table_length']);
-			}
-		} else {
-			return false;
-		}
-
-		// bejárjuk a $data_arr tömböt és minden elemen végrehajtjuk a törlést
-		foreach($data_arr as $value) {
-			//átalakítjuk a integer-ré a kapott adatot
-			$value = (int)$value;
-				
-			//felhasználó törlése	
-			$this->query->reset();
-			$this->query->set_table(array('newsletters'));
-			//a delete() metódus integert (lehet 0 is) vagy false-ot ad vissza
-			$result = $this->query->delete('newsletter_id', '=', $value);
-			
-			if($result !== false) {
-				// ha a törlési sql parancsban nincs hiba
-				if($result > 0){
-					//sikeres törlés
-					$success_counter += $result;
-				}
-				else {
-					//sikertelen törlés
-					$fail_counter += 1;
-				}
-			}
-			else {
-				// ha a törlési sql parancsban hiba van
-				throw new Exception('Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!');
-				return false;
-			}
-		}
-
-		// üzenetek eltárolása
-		if($success_counter > 0) {
-			$response = array(
-				"status" => 'success',
-				"message" => 'Hírlevél törölve.'
-			);
-			return json_encode($response);
-			
-		}
-		if($fail_counter > 0){
-			$response = array(
-				"status" => 'error',
-				"message" => 'Hírlevél törlése nem sikerült!'
-			);
-			return json_encode($response);
-		}
-		
-		// default visszatérési érték (akkor tér vissza false-al ha hibás az sql parancs)	
-		return true;	
-	}
-
-	
-	/**
-	 * Üzenetet küld a böngészőnek a folyamat állásáról
+	 * Hírlevél küldése közben üzenetet küld a böngészőnek a folyamat állásáról
 	 */
 	private function send_msg($id, $message, $progress = null) {
 		
@@ -273,13 +186,9 @@ class Newsletter_model extends Model {
 	
 	/**
 	 *	Hírlevelek elküldése
-	 *
-	 *	$_POST['message_id']
-	 *
 	 */
 	public function send_newsletter($newsletter_id = null)
 	{
-		
 		if (!isset($newsletter_id)) {
 			$this->send_msg('CLOSE', 'Hibas newsletter_id!');
 			return false;
@@ -549,8 +458,8 @@ class Newsletter_model extends Model {
 			$this->query->set_where('newsletter_id', '=', $newsletter_id);
 			$result = $this->query->update($data);
 			
-	// utolsó válasz		
-	$this->send_msg('CLOSE', '<br />Sikeres küldések száma: ' . count($success) . '<br />' . 'Sikertelen küldések száma: ' . count($fail) . '<br />');
+		// utolsó válasz		
+		$this->send_msg('CLOSE', '<br />Sikeres küldések száma: ' . count($success) . '<br />' . 'Sikertelen küldések száma: ' . count($fail) . '<br />');
 		
 		} // email küldés vége
 		
@@ -558,9 +467,6 @@ class Newsletter_model extends Model {
 	
 	/**
 	 *	Visszaadja a newsletter_stats tábla tartalmát
-	 *	
-	 *
-	 *	@param 
 	 */
 	public function newsletter_stats_query()
 	{

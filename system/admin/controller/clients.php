@@ -4,25 +4,17 @@ class Clients extends Admin_controller {
     function __construct()
     {
         parent::__construct();
-        $this->loadModel('clients_model');
     }
      
     /**
-     * 	Partnerek kilistázása
+     * 	Partnerek listája
      */
     public function index()
     {
         $this->view->title = 'Partnereink oldal';
         $this->view->description = 'Partnereink description';
 
-        $this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/select2/select2.css');
-        $this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/select2/select2.min.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/datatables/media/js/jquery.dataTables.min.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootbox/bootbox.min.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'datatable.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/clients.js');
+        $this->view->add_links(array('select2', 'datatable', 'bootbox', 'vframework', 'clients'));
 
         $this->view->all_client = $this->clients_model->all_client_query();
 //$this->view->debug(true);
@@ -30,52 +22,51 @@ class Clients extends Admin_controller {
     }
 
     /**
-     * 	Új partner hozzáadása
+     *  Partner hozzáadása
      */
-    public function new_client()
+    public function insert()
     {
         if ( $this->request->has_post() ) {
             $result = $this->clients_model->insert_client();
             if ($result) {
                 Util::redirect('clients');
             } else {
-                Util::redirect('clients/new_client');
+                Util::redirect('clients/insert');
             }
         }
 
         $this->view->title = 'Új partner oldal';
         $this->view->description = 'Új partner description';
-        // css linkek generálása
-        $this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.css');
-        $this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/croppic/croppic.css');
-        $this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/select2/select2.css');
-        // js linkek generálása
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/select2/select2.min.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/croppic/croppic.min.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/new_client.js');
 
+        $this->view->add_links(array('select2', 'bootstrap-fileupload', 'croppic', 'vframework', 'client_insert'));
 //$this->view->debug(true);
-
-        $this->view->render('clients/tpl_new_client');
+        $this->view->render('clients/tpl_client_insert');
     }
 
     /**
-     * 	partner törlése AJAX
+     * 	Partner törlése AJAX
      */
     public function delete_client_AJAX()
     {
         if($this->request->is_ajax()){
-            $id = $this->request->get_post('client_id', 'integer');
-            $result = $this->clients_model->delete_client_AJAX($id);
-            echo json_encode($result);
+            if(1){
+                // a POST-ban kapott user_id egy string ami egy szám vagy számok felsorolása pl.: "23" vagy "12,45,76" 
+                $id = $this->request->get_post('item_id');
+                $respond = $this->clients_model->delete_client_AJAX($id);
+                echo json_encode($respond);
+            } else {
+                echo json_encode(array(
+                    'status' => 'error',
+                    'message' => 'Nincs engedélye a művelet végrehajtásához!'
+                ));
+            }
         }
     }
 
     /**
      * 	Partner módosítása
      */
-    public function update_client()
+    public function update()
     {
         if ($this->request->has_post()) {
             $result = $this->clients_model->update_client($this->request->get_params('id'));
@@ -89,19 +80,12 @@ class Clients extends Admin_controller {
 
         $this->view->title = 'Partner módosítása oldal';
         $this->view->description = 'Partner módosítása description';
-        // css linkek generálása
-        $this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.css');
-        $this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/croppic/croppic.css');
 
-        // js linkek generálása
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/croppic/croppic.min.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-fileupload/bootstrap-fileupload.js');
-        $this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/edit_client.js');
+        $this->view->add_links(array('bootstrap-fileupload', 'croppic', 'vframework', 'client_update'));
 
-        // a módosítandó kolléga adatai
+        // a módosítandó kliens adatai
         $this->view->actual_client = $this->clients_model->one_client_query($this->request->get_params('id'));
 
-        // template betöltése
         $this->view->render('clients/tpl_client_update');
     }
 

@@ -12,7 +12,7 @@ class User_manual extends Admin_controller {
 		$this->view->title = 'Admin dokumentáció oldal';
 		$this->view->description = 'Admin dookumentáció description';
 		
-		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/common.js');
+		$this->view->add_link('js', ADMIN_JS . 'pages/common.js');
 		
 		$this->view->render('user_manual/tpl_user_manual');
 	}

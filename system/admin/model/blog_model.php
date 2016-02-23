@@ -183,49 +183,36 @@ class blog_model extends Admin_model {
 	}
 	
 	
-
-	public function delete_blog()
+    /**
+     * Blog törlése AJAX-al
+     *
+     * @param string $id     ez lehet egy szám, vagy felsorolás pl: 23 vagy 12,14,36
+     */
+	public function delete_blog_AJAX($id)
 	{
 		// a sikeres törlések számát tárolja
 		$success_counter = 0;
+        // a sikeresen törölt id-ket tartalmazó tömb
+        $success_id = array();		
 		// a sikertelen törlések számát tárolja
 		$fail_counter = 0; 
-		
-		// Több user törlése
-		if($this->request->has_post('delete_blog')) {
-			$data_arr = $this->request->get_post();
-			
-			//eltávolítjuk a tömbből a felesleges elemeket	
-			if(isset($data_arr['delete_blog'])) {
-				unset($data_arr['delete_blog']);
-			}
-			if(isset($data_arr['blog_length'])) {
-				unset($data_arr['blog_length']);
-			}
-		} else {
-		// egy user törlése (nem POST adatok alapján)
-			if(!$this->request->has_params('id')){
-				throw new Exception('Nincs id-t tartalmazo parameter az url-ben (ezert nem tudunk torolni id alapjan)!');
-				return false;
-			}
-			//berakjuk a $data_arr tömbbe a törlendő felhasználó id-jét
-			$data_arr = array($this->request->get_params('id'));
-		}
+
+        // a paraméterként kapott stringből tömböt csinálunk a , karakter mentén
+        $data_arr = explode(',', $id);
 		
 		// bejárjuk a $data_arr tömböt és minden elemen végrehajtjuk a törlést
 		foreach($data_arr as $value) {
-			
 			//átalakítjuk a integer-ré a kapott adatot
 			$value = (int)$value;
 			
-			//lekérdezzük a törlendő user avatar képének a nevét, hogy törölhessük a szerverről
+			//lekérdezzük a törlendő blog képének a nevét, hogy törölhessük a szerverről
 			$this->query->reset();
 			$this->query->set_table('blog');
 			$this->query->set_columns(array('blog_picture'));
 			$this->query->set_where('blog_id', '=', $value);
 			$photo_name = $this->query->select();			
 
-			//felhasználó törlése	
+			//blog törlése	
 			$this->query->reset();
 			$this->query->set_table(array('blog'));
 			//a delete() metódus integert (lehet 0 is) vagy false-ot ad vissza
@@ -234,7 +221,7 @@ class blog_model extends Admin_model {
 			if($result !== false) {
 				// ha a törlési sql parancsban nincs hiba
 				if($result > 0){
-					//ha van feltöltött képe a bloghoz (az adatbázisban szerepel elérési út és filenév)
+					//ha van feltöltött képe a bloghoz (az adatbázisban szerepel a file-név)
 					if(!empty($photo_name[0]['blog_picture'])){
 					
 						$picture_path = Config::get('blogphoto.upload_path') . $photo_name[0]['blog_picture'];
@@ -245,15 +232,16 @@ class blog_model extends Admin_model {
 					
 						//kép file törlése a szerverről (ha az Util::del_file() falsot ad vissza nem tudtuk törölni a képet... hibaüzenet)
 						if(!$del_result){
-                            Message::set('error', 'A blogbejegyzés képe nem létezik, vagy nem törölhető!');
+                            Message::log('A blogbejegyzés képe nem létezik, vagy nem törölhető! - ' . $picture_path);
 						}
 						//kép file törlése a szerverről (ha az Util::del_file() falsot ad vissza nem tudtuk törölni a képet... hibaüzenet)
 						if(!$del_thumb_result){
-                            Message::set('error', 'A blogbejegyzés nézőképe nem létezik, vagy nem törölhető!');
+                            Message::log('A blogbejegyzés nézőképe nem létezik, vagy nem törölhető! - ' . $thumb_picture_path);
 						}
 					}				
 					//sikeres törlés
 					$success_counter += $result;
+					$success_id[] = $value;
 				}
 				else {
 					//sikertelen törlés
@@ -262,21 +250,26 @@ class blog_model extends Admin_model {
 			}
 			else {
 				// ha a törlési sql parancsban hiba van
-				throw new Exception('Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!');
-				return false;
+                return array(
+                    'status' => 'error',
+                    'message_error' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!',                  
+                );
 			}
 		}
 
-		// üzenetek eltárolása
-		if($success_counter > 0) {
-            Message::set('success', $success_counter . ' blogbejegyzés törlése sikerült.');
-		}
-		if($fail_counter > 0){
-            Message::set('error', $fail_counter . ' blogbejegyzés törlése nem sikerült!');
-		}
-		
-		// default visszatérési érték (akkor tér vissza false-al ha hibás az sql parancs)	
-		return true;	
+        // üzenetek visszaadása
+        $respond = array();
+        $respond['status'] = 'success';
+        
+        if ($success_counter > 0) {
+            $respond['message_success'] = $success_counter . ' blog törölve.';
+        }
+        if ($fail_counter > 0) {
+            $respond['message_error'] = $fail_counter . ' blogot már töröltek!';
+        }
+
+        // respond tömb visszaadása
+        return $respond;	
 	}
 
 	public function category_update($id)

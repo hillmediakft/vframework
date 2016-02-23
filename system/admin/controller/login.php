@@ -7,7 +7,6 @@ class Login extends Admin_controller
     function __construct()
     {
         parent::__construct();
-		$this->loadModel('login_model');
     }
 
 	

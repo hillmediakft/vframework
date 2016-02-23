@@ -1,4 +1,4 @@
-var editClient = function () {
+var Client_update = function () {
 
     var cropClientPhoto = function () {
         var userPhoto = $('#client_image');
@@ -20,10 +20,6 @@ var editClient = function () {
     var oldImg = $('#old_img').val();
     $('#client_image').css('background-image', 'url(' + oldImg + ')');
 
-    var hideAlert = function () {
-        $('div.alert-success').delay(3000).slideUp(750);
-    }
-    
     var submitUpdateClient = function () {
         $('#update_client').submit(function (e) {
             e.preventDefault();
@@ -43,8 +39,8 @@ var editClient = function () {
 //main method to initiate page
         init: function () {
             cropClientPhoto();
-            hideAlert();
             submitUpdateClient();
+            vframework.hideAlert();
         },
     };
 }();
@@ -52,6 +48,6 @@ $(document).ready(function () {
     Metronic.init(); // init metronic core componets
     Layout.init(); // init layout
     QuickSidebar.init(); // init quick sidebar
-    Demo.init(); // init demo features 
-    editClient.init(); // init users page
+    // Demo.init(); // init demo features 
+    Client_update.init(); // init users page
 });

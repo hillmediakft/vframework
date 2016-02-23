@@ -12,7 +12,7 @@ class Admin_controller extends Controller {
         // kapcsolat objektum
         $this->connect = db::get_connect();
         // model betöltése
-        //$this->loadModel($this->request->get_controller() . '_model');
+        $this->loadModel($this->request->get_controller() . '_model');
     }
 }
 ?>

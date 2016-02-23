@@ -35,7 +35,7 @@
                     <div class="portlet-title">
                         <div class="caption"><i class="fa fa-file"></i>Rólunk mondták</div>
                         <div class="actions">
-                            <a href="admin/testimonials/new_testimonial" class="btn blue-steel btn-sm"><i class="fa fa-plus"></i> Új vélemény hozzáadása</a>
+                            <a href="admin/testimonials/insert" class="btn blue-steel btn-sm"><i class="fa fa-plus"></i> Új vélemény hozzáadása</a>
                             <!-- <button class="btn red btn-sm" name="delete_job_submit" value="submit" type="submit"><i class="fa fa-trash"></i> Csoportos törlés</button> -->
                         </div>
                     </div>
@@ -67,7 +67,7 @@
                                                         <i class="fa fa-cogs"></i> Műveletek <i class="fa fa-angle-down"></i>
                                                     </a>
                                                     <ul class="dropdown-menu pull-right">
-                                                        <li><a href="admin/testimonials/edit/<?php echo $value['id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
+                                                        <li><a href="admin/testimonials/update/<?php echo $value['id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
                                                         <li><a href="admin/testimonials/delete/<?php echo $value['id']; ?>" id="delete_<?php echo $value['id']; ?>"><i class="fa fa-trash"></i> Töröl</a></li>
                                                     </ul>
                                                 </div>

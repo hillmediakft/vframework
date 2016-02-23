@@ -24,7 +24,7 @@ class db{
 		if (!self::$connect) {
 			try {
 				self::$connect = new PDO('mysql:host=' . Config::get('db.host') . ';dbname=' . Config::get('db.name') . ';charset=utf8', Config::get('db.user'), Config::get('db.pass'));
-				self::$connect-> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				self::$connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			}
 			catch(PDOException $e) {
 				die('Database error: ' . $e->getMessage());

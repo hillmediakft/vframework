@@ -1,8 +1,4 @@
-/**
-EditTestimonial oldal
-**/
-var EditTestimonial = function () {
-
+var Testimonial_update = function () {
 
 	var updateTestimonialConfirm = function () {
 			$('#update_testimonial_form').submit(function(e){
@@ -13,18 +9,23 @@ var EditTestimonial = function () {
 				});
 				bootbox.confirm("Biztosan menti a módosításokat?", function(result) {
 					if (result) {
-						// a submit() nem küldi el a gomb name értékét, ezért be kell rakni egy hidden elemet
-						$('#update_testimonial_form').append($("<input>").attr("type", "hidden").attr("name", "submit_update_testimonial").val("submit_update_testimonial"));
-						currentForm.submit(); 	
+
+						Metronic.blockUI({
+				            boxed: true,
+				            message: 'Feldolgozás...'
+				        });	
+
+						setTimeout(function() {
+							currentForm.submit();
+						}, 300); 	
 					}
                 }); 
             });	 		
 	}
 	
-	var hideAlert = function () {
-		$('div.alert').delay( 2500 ).slideUp( 750 );						 		
-	}	
-	
+    var hideAlert = function () {
+        $('div.alert.alert-success, div.alert.alert-danger').delay(3000).slideUp(750);
+    }	
 
     return {
 
@@ -32,8 +33,6 @@ var EditTestimonial = function () {
         init: function () {
 			updateTestimonialConfirm();
 			hideAlert();
-
-			
         }
 
     };
@@ -44,8 +43,8 @@ $(document).ready(function() {
 	Metronic.init(); // init metronic core componets
 	Layout.init(); // init layout
 	QuickSidebar.init(); // init quick sidebar
-	Demo.init(); // init demo features
-	EditTestimonial.init();
+	// Demo.init(); // init demo features
+	Testimonial_update.init();
 	
 
 

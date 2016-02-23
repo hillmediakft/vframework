@@ -11,13 +11,7 @@
 
 
         <!-- OLDALSPECIFIKUS CSS LINKEK -->
-        <?php
-        if (isset($this->css_link)) {
-            foreach ($this->css_link as $value) {
-                echo $value;
-            }
-        }
-        ?>
+        <?php $this->get_css_link(); ?>
 
     </head>
     <body>

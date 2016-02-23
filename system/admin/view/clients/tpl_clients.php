@@ -22,19 +22,18 @@
         <div class="row">
             <div class="col-md-12">
 	
-                <div id="ajax_message"></div> 						
                 
                 <!-- echo out the system feedback (error and success messages) -->
+                <div id="ajax_message"></div> 						
                 <?php $this->renderFeedbackMessages(); ?>				
 
-                <form class="horizontal-form" id="del_client_form" method="POST" action="">	
+                <form class="horizontal-form" id="client_form" method="POST" action="">	
 
                     <div class="portlet">
                         <div class="portlet-title">
                             <div class="caption"><i class="fa fa-cogs"></i>Partnerek listája</div>
                             <div class="actions">
-                                <a href="admin/clients/new_client" class="btn blue btn-sm"><i class="fa fa-plus"></i> Új partner hozzáadása</a>
-                                 
+                                <a href="admin/clients/insert" class="btn blue btn-sm"><i class="fa fa-plus"></i> Új partner hozzáadása</a>
                             </div>
                         </div>
                         <div class="portlet-body">
@@ -58,21 +57,17 @@
                                             <td>									
                                                 <div class="actions">
                                                     <div class="btn-group">
-                                                        <a class="btn btn-sm grey-steel" href="#" data-toggle="dropdown" <?php echo ((Session::get('user_role_id') > 2)) ? 'disabled' : ''; ?>>
+                                                        <a class="btn btn-sm grey-steel" href="#" data-toggle="dropdown">
                                                             <i class="fa fa-cogs"></i> 
-                                                            
                                                         </a>
                                                         <ul class="dropdown-menu pull-right">
-
-                                                            <?php if ((Session::get('user_role_id') < 3)) { ?>	
-                                                                <li><a href="<?php echo 'admin/clients/update_client/' . $value['client_id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
+                                                            <?php if (1) { ?>	
+                                                                <li><a href="<?php echo 'admin/clients/update/' . $value['client_id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
                                                             <?php }; ?>
 
-                                                            <?php if ((Session::get('user_role_id') < 3)) { ?>	
-                                                                <li><a id="delete_client_<?php echo $value['client_id']; ?>" data-id="<?php echo $value['client_id']; ?>"> <i class="fa fa-trash"></i> Töröl</a></li>
+                                                            <?php if (1) { ?>	
+                                                                <li><a class="delete_item" data-id="<?php echo $value['client_id']; ?>"> <i class="fa fa-trash"></i> Töröl</a></li>
                                                             <?php }; ?>
-
-
                                                         </ul>
                                                     </div>
                                                 </div>

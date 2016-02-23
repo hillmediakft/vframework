@@ -1,4 +1,4 @@
-var newBlog = function () {
+var Blog_insert = function () {
 
 	/**
 	 *	Form adatok elküldése
@@ -42,11 +42,6 @@ var newBlog = function () {
 		}
 	}
 
-
-	var hideAlert = function () {
-		$('div.alert').delay( 2500 ).slideUp( 750 );						 		
-	}
-
     var ckeditorInit = function () {
         CKEDITOR.replace( 'blog_body', {customConfig: 'config_custom3.js'});
     }
@@ -56,8 +51,8 @@ var newBlog = function () {
         init: function () {
 			send_form();
 			handleDatePickers();
-			hideAlert();
 			ckeditorInit();
+			vframework.hideAlert();
         }
     };
 
@@ -67,6 +62,6 @@ jQuery(document).ready(function() {
 	Metronic.init(); // init metronic core componets
 	Layout.init(); // init layout
 	QuickSidebar.init(); // init quick sidebar
-	Demo.init(); // init demo features	
-	newBlog.init();
+	// Demo.init(); // init demo features	
+	Blog_insert.init();
 });

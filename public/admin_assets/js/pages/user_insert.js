@@ -1,4 +1,4 @@
-var newUser = function () {
+var User_insert = function () {
 
 	/**
 	 *	Hibajelző objektum a form validáláshoz (a hibákat tartalamazó tab "színének" vezérlésében segít)
@@ -19,20 +19,11 @@ var newUser = function () {
 
 	/**
 	 *	Form validátor
-	 *	(ha minden rendben indítja a send_data() metódust ami ajax-al küldi az adatokat)
 	 */
-    var handleValidation1 = function() {
-		console.log('start handleValidation1');
-        // for more info visit the official plugin documentation: 
-            // http://docs.jquery.com/Plugins/Validation
+    var handleValidation = function() {
+		console.log('start validation');
 
-		var form1 = $('#new_user_form');
-		var error1 = $('.alert-danger', form1);
-		var error1_span = $('.alert-danger > span', form1);
-		var success1 = $('.alert-success', form1);
-		//var success1_span = $('.alert-success > span', form1);
-
-		form1.validate({
+		$('#new_user_form').validate({
 			errorElement: 'span', //default input error message container
 			errorClass: 'help-block help-block-error', // default input error message class
 			focusInvalid: true, // do not focus the last invalid input
@@ -63,12 +54,21 @@ var newUser = function () {
 			},
 			// az invalidHandler akkor aktiválódik, ha elküldjük a formot és hiba van
 			invalidHandler: function (event, validator) { //display error alert on form submit              
-				
-				//success1.hide();
+
 				var errors = validator.numberOfInvalids();
-				error1_span.html(errors + ' mezőt nem megfelelően töltött ki!');
-				error1.show();
-				error1.delay(3000).slideUp(750);
+				
+				Metronic.alert({
+				    container: $('#ajax_message'), // $('#elem'); - alerts parent container(by default placed after the page breadcrumbs)
+				    place: "append", // "append" or "prepend" in container 
+				    type: 'danger', // alert's type (success, danger, warning, info)
+				    message: errors + " mezőt nem megfelelően töltött ki!", // alert's message
+				    close: true, // make alert closable
+				    reset: true, // close all previouse alerts first
+				    focus: true, // auto scroll to the alert after shown
+				    closeInSeconds: 5, // auto close after defined seconds
+				    icon: "warning" // put icon before the message
+				});
+
 			},
 
 			highlight: function (element) { // hightlight error inputs
@@ -116,15 +116,13 @@ var newUser = function () {
 			},
 
 			success: function (label) {
-				console.log('success');
+				//console.log('success');
 				//label.closest('.form-group').removeClass('has-error').addClass("has-success"); // set success class to the control group
 				label.closest('.form-group').removeClass('has-error'); // set success class to the control group
 			},
 
 			submitHandler: function (form) {
 				//console.log('submitHandler');
-				error1.hide();
-				//success1.show();
 
 				//adatok elküldése "normál" küldéssel
 				form.submit();
@@ -162,7 +160,7 @@ var newUser = function () {
 		init: function () {           
 
 			cropUserPhoto();
-		    handleValidation1();
+		    handleValidation();
 			hideAlert();
 		
 		},
@@ -173,6 +171,6 @@ $(document).ready(function() {
 	Metronic.init(); // init metronic core componets
 	Layout.init(); // init layout
 	QuickSidebar.init(); // init quick sidebar
-	Demo.init(); // init demo features 
-	newUser.init(); // init users page
+	//Demo.init(); // init demo features 
+	User_insert.init(); // init users page
 });

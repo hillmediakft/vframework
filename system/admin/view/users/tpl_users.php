@@ -40,13 +40,12 @@
 
                             <div class="actions">
                                 <?php
-                                $loggedin_user_role = Session::get('user_role_id');
                                 $loggedin_user_id = Session::get('user_id');
 
                                 if (Acl::check('insert_user')) { ?>
-                                    <a href="admin/users/new_user" class="btn blue-steel btn-sm"><i class="fa fa-plus"></i> Új felhasználó</a>
+                                    <a href="admin/users/insert" class="btn blue-steel btn-sm"><i class="fa fa-plus"></i> Új felhasználó</a>
                                 <?php } ?>
-                                <button class="btn red btn-sm" id="del_user_group" type="button"><i class="fa fa-trash"></i> Csoportos törlés</button>
+                                <button class="btn red btn-sm" id="delete_group" type="button"><i class="fa fa-trash"></i> Csoportos törlés</button>
                                 <div class="btn-group">
                                     <a data-toggle="dropdown" class="btn btn-sm default">
                                         <i class="fa fa-wrench"></i> Eszközök <i class="fa fa-angle-down"></i>
@@ -87,7 +86,7 @@
 <?php foreach ($all_user as $value) { ?>
                                     <tr class="odd gradeX">
                                         <td>
-                                        <?php if (Acl::check('delete_user')) { ?>
+                                        <?php if (Acl::check('delete_user') && $value['user_id'] != $loggedin_user_id) { ?>
                                             <input type="checkbox" class="checkboxes" name="user_id_<?php echo $value['user_id']; ?>" value="<?php echo $value['user_id']; ?>"/>
                                         <?php } ?>	
                                         </td>
@@ -109,23 +108,23 @@
 
                                                     <a class="btn btn-sm grey-steel" title="műveletek" data-toggle="dropdown"><i class="fa fa-cogs"></i></a>
                                                     <ul class="dropdown-menu pull-right">
-                                                        <?php if (Acl::check('edit_user')) { ?>	
+                                                        <?php if (Acl::check('update_user')) { ?>	
                                                             <li><a href="admin/users/profile/<?php echo $value['user_id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
                                                         <?php } else { ?>
-                                                            <li class="disabled-link"><a class="disable-target"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
+                                                            <!-- <li class="disabled-link"><a class="disable-target"><i class="fa fa-pencil"></i> Szerkeszt</a></li> -->
                                                         <?php } 
-                                                            if (Acl::check('delete_user')) { ?>
-                                                            <li><a id="delete_user_<?php echo $value['user_id']; ?>" data-id="<?php echo $value['user_id']; ?>"> <i class="fa fa-trash"></i> Töröl</a></li>
+                                                            if (Acl::check('delete_user') && $value['user_id'] != $loggedin_user_id) { ?>
+                                                            <li><a class="delete_item" data-id="<?php echo $value['user_id']; ?>"> <i class="fa fa-trash"></i> Töröl</a></li>
                                                         <?php } else { ?>
-                                                            <li class="disabled-link"><a class="disable-target" title="Nem törölhető"><i class="fa fa-trash"></i> Töröl</a></li>
+                                                            <!-- <li class="disabled-link"><a class="disable-target" title="Nem törölhető"><i class="fa fa-trash"></i> Töröl</a></li> -->
                                                         <?php } ?>
 
-                                                        <?php if (1) { ?>	
+                                                        <?php if (Acl::check('change_status_user') && $value['user_id'] != $loggedin_user_id) { ?>	
                                                             <?php if ($value['user_active'] == 1) { ?>
-                                                                <li><a rel="<?php echo $value['user_id']; ?>" id="make_inactive_<?php echo $value['user_id']; ?>" data-action="make_inactive"><i class="fa fa-ban"></i> Blokkol</a></li>
+                                                                <li><a class="change_status" data-id="<?php echo $value['user_id']; ?>" data-action="make_inactive"><i class="fa fa-ban"></i> Blokkol</a></li>
                                                             <?php } ?>
                                                             <?php if ($value['user_active'] == 0) { ?>
-                                                                <li><a rel="<?php echo $value['user_id']; ?>" id="make_active_<?php echo $value['user_id']; ?>" data-action="make_active"><i class="fa fa-check"></i> Aktivál</a></li>
+                                                                <li><a class="change_status" data-id="<?php echo $value['user_id']; ?>" data-action="make_active"><i class="fa fa-check"></i> Aktivál</a></li>
                                                             <?php } ?>
                                                         <?php } ?>	
                                                     </ul>

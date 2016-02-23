@@ -13,7 +13,7 @@ class Home extends Site_controller {
     
 // lorem ipsum dolor sit amet        
 
-        $this->view->js_link[] = $this->make_link('js', SITE_ASSETS, 'pages/home.js');
+        $this->view->add_link('js', SITE_ASSETS . 'pages/home.js');
         // lekérdezések
         // $this->view->settings = $this->home_model->get_settings();
 

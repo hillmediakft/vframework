@@ -286,16 +286,17 @@ class Users_model extends Admin_model {
                 // ha a törlési sql parancsban hiba van
                 return array(
                     'status' => 'error',                  
-                    'message' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!',                  
+                    'message_error' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!',                  
                 );
             }
         }
 
         // üzenetek visszaadása
         $respond = array();
+        $respond['status'] = 'success';
+        
         if ($success_counter > 0) {
             $respond['message_success'] = $success_counter . ' felhasználó törölve.';
-            $respond['success_id'] = $success_id;
         }
         if ($fail_counter > 0) {
             $respond['message_error'] = $fail_counter . ' felhasználót már töröltek!';
@@ -614,12 +615,7 @@ class Users_model extends Admin_model {
         $this->query->set_table(array('users'));
         $this->query->set_where('user_id', '=', $id);
         $result = $this->query->update(array('user_active' => $data));
-
-        if ($result) {
-            return true;
-        } else {
-            return false;
-        }
+        return ($result) ? true : false;
     }
 
     /**
@@ -710,8 +706,7 @@ class Users_model extends Admin_model {
         if (isset($id)) {
             $this->query->set_where('role_id', '=', $id);
         }
-        $result = $this->query->select();
-        return $result;
+        return $this->query->select();
     }
 
     // a felhasználó szerepeket (szuperadmin, admin stb.) tölti be 
@@ -720,8 +715,7 @@ class Users_model extends Admin_model {
         $this->query->reset();
         $this->query->set_table(array('permissions'));
         $this->query->set_columns(array('perm_id', 'perm_key', 'perm_desc'));
-        $result = $this->query->select();
-        return $result;
+        return $this->query->select();
     }
 
     /**

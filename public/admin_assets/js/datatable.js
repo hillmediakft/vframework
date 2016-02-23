@@ -39,13 +39,11 @@ var Datatable = function() {
                 filterApplyAction: "filter",
                 filterCancelAction: "filter_cancel",
                 resetGroupActionInputOnSuccess: true,
-                loadingMessage: 'Betöltés...',
+                loadingMessage: 'Loading...',
                 dataTable: {
-                    "dom": "<'row'<'col-md-7 col-sm-6'pli><'col-md-5 col-sm-6'<'table-group-actions pull-right'>>r><'table-scrollable't><'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>", // datatable layout
+                    "dom": "<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'<'table-group-actions pull-right'>>r><'table-scrollable't><'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>", // datatable layout
                     "pageLength": 10, // default records per page
-                    
-					/*
-					"language": { // language settings
+                    "language": { // language settings
                         // metronic spesific
                         "metronicGroupActions": "_TOTAL_ records selected:  ",
                         "metronicAjaxRequestGeneralError": "Could not complete request. Please check your internet connection",
@@ -65,27 +63,7 @@ var Datatable = function() {
                             "pageOf": "of"
                         }
                     },
-					*/
-					"language": { // language settings
-						// metronic spesific
-						"metronicGroupActions": "_TOTAL_ sor kiválasztva: ",
-						"metronicAjaxRequestGeneralError": "A kérés nem hajtható végre, ellenőrizze az internet kapcsolatot!",
 
-						// data tables spesific
-						"lengthMenu": "<span class='seperator'>&nbsp;|&nbsp;</span>_MENU_ sor/oldal",
-						"info": "<span class='seperator'>&nbsp;|&nbsp;</span>_TOTAL_ sor",
-						"infoEmpty": "&nbsp; Nincs megjeleníthető adat",
-						"emptyTable": "Üres az adatbázis",
-						"zeroRecords": "Nincs találat",
-						"paginate": {
-							"previous": "Előző",
-							"next": "Következő",
-							"last": "Utolsó",
-							"first": "Első",
-							"page": "",
-							"pageOf": " / "
-						}
-					},
                     "orderCellsTop": true,
                     "columnDefs": [{ // define columns sorting options(by default all columns are sortable extept the first checkbox column)
                         'orderable': false,

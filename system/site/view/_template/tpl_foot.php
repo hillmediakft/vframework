@@ -1,12 +1,6 @@
 
 <!-- BEGIN PAGE LEVEL SCRIPTS -->
-<?php
-if (isset($this->js_link)) {
-    foreach ($this->js_link as $value) {
-        echo $value;
-    }
-}
-?>
+<?php $this->get_js_link(); ?>
 
 </body>
 </html>

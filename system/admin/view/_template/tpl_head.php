@@ -21,12 +21,7 @@
         <!-- BEGIN PAGE LEVEL PLUGIN STYLES -->
 
         <!-- OLDALSPECIFIKUS CSS LINKEK -->
-        <?php
-        foreach ($this->css_link as $value) {
-            echo $value;
-        }
-        ?>
-
+        <?php $this->get_css_link(); ?>
 
         <!-- END PAGE LEVEL PLUGIN STYLES -->
         <!-- BEGIN THEME STYLES -->
@@ -153,19 +148,19 @@
                                         Felhasználók listája</a>
                                 </li>
 
-                                <?php if (Session::get('user_role_id') == 1) { ?>
-                                    <li class="<?php $this->menu_active(null, 'new_user'); ?>">
-                                        <a href="admin/users/new_user">
+                                <?php if (1) { ?>
+                                    <li class="<?php $this->menu_active('users', 'insert'); ?>">
+                                        <a href="admin/users/insert">
                                             Új felhasználó</a>
                                     </li>
                                 <?php } ?>
 
-                                <li class="<?php $this->menu_active(null, 'profile'); ?>">
+                                <li class="<?php $this->menu_active('users', 'profile'); ?>">
                                     <a href="admin/users/profile/<?php echo Session::get('user_id'); ?>">
                                         Profilom</a>
                                 </li>
 
-                                <li class="<?php $this->menu_active(null, 'user_roles|edit_roles'); ?>">
+                                <li class="<?php $this->menu_active('users', 'user_roles|edit_roles'); ?>">
                                     <a href="admin/users/user_roles">
                                         Csoportok</a>
                                 </li>
@@ -173,28 +168,22 @@
                             </ul>
                         </li>
 
-
-
-                        <!--  GALÉRIÁK
-                                                        <li class="<?php //$this->menu_active('photo_gallery|video_gallery'); ?>">
-                                                                <a href="javascript:;">
-                                                                <i class="fa fa-picture-o"></i> 
-                                                                <span class="title">Galériák</span>
-                                                                <span class="arrow "></span>
-                                                                </a>
-                                                                <ul class="sub-menu">
-                                                                        <li class="<?php //$this->menu_active('photo_gallery'); ?>">
-                                                                                <a href="admin/photo_gallery">
-                                                                                Képgaléria</a>
-                                                                        </li>
-                                                                        <li class="<?php //$this->menu_active('video_gallery'); ?>">
-                                                                                <a href="admin/video_gallery">
-                                                                                Videógaléra</a>
-                                                                        </li>
-                                                                </ul>
-                                                        </li>
-                        -->	
-
+                        <!--  GALÉRIÁK -->	
+                        <li class="<?php $this->menu_active('photo_gallery|video_gallery'); ?>">
+                            <a href="javascript:;">
+                                <i class="fa fa-picture-o"></i> 
+                                <span class="title">Galériák</span>
+                                <span class="arrow "></span>
+                            </a>
+                            <ul class="sub-menu">
+                                <li class="<?php $this->menu_active('photo_gallery'); ?>">
+                                    <a href="admin/photo_gallery">Képgaléria</a>
+                                </li>
+                                <li class="<?php $this->menu_active('video_gallery'); ?>">
+                                    <a href="admin/video_gallery">Videógaléra</a>
+                                </li>
+                            </ul>
+                        </li>
 
                         <li class="<?php $this->menu_active('slider|testimonials|clients'); ?>">
                             <a href="javascript:;">
@@ -270,8 +259,8 @@
                                 <li class="<?php $this->menu_active('newsletter', 'index'); ?>">
                                     <a href="admin/newsletter">Hírlevelek</a>
                                 </li>
-                                <li class="<?php $this->menu_active('newsletter', 'new_newsletter'); ?>">
-                                    <a href="admin/newsletter/new_newsletter">Új hírlevél</a>
+                                <li class="<?php $this->menu_active('newsletter', 'insert'); ?>">
+                                    <a href="admin/newsletter/insert">Új hírlevél</a>
                                 </li>
                                 <li class="<?php $this->menu_active('newsletter', 'newsletter_stats'); ?>">
                                     <a href="admin/newsletter/newsletter_stats">Elküldött hírlevelek</a>

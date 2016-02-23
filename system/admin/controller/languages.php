@@ -4,7 +4,6 @@ class Languages extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
-		$this->loadModel('languages_model');
 	}
 
 	public function index()
@@ -13,9 +12,8 @@ class Languages extends Admin_controller {
 		$this->view->title = 'Nyelvek oldal';
 		$this->view->description = 'Nyelvek oldal description';
 		
-		$this->view->css_link[] = $this->make_link('css', ADMIN_ASSETS, 'plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css');
-		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js');
-		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/languages.js');
+		$this->view->add_lins(array('bootstrap-editable'));
+		$this->view->add_link('js', ADMIN_JS . 'pages/languages.js');
 		
 		$this->view->languages = $this->languages_model->get_language_data();
 		
