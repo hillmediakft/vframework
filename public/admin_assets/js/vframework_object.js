@@ -367,7 +367,7 @@ var vframework = function () {
 		},
 
         hideAlert: function () {
-            $('div.alert').delay( 3000 ).slideUp( 750 );                                
+            $('div.alert.alert-success, div.alert.alert-danger').delay( 3000 ).slideUp( 750 );                                
         },
 
         // ckeditor bekapcsolása (options: { textarea_name_attr: "config_name" })
