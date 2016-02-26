@@ -105,7 +105,20 @@ class Validate {
 		foreach ($this->rules_arr as $item => $rules) {
 			foreach ($rules as $rule => $rule_value) {
 
-				$value = trim($source[$item]);
+				// ha a formban tömbként van megadva az input, a validátorban az elem neve pl.: user.name.first
+				if(strpos($item, '.') !== false) {
+					$_keys = explode('.', $item);
+					// a teljes $source tömbből csak a megadott tömbelemet rendeljük hozzá a $value változóhoz
+					$value[$_keys[0]] = $source[$_keys[0]];
+					// a tömbbejárás során a $value utolsó értéke a keresett tömbelem érték (string) lesz
+					foreach ($_keys as $key_part) {
+						$value = $value[$key_part];
+					}
+					$value = trim($value);
+				}
+				else {
+					$value = trim($source[$item]);
+				}
 
 				// szabály vizsgálatok
 				if ($rule === 'required' && empty($value))
