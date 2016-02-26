@@ -6,12 +6,7 @@ class Request {
 
 	private $uri; // uri objektum
 	private $router; // router objektum
-
-	/**
-	 * Az engedélyezett szűrőket tartalamzó tömb
-	 */
-	private $allowed_filters = array('integer', 'boolean', 'remove_danger_tags');
-
+	private $filter = null; // filter objektum
 
 	public function __construct($uri, $router)
 	{
@@ -92,15 +87,20 @@ class Request {
 	 */
 	public function get_post($key = NULL, $filter = NULL, $default_value = '')
 	{
-		if(!is_null($filter) && !in_array($filter, $this->allowed_filters)){
-			throw new Exception('Nem megengedett filter a request class get_post metodusaban');
-			exit();
+		// adatok a $_POST tömbből
+		$post_data = $this->_fetch_from_array($_POST, $key);
+		
+		if(!isset($this->filter)){
+			// filter objektum példányosítása, ha még nincs
+			$this->filter = new Filter();
+		}
+		$filtered_data = $this->filter->sanitize($post_data, $filter);
+
+		if( ($filtered_data === '' || is_null($filtered_data)) && $default_value !== '' ) {
+			return $default_value;
 		}
 
-		// adatok a $_POST tömbből
-		$value = $this->_fetch_from_array($_POST, $key);
-
-		return $this->_filter($filter, $value, $default_value);
+		return $filtered_data;
 	}
 
 	/**
@@ -113,17 +113,21 @@ class Request {
 	 */
 	public function get_query($key = NULL, $filter = NULL, $default_value = '')
 	{
-		if(!is_null($filter) && !in_array($filter, $this->allowed_filters)){
-			throw new Exception('Nem megengedett filter a request class get_query metodusaban');
-			exit();
+		// adatok a $_GET tömbből
+		$query_data = $this->_fetch_from_array($_GET, $key);
+		
+		if(!isset($this->filter)){
+			// filter objektum példányosítása, ha még nincs
+			$this->filter = new Filter();
+		}
+		$filtered_data = $this->filter->sanitize($query_data, $filter);
+
+		if( ($filtered_data === '' || is_null($filtered_data)) && $default_value !== '' ) {
+			return $default_value;
 		}
 
-		// adatok a $_GET tömbből
-		$value = $this->_fetch_from_array($_GET, $key);
-
-		return $this->_filter($filter, $value, $default_value);
+		return $filtered_data;
 	}
-
 
 	/**
 	 * HTTP Referer visszaadása a $_SERVER szuperglobális tömbből
@@ -140,7 +144,6 @@ class Request {
 	{
 		return strtolower($_SERVER['REQUEST_METHOD']);
 	}
-
 
 	/**
 	 * Ellenőrzi, hogy létezik-e a paraméterként kapott index a $_REQUEST szuperglobális tömbben
@@ -170,11 +173,17 @@ class Request {
 
 	/**
 	 * Ellenőrzi, hogy létezik-e a paraméterként kapott index a $_GET szuperglobális tömbben
+	 * Ha nem adunk paramétert a metódusnak, akkor azt vizsgálja, hogy üres-e a $_GET tömb
+	 * (ha a $_GET tömb üres, akkor false-t ad vissza, ha nem üres, akkor true)
 	 *
 	 * @return boolean
 	 */
-	public function has_query($index)
+	public function has_query($index = null)
 	{
+		if(is_null($index)){
+			return !empty($_GET);
+		}
+
 		return isset($_GET[$index]);
 	}
 
@@ -207,8 +216,6 @@ class Request {
 	{
 		return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 	}
-
-
 
 
 	/**
@@ -261,119 +268,6 @@ class Request {
 			exit();
 			//return NULL;
 		}
-
-		return $value;
-	}
-
-
-	/**
-	 * Értékek szűrése, adott típusra alakítása, default érték beállítása
-	 */				
-	private function _filter($filter, $value, $default_value)
-	{
-		if(is_null($filter)){
-			// ha nem üres a value - alap szűrések
-			if(!empty($value)){
-				// ha működik a magic_quotes_gpc (csak régi PHP-nál) hozzáadott /-ek eltávolítása
-				if (get_magic_quotes_gpc() && ($this->is_post() || $this->is_get())) {
-					$value = $this->_stripSlashes($value);
-				}
-				// html tag-ek eltávolítása 
-				$value = $this->_stripTags($value);
-			}
-			else {
-				// ha üres a value
-				$value = $default_value;
-			}
-		}
-		else {
-			switch($filter){
-
-				case 'integer':
-					$default_value = (empty($default_value)) ? 0 : (int)$default_value;
-					$value = (empty($value)) ? $default_value : (int)$value;
-					break;
-
-				case 'boolean':
-					//$value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);	
-					$value = strtolower($value);
-					if (($value == 'f') || ($value == 'false') || ($value == 'no') || ($value == 'off') || !$value) {
-						$value = FALSE;
-					} else {
-						$value = TRUE;
-					}
-					break;
-
-				case 'remove_danger_tags':
-					$value = (!empty($value)) ? $this->_strip_dangertags($value, array('script')) : $default_value; 
-					break;
-			}
-		}	
-
-		return $value; 
-	}
-
-// ------- Szürő metódusok 
-
-	/**
-	 * Removes slashes from a value (rekurzív)
-	 * 
-	 * @param string|array $value  The value to strip
-	 * @return string|array  The `$value` with slashes stripped
-	 */
-	private function _stripSlashes($value)
-	{
-		if (is_array($value)) {
-			foreach ($value as $key => $sub_value) {
-				$value[$key] = $this->_stripSlashes($sub_value);
-			}
-			return $value;
-		}
-		return stripslashes($value);
-	}
-
-	/**
-	 * Eltávolítja a html tag-eket (rekurzív)
-	 * 
-	 * @param string|array $value  			string amiből el kell távolítani a html tag-eket
-	 * @param string|array $allowed_tags  	engedélyezett html tag-ek ('<br><h1><p>')
-	 * @return string|array  				The `$value` with slashes stripped
-	 */
-	private function _stripTags($value, $allowed_tags = null)
-	{
-		if (is_array($value)) {
-			foreach ($value as $key => $sub_value) {
-				$value[$key] = $this->_stripTags($sub_value, $allowed_tags);
-			}
-			return $value;
-		}
-
-		if(is_null($allowed_tags)) {
-			return strip_tags($value);
-		} else {
-			return strip_tags($value, $allowed_tags);
-		}
-	}
-
-	/**
-	 * Eltávolítja a paraméterben megadott html tag-eket (rekurzív)
-	 * 
-	 * @param string|array $value  	string amiből el kell távolítani a html script tag-eket
-	 * @param array $tags  			eltávolítandó html tag-ek
-	 * @return string|array  		The `$value` with slashes stripped
-	 */
-	private function _strip_dangertags($value, $tags)
-	{
-		if (is_array($value)) {
-			foreach ($value as $key => $sub_value) {
-				$value[$key] = $this->_strip_dangertags($sub_value, $tags);
-			}
-			return $value;
-		}
-	    
-	    foreach ($tags as $tag) {
-			$value = preg_replace("~<" . $tag . "(.*?)>(.*?)</" . $tag . ">~i","", $value);
-	    }
 
 		return $value;
 	}
