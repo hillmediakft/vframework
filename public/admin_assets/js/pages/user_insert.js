@@ -29,7 +29,6 @@ var User_insert = function () {
 			focusInvalid: true, // do not focus the last invalid input
 			ignore: "input[name='img']",
 			rules: {
-				/*
 				name: {
 					minlength: 2,
 					required: true
@@ -52,7 +51,6 @@ var User_insert = function () {
 					required: true,
 					equalTo: "#password"
 				}
-				*/
 			},
 			// az invalidHandler akkor aktiválódik, ha elküldjük a formot és hiba van
 			invalidHandler: function (event, validator) { //display error alert on form submit              
