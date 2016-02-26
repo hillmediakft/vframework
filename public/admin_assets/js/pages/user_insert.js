@@ -23,12 +23,13 @@ var User_insert = function () {
     var handleValidation = function() {
 		console.log('start validation');
 
-		$('#new_user_form').validate({
+		$('#user_insert_form').validate({
 			errorElement: 'span', //default input error message container
 			errorClass: 'help-block help-block-error', // default input error message class
 			focusInvalid: true, // do not focus the last invalid input
 			ignore: "input[name='img']",
 			rules: {
+				/*
 				name: {
 					minlength: 2,
 					required: true
@@ -51,6 +52,7 @@ var User_insert = function () {
 					required: true,
 					equalTo: "#password"
 				}
+				*/
 			},
 			// az invalidHandler akkor aktiválódik, ha elküldjük a formot és hiba van
 			invalidHandler: function (event, validator) { //display error alert on form submit              

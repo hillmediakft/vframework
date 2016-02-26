@@ -26,7 +26,7 @@
 				<?php $this->renderFeedbackMessages();?>			
 				
 					<!-- BEGIN FORM-->			
-					<form action="admin/users/new_user" method="POST" id="new_user_form" name="new_user_form">	
+					<form action="admin/users/insert" method="POST" id="user_insert_form" name="user_insert_form">	
 
 						<div class="portlet">
 							<div class="portlet-title">
