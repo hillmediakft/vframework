@@ -86,6 +86,7 @@ var Users = function () {
 
         });
 
+        //var tableWrapper = jQuery('#users_wrapper');
 
         table.find('.group-checkable').change(function () {
             var set = jQuery(this).attr("data-set");
@@ -101,7 +102,13 @@ var Users = function () {
             });
             jQuery.uniform.update(set);
         });
-
+/*
+        table.on('change', 'tbody tr .checkboxes', function () {
+            $(this).parents('tr').toggleClass("active");
+        });
+*/
+        // tableWrapper.find('.dataTables_length select').addClass("form-control input-xsmall input-inline"); // modify table per page dropdown
+        //tableWrapper.find('.dataTables_length select').select2(); // initialize select2 dropdown
     };
 
     return {
