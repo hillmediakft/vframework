@@ -15,7 +15,7 @@
  * @author    Eoghan O'Brien <eoghan@eoghanobrien.com>
  * @copyright 2009 - 2014 Eoghan O'Brien
  * @license   http://github.com/eoghanobrien/php-simple-mail/LICENCE.txt MIT
- * @version   1.4
+ * @version   1.5
  * @link      http://github.com/eoghanobrien/php-simple-mail
  */
 
@@ -68,6 +68,12 @@ class SimpleMail
     protected $_attachments = array();
 
     /**
+     * @var string $_uid
+     */
+    protected $_uid;
+
+
+    /**
      * __construct
      *
      * Resets the class properties.
@@ -93,6 +99,7 @@ class SimpleMail
         $this->_wrap = 78;
         $this->_params = null;
         $this->_attachments = array();
+        $this->_uid = $this->getUniqueId();
         return $this;
     }
 
@@ -319,6 +326,7 @@ class SimpleMail
 
     /**
      * hasAttachments
+     * 
      * Checks if the email has any registered attachments.
      *
      * @return bool
@@ -335,45 +343,60 @@ class SimpleMail
      */
     public function assembleAttachmentHeaders()
     {
-        $uid = $this->getUniqueId();
-        $eol = PHP_EOL;
         $head = array();
-        $head[] = "{$eol}MIME-Version: 1.0";
-        $head[] = "Content-Type: multipart/mixed; boundary=\"{$uid}\"{$eol}";
-        $head[] = "This is a multi-part message in MIME format.";
-        $head[] = "--{$uid}";
-        $head[] = "Content-type:text/html; charset=\"utf-8\"";
-        $head[] = "Content-Transfer-Encoding: 7bit{$eol}";
-        $head[] = $this->_message . "{$eol}";
-        $head[] = "--{$uid}";
+        $head[] = "MIME-Version: 1.0";
+        $head[] = "Content-Type: multipart/mixed; boundary=\"{$this->_uid}\"";
 
-        foreach ($this->_attachments as $attachment) {
-            $head[] = $this->getAttachmentMimeTemplate($attachment, $uid);
-        }
-
-        return join("{$eol}", $head);
+        return join(PHP_EOL, $head);
     }
 
     /**
-     * getAttachmentMimeTemplate()
+     * assembleAttachmentBody
+     *
+     * @return string
+     */
+    public function assembleAttachmentBody()
+    {
+        $body = array();
+        $body[] = "This is a multi-part message in MIME format.";
+        $body[] = "--{$this->_uid}";
+        $body[] = "Content-type:text/html; charset=\"utf-8\"";
+        $body[] = "Content-Transfer-Encoding: 7bit";
+        $body[] = "";
+        $body[] = $this->_message;
+        $body[] = "";
+        $body[] = "--{$this->_uid}";
+
+        foreach ($this->_attachments as $attachment) {
+            $body[] = $this->getAttachmentMimeTemplate($attachment);
+        }
+
+        return implode(PHP_EOL, $body);
+    }
+
+    /**
+     * getAttachmentMimeTemplate
      *
      * @param array  $attachment An array containing 'file' and 'data' keys.
      * @param string $uid        A unique identifier for the boundary.
      *
      * @return string
      */
-    public function getAttachmentMimeTemplate($attachment, $uid)
+    public function getAttachmentMimeTemplate($attachment)
     {
-        $eol = PHP_EOL;
         $file = $attachment['file'];
         $data = $attachment['data'];
+
         $head = array();
         $head[] = "Content-Type: application/octet-stream; name=\"{$file}\"";
         $head[] = "Content-Transfer-Encoding: base64";
-        $head[] = "Content-Disposition: attachment; filename=\"{$file}\"{$eol}";
-        $head[]= "{$data}{$eol}";
-        $head[]= "--{$uid}";
-        return implode($eol, $head);
+        $head[] = "Content-Disposition: attachment; filename=\"{$file}\"";
+        $head[] = "";
+        $head[] = $data;
+        $head[] = "";
+        $head[] = "--{$this->_uid}";
+
+        return implode(PHP_EOL, $head);
     }
 
     /**
@@ -394,8 +417,8 @@ class SimpleMail
         }
 
         if ($this->hasAttachments()) {
-            $message = '';
-            $headers .= $this->assembleAttachmentHeaders();
+            $message  = $this->assembleAttachmentBody();
+            $headers .= PHP_EOL . $this->assembleAttachmentHeaders();
         } else {
             $message = $this->getWrapMessage();
         }
@@ -414,7 +437,7 @@ class SimpleMail
     }
 
     /**
-     * magic __toString function.
+     * magic __toString function
      *
      * @return string
      */
@@ -445,7 +468,7 @@ class SimpleMail
     }
 
     /**
-     * encodeUtf8()
+     * encodeUtf8
      *
      * @param string $value The value to encode.
      *
@@ -461,7 +484,7 @@ class SimpleMail
     }
 
     /**
-     * encodeUtf8Word()
+     * encodeUtf8Word
      *
      * @param string $value The word to encode.
      *
@@ -473,7 +496,7 @@ class SimpleMail
     }
 
     /**
-     * encodeUtf8Words()
+     * encodeUtf8Words
      *
      * @param string $value The words to encode.
      *
@@ -547,8 +570,8 @@ class SimpleMail
     /**
      * filterOther
      *
-     * Removes any carriage return, line feed or tab characters before
-     * sanitizing.
+     * Removes ASCII control characters including any carriage return, line
+     * feed or tab characters.
      *
      * @param string $data The data to filter.
      *
@@ -556,16 +579,11 @@ class SimpleMail
      */
     public function filterOther($data)
     {
-        $rule = array(
-            "\r" => '',
-            "\n" => '',
-            "\t" => ''
-        );
-        return strtr(filter_var($data, FILTER_SANITIZE_STRING), $rule);
+        return filter_var($data, FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_LOW);
     }
 
     /**
-     * getHeadersForSend()
+     * getHeadersForSend
      *
      * @return string
      */
@@ -578,7 +596,7 @@ class SimpleMail
     }
 
     /**
-     * getToForSend()
+     * getToForSend
      *
      * @return string
      */
@@ -591,7 +609,7 @@ class SimpleMail
     }
 
     /**
-     * getUniqueId()
+     * getUniqueId
      *
      * @return string
      */
@@ -601,7 +619,7 @@ class SimpleMail
     }
 
     /**
-     * getWrapMessage()
+     * getWrapMessage
      *
      * @return string
      */
