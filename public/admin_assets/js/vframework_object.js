@@ -82,7 +82,7 @@ var vframework = function () {
 	};
 
 	/**
-	 * User(ek) törlése ajax-al
+	 * Tábla elemek törlése ajax-al
 	 *
 	 * @param array 				id         	törlendő id-ket tartalamzó string: "12,45,78" vagy csak egyet "23"
 	 * @param objektum vagy null 	deleteRow 	HTML elem, amit törölni kell a dom-ból (csoportos törlésnél null az értéke!)

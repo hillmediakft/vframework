@@ -6,24 +6,38 @@ var Newsletter = function () {
     var newsletterTable = function () {
 
         var table = $('#newsletter_table');
-		// begin first table
-        
 	
 		table.dataTable({
 
-            // Internationalisation. For more info refer to http://datatables.net/manual/i18n
             "language": {
-                "aria": {
-                    "sortAscending": ": activate to sort column ascending",
-                    "sortDescending": ": activate to sort column descending"
+                // metronic specific
+                "metronicGroupActions": "_TOTAL_ sor kiválasztva: ",
+                "metronicAjaxRequestGeneralError": "A kérés nem hajtható végre, ellenőrizze az internet kapcsolatot!",
+
+                // data tables specific                
+                "decimal":        "",
+                "emptyTable":     "Nincs megjeleníthető adat!",
+                "info":           "_START_ - _END_ elem &nbsp; _TOTAL_ elemből",
+                "infoEmpty":      "Nincs megjeleníthető adat!",
+                "infoFiltered":   "(Szűrve _MAX_ elemből)",
+                "infoPostFix":    "",
+                "thousands":      ",",
+                "lengthMenu":     " _MENU_ elem/oldal",
+                "loadingRecords": "Betöltés...",
+                "processing":     "Feldolgozás...",
+                "search":         "Keresés:",
+                "zeroRecords":    "Nincs egyező elem",
+                "paginate": {
+                    "previous":   "Előző",
+                    "next":       "Következő",
+                    "last":       "Utolsó",
+                    "first":      "Első",
+                    "pageOf":     "&nbsp;/&nbsp;"
                 },
-                "emptyTable": "No data available in table",
-                "info": "_START_ - _END_ elem _TOTAL_ elemből",
-                "infoEmpty": "Nincs megjeleníthető adat!",
-                "infoFiltered": "(Szűrve _MAX_ elemből)",
-                "lengthMenu": "Show _MENU_ entries",
-                "search": "Search:",
-                "zeroRecords": "Nincs egyező elem"
+                "aria": {
+                    "sortAscending":  ": aktiválja a növekvő rendezéshez",
+                    "sortDescending": ": aktiválja a csökkenő rendezéshez"
+                }
             },
 
             // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
@@ -61,16 +75,6 @@ var Newsletter = function () {
             // set the initial value
             "pageLength": 5,            
             "pagingType": "bootstrap_full_number",
-            "language": {
-                "search": "Keresés: ",
-                "lengthMenu": "  _MENU_ elem/oldal",
-                "paginate": {
-                    "previous": "Előző",
-                    "next": "Következő",
-                    "last": "Utolsó",
-                    "first": "Első"
-                }
-            },
             "columnDefs": [{  // set default column settings
                 'orderable': false,
                 'targets': [0]
@@ -85,7 +89,7 @@ var Newsletter = function () {
 		
         });
 
-        var tableWrapper = jQuery('#newsletter_table_wrapper');
+        // var tableWrapper = jQuery('#newsletter_table_wrapper');
 
         table.find('.group-checkable').change(function () {
             var set = jQuery(this).attr("data-set");
@@ -101,57 +105,56 @@ var Newsletter = function () {
             });
             jQuery.uniform.update(set);
         });
-
+/*
         table.on('change', 'tbody tr .checkboxes', function () {
             $(this).parents('tr').toggleClass("active");
         });
 
         tableWrapper.find('.dataTables_length select').addClass("form-control input-sm input-inline"); // modify table per page dropdown
-    }
+*/
+    };
 	
 	var deleteOneNewsletterConfirm = function () {
-	 		$('[id*=delete_newsletter]').on('click', function(e){
-               	e.preventDefault();
-				//var deleteLink = $(this).attr('href');
-				var newsletterName = $(this).closest("tr").find('td:nth-child(2)').text();
-				
-				// az <a> html elemet hozzárendeljük a link nevű változóhoz
-				var link = $(this);
-				
-				bootbox.setDefaults({
-					locale: "hu", 
-				});
-				bootbox.confirm("Biztosan törölni akarja a <strong>" + newsletterName + "</strong> hírlevelet?", function(result) {
-					if (result) {
-						//window.location.href = deleteLink;
-						
-						// paraméter az <a> elem amire klikkeltünk
-						delete_newsletter_AJAX(link);						
-					}
-                }); 
-            });	
+        $('[id*=delete_newsletter]').on('click', function(e){
+            e.preventDefault();
+            //var deleteLink = $(this).attr('href');
+            var newsletterName = $(this).closest("tr").find('td:nth-child(2)').text();
+
+            // az <a> html elemet hozzárendeljük a link nevű változóhoz
+            var link = $(this);
+
+            bootbox.setDefaults({
+                locale: "hu", 
+            });
+            bootbox.confirm("Biztosan törölni akarja a <strong>" + newsletterName + "</strong> hírlevelet?", function(result) {
+                if (result) {
+                    //window.location.href = deleteLink;
+
+                    // paraméter az <a> elem amire klikkeltünk
+                    delete_newsletter_AJAX(link);						
+                }
+            }); 
+        });	
 	 
-	}
+	};
 	
 	var deleteNewsletterTableConfirm = function () {
-			$('#del_newsletter_form').submit(function(e){
-                e.preventDefault();
-				currentForm = this;
-				bootbox.setDefaults({
-					locale: "hu", 
-				});
-				bootbox.confirm("Biztosan törölni akarja a kijelölt hírleveleket?", function(result) {
-					if (result) {
-						// a submit() nem küldi el a gomb name értékét, ezért be kell rakni egy hidden elemet
-						$('#del_newsletter_form').append($("<input>").attr("type", "hidden").attr("name", "delete_newsletter").val("submit_delete_newsletter"));
-						currentForm.submit(); 	
-					}
-                }); 
-            });	 		
-	}
+        $('#del_newsletter_form').submit(function(e){
+            e.preventDefault();
+            currentForm = this;
+            bootbox.setDefaults({
+                locale: "hu", 
+            });
+            bootbox.confirm("Biztosan törölni akarja a kijelölt hírleveleket?", function(result) {
+                if (result) {
+                    // a submit() nem küldi el a gomb name értékét, ezért be kell rakni egy hidden elemet
+                    $('#del_newsletter_form').append($("<input>").attr("type", "hidden").attr("name", "delete_newsletter").val("submit_delete_newsletter"));
+                    currentForm.submit(); 	
+                }
+            }); 
+        });	 		
+	};
 
-	
-	
 	var submitNewsletterConfirm = function () {
 		$('[id*=submit_newsletter]').on('click', function(e){
 			e.preventDefault();
@@ -174,7 +177,7 @@ var Newsletter = function () {
 			}); 
 		});	
 	 
-	}
+	};
 	
 	
 	
@@ -511,7 +514,7 @@ var Newsletter = function () {
 			enableDisableButtons();
 			hideAlert();
 			printTable();
-			submit_newsletter_AJAX_2;
+			submit_newsletter_AJAX_2();
 			
         }
 
@@ -523,7 +526,6 @@ $(document).ready(function() {
 	Metronic.init(); // init metronic core componets
 	Layout.init(); // init layout
 	QuickSidebar.init(); // init quick sidebar
-	Demo.init(); // init demo features 
+	// Demo.init(); // init demo features 
 	Newsletter.init(); // init Newsletter page
-		
 });

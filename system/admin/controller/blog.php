@@ -121,7 +121,7 @@ class Blog extends Admin_controller {
 		$this->view->title = 'Admin blog oldal';
 		$this->view->description = 'Admin blog oldal description';	
 		// linkek
-		$this->view->add_links('vframework', 'blog_category_insert');   
+		$this->view->add_links(array('vframework', 'blog_category_insert'));   
 		
 		$this->view->render('blog/tpl_category_insert');	
 	}
@@ -141,7 +141,7 @@ class Blog extends Admin_controller {
 		$this->view->title = 'Admin blog oldal';
 		$this->view->description = 'Admin blog oldal description';	
 		// linkek
-		$this->view->add_links('vframework', 'blog_category_update');   
+		$this->view->add_links(array('vframework', 'blog_category_update'));   
 		
 		$this->view->content = $this->blog_model->blog_category_query($this->request->get_params('id'));
 		

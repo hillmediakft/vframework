@@ -13,14 +13,14 @@ var Blog_update = function () {
 	            message: 'Feldolgozás...'
 	        });	
 
-			currentForm = this;
+			var currentForm = this;
 
 			setTimeout(function(){
 				currentForm.submit();
 			}, 300);
 
 		});
-	}
+	};
 
 	var handleDatePickers = function () {
 
@@ -36,11 +36,11 @@ var Blog_update = function () {
 			});
 			//$('body').removeClass("modal-open"); // fix bug when inline picker is used in modal
 		}
-	}
+	};
 
     var ckeditorInit = function () {
         CKEDITOR.replace( 'blog_body', {customConfig: 'config_custom3.js'});
-    }
+    };
 
     return {
         //main function to initiate the module

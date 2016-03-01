@@ -1,31 +1,30 @@
 <!-- BEGIN CONTENT -->
 	<div class="page-content-wrapper">
 		<div class="page-content">
-				<!-- BEGIN PAGE HEADER-->
-					<!-- BEGIN PAGE TITLE & BREADCRUMB-->
-					<!--
-					<h3 class="page-title">
-						Oldal <small>szerkesztése</small>
-					</h3>
-					-->
-					<div class="page-bar">
-						<ul class="page-breadcrumb">
-							<li>
-								<i class="fa fa-home"></i>
-								<a href="admin/home">Kezdőoldal</a> 
-								<i class="fa fa-angle-right"></i>
-							</li>
-							<li><span>Oldal szerkesztése</span></li>
-						</ul>
-					</div>
-					<!-- END PAGE TITLE & BREADCRUMB-->
-				<!-- END PAGE HEADER-->
-
+        <!-- BEGIN PAGE HEADER-->
+            <!-- BEGIN PAGE TITLE & BREADCRUMB-->
+            <!--
+            <h3 class="page-title">
+                Oldal <small>szerkesztése</small>
+            </h3>
+            -->
+            <div class="page-bar">
+                <ul class="page-breadcrumb">
+                    <li>
+                        <i class="fa fa-home"></i>
+                        <a href="admin/home">Kezdőoldal</a> 
+                        <i class="fa fa-angle-right"></i>
+                    </li>
+                    <li><span>Oldal szerkesztése</span></li>
+                </ul>
+            </div>
+            <!-- END PAGE TITLE & BREADCRUMB-->
+        <!-- END PAGE HEADER-->
 			
 			<!-- BEGIN PAGE CONTENT-->
 			<div class="row">
 				<div class="col-md-12">
-                    <form action="" id="update_page_form" name="update_page_form" method='POST'>
+                    <form action="" id="page_update_form" name="update_page_form" method='POST'>
 
 						<!-- BEGIN EXAMPLE TABLE PORTLET-->
 						<div class="portlet">

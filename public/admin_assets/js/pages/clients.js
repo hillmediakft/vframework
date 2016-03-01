@@ -1,6 +1,3 @@
-/**
- Crew_members oldal
- **/
 var Clients = function () {
 
     var clientsTable = function () {
@@ -87,7 +84,7 @@ var Clients = function () {
         });
 */
         // tableWrapper.find('.dataTables_length select').addClass("form-control input-sm input-inline"); // modify table per page dropdown
-    }
+    };
 
     return {
         //main function to initiate the module

@@ -23,7 +23,7 @@ class Newsletter extends Admin_controller {
 	 */
 	public function insert()
 	{
-		if($this->request->has_post('submit_new_newsletter')) {
+		if($this->request->has_post()) {
 			$this->newsletter_model->insert_newsletter();
 			Util::redirect('newsletter');
 		}

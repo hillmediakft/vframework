@@ -1,10 +1,10 @@
 var Page_update = function () {
 
 	var updatePageConfirm = function () {
-		$('#update_page_form').submit(function(e){
+		$('#page_update_form').submit(function(e){
             e.preventDefault();
 			
-			currentForm = this;
+			var currentForm = this;
 			
 			bootbox.setDefaults({
 				locale: "hu", 
@@ -23,7 +23,7 @@ var Page_update = function () {
 				}
             }); 
         });	 		
-	}
+	};
 
     return {
 

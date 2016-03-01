@@ -1,30 +1,25 @@
-/**
-EditPage oldal
-**/
 var EditContent = function () {
 
-
 	var updateContentConfirm = function () {
-			$('#update_content_form').submit(function(e){
-                e.preventDefault();
-				currentForm = this;
-				bootbox.setDefaults({
-					locale: "hu", 
-				});
-				bootbox.confirm("Biztosan meni a módosításokat?", function(result) {
-					if (result) {
-						// a submit() nem küldi el a gomb name értékét, ezért be kell rakni egy hidden elemet
-						$('#update_content_form').append($("<input>").attr("type", "hidden").attr("name", "submit_update_content").val("submit_update_content"));
-						currentForm.submit(); 	
-					}
-                }); 
-            });	 		
-	}
+        $('#update_content_form').submit(function(e){
+            e.preventDefault();
+            var currentForm = this;
+            bootbox.setDefaults({
+                locale: "hu", 
+            });
+            bootbox.confirm("Biztosan meni a módosításokat?", function(result) {
+                if (result) {
+                    // a submit() nem küldi el a gomb name értékét, ezért be kell rakni egy hidden elemet
+                    $('#update_content_form').append($("<input>").attr("type", "hidden").attr("name", "submit_update_content").val("submit_update_content"));
+                    currentForm.submit(); 	
+                }
+            }); 
+        });	 		
+	};
 	
 	var hideAlert = function () {
 		$('div.alert').delay( 2500 ).slideUp( 750 );						 		
-	}	
-	
+	};	
 
     return {
 
@@ -32,8 +27,6 @@ var EditContent = function () {
         init: function () {
 			updateContentConfirm();
 			hideAlert();
-
-			
         }
 
     };
@@ -44,11 +37,6 @@ $(document).ready(function() {
 	Metronic.init(); // init metronic core componets
 	Layout.init(); // init layout
 	QuickSidebar.init(); // init quick sidebar
-	Demo.init(); // init demo features
+	// Demo.init(); // init demo features
 	EditContent.init();
-	
-
-
-
-	
 });

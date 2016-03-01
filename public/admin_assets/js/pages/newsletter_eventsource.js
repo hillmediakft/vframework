@@ -87,7 +87,7 @@ var Newsletter = function () {
 
         tableWrapper.find('.dataTables_length select').addClass("form-control input-sm input-inline"); // modify table per page dropdown
 */   
-    }
+    };
 	
 	var submitNewsletterConfirm = function () {
 		$('.submit_newsletter').on('click', function(e){
@@ -107,7 +107,7 @@ var Newsletter = function () {
 			}); 
 		});	
 	 
-	}
+	};
 	
 /*--------------------------------------------------*/	
 	
@@ -159,18 +159,18 @@ var Newsletter = function () {
 			addLog('Error occurred');
 			es.close();
 		});
-	}
+	};
 	  
 	var stopTask = function() {
 		es.close();
 		addLog('Interrupted');
-	}
+	};
 	  
 	var addLog = function(message) {
 		var message_box = document.getElementById('message');
 		message_box.innerHTML += message + '<br>';
 		message_box.scrollTop = message_box.scrollHeight;
-	}		
+	};		
 	
 	
 /*--------------------------------------------------*/		
@@ -215,5 +215,4 @@ $(document).ready(function() {
 	QuickSidebar.init(); // init quick sidebar
 	// Demo.init(); // init demo features 
 	Newsletter.init(); // init Newsletter page
-		
 });

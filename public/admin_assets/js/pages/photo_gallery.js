@@ -1,36 +1,118 @@
 var Portfolio = function () {
 
-		// üzenet doboz eltüntetése
 	var mixGrid = function () {
-		 $('.mix-grid').mixitup();						 		
-	}
-	
-	// üzenet doboz eltüntetése
-	var hideAlert = function () {
-		$('div.alert').delay( 2500 ).slideUp( 750 );						 		
-	}
+		 // $('.mix-grid').mixitup();						 		
+		 $('#mixitup_container').mixitup();						 		
+	};
 	
 	var deletePhotoConfirm = function () {
-		$('[id*=delete_photo]').on('click', function(e){
+		$('#mixitup_container').on('click', '.mix-delete', function(e){
             e.preventDefault();
-			var deleteLink = $(this).attr('href');
+
+			var id = $(this).attr('data-id');
+            var deleted_photo = $('#photo_' + id); // a törlendo fotó div eleme
+			
 			bootbox.setDefaults({
-				locale: "hu", 
+				locale: "hu"
 			});
+			
 			bootbox.confirm("Biztosan törölni akarja a fotót?", function(result) {
 				if (result) {
-					window.location.href = deleteLink; 	
+					delete_photo(id, deleted_photo);
 				}
             }); 
         });			
-	}	
+	};
+
+
+	/**
+	 * Photo törlése ajax-al
+	 *
+	 * @param array id
+	 * @param objektum deleted_photo 	HTML elem, amit törölni kell a dom-ból
+	 */
+	var delete_photo = function (id, deleted_photo) {
+
+        $.ajax({
+            url: "admin/photo_gallery/delete_photo_AJAX",
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                item_id: id
+            },
+            beforeSend: function() {
+                Metronic.blockUI({
+                    boxed: true,
+                    message: 'Feldolgozás...'
+                });
+            },
+            complete: function(){
+                Metronic.unblockUI();
+            },
+            success: function (result) {
+                
+                if (result.status == 'success') {
+
+                    deleted_photo.remove(); // HTML elem törlése a DOM-ból
+
+                    if(result.message_success) {
+                        Metronic.alert({
+                            type: 'success',
+                            //icon: 'warning',
+                            message: result.message_success,
+                            container: ajax_message,
+                            place: 'append',
+                            close: true, // make alert closable
+                            reset: false, // close all previouse alerts first
+                            //focus: true, // auto scroll to the alert after shown
+                            closeInSeconds: 3 // auto close after defined seconds
+                        });                                
+                    }
+                    if (result.message_error) {
+                        Metronic.alert({
+                            type: 'warning',
+                            //icon: 'warning',
+                            message: result.message_error,
+                            container: ajax_message,
+                            place: 'append',
+                            close: true, // make alert closable
+                            reset: false, // close all previouse alerts first
+                            //focus: true, // auto scroll to the alert after shown
+                            closeInSeconds: 3 // auto close after defined seconds
+                        });  
+                    }
+                
+                }    
+                else if (result.status == 'error') {
+                    Metronic.alert({
+                        type: 'danger',
+                        //icon: 'warning',
+                        message: result.message,
+                        container: ajax_message,
+                        place: 'append',
+                        close: true, // make alert closable
+                        //reset: false, // close all previouse alerts first
+                        //focus: true, // auto scroll to the alert after shown
+                        closeInSeconds: 5 // auto close after defined seconds
+                    });
+                }
+            },
+            error: function(xhr, textStatus, errorThrown){
+                console.log(errorThrown);
+                console.log("Hiba történt: " + textStatus);
+				console.log("Rendszerválasz: " + xhr.responseText); 
+            } 
+        }); // ajax end
+	};
+
 	
     return {
         //main function to initiate the module
         init: function () {
             mixGrid();
-			hideAlert();
 			deletePhotoConfirm();
+			
+			vframework.hideAlert();
         }
 
     };
@@ -41,6 +123,6 @@ jQuery(document).ready(function() {
 	Metronic.init(); // init metronic core componets
 	Layout.init(); // init layout
 	QuickSidebar.init(); // init quick sidebar
-	Demo.init(); // init demo features	
+	// Demo.init(); // init demo features	
 	Portfolio.init();
 });

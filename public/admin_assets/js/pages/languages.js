@@ -2,7 +2,7 @@ jQuery(document).ready(function() {
 	Metronic.init(); // init metronic core componets
 	Layout.init(); // init layout
 	QuickSidebar.init(); // init quick sidebar
-	Demo.init(); // init demo features
+	// Demo.init(); // init demo features
     
 	$.fn.editable.defaults.mode = 'popup';
 	$.fn.editable.defaults.inputclass = 'form-control';

@@ -3,7 +3,7 @@ var Newsletter_update = function () {
     var updateNewsletterConfirm = function () {
         $('#newsletter_update_form').submit(function (e) {
             e.preventDefault();
-            currentForm = this;
+            var currentForm = this;
             bootbox.setDefaults({
                 locale: "hu",
             });
@@ -19,16 +19,16 @@ var Newsletter_update = function () {
                     // végrehajtás késleltetése, hogy helyesen jelenjen meg a töltéstjelző spinner
                     setTimeout(function(){
 						currentForm.submit();
-					}, 500);
+					}, 300);
 
                 }
             });
         });
-    }
+    };
 
     var ckeditorInit = function () {
         CKEDITOR.replace( 'newsletter_body', {customConfig: 'config_custom3.js'});
-    }
+    };
 
     return {
         //main function to initiate the module

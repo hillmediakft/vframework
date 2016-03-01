@@ -23,7 +23,8 @@ var Client_update = function () {
     var submitUpdateClient = function () {
         $('#update_client_form').submit(function (e) {
             e.preventDefault();
-            currentForm = this;
+            
+            var currentForm = this;
 
             Metronic.blockUI({
                 boxed: true,
@@ -43,6 +44,7 @@ var Client_update = function () {
         }
     };
 }();
+
 $(document).ready(function () {
     Metronic.init(); // init metronic core componets
     Layout.init(); // init layout

@@ -20,7 +20,8 @@ var Client_insert = function () {
     var submitClient = function () {
         $('#client_insert_form').submit(function (e) {
             e.preventDefault();
-            currentForm = this;
+            
+            var currentForm = this;
 
             Metronic.blockUI({
                 boxed: true,
@@ -33,18 +34,15 @@ var Client_insert = function () {
         });
     };
 
-    var hideAlert = function () {
-        $('div.alert.alert-success, div.alert.alert-danger').delay(3000).slideUp(750);
-    };
-
     return {
         init: function () {
             cropClientPhoto();
             submitClient();
-            hideAlert();
+            vframework.hideAlert();
         }
     };
 }();
+
 $(document).ready(function () {
     Metronic.init(); // init metronic core componets
     Layout.init(); // init layout

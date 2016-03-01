@@ -176,7 +176,7 @@
                                 <span class="arrow "></span>
                             </a>
                             <ul class="sub-menu">
-                                <li class="<?php $this->menu_active('photo_gallery'); ?>">
+                                <li class="<?php $this->menu_active('photo_gallery', 'index'); ?>">
                                     <a href="admin/photo_gallery">Képgaléria</a>
                                 </li>
                                 <li class="<?php $this->menu_active('video_gallery'); ?>">

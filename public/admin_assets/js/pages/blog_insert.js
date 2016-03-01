@@ -11,16 +11,16 @@ var Blog_insert = function () {
 			Metronic.blockUI({
 	            boxed: true,
 	            message: 'Feldolgozás...'
-	        });	
+	        });
 
-			currentForm = this;
+			var currentForm = this;
 
 			setTimeout(function(){
 				currentForm.submit();
 			}, 300);
 
 		});
-	}
+	};
 
 
 	/**
@@ -33,18 +33,18 @@ var Blog_insert = function () {
 				rtl: Metronic.isRTL(),
 				orientation: "left",
 				autoclose: true,
-				format:"yyyy-mm-dd",
+				format: "yyyy-mm-dd",
 				language: "hu-HU",
-                                startDate: '0d',
-                                endDate: '+2m'
+                startDate: '0d',
+                endDate: '+2m'
 			});
 			//$('body').removeClass("modal-open"); // fix bug when inline picker is used in modal
 		}
-	}
+	};
 
     var ckeditorInit = function () {
-        CKEDITOR.replace( 'blog_body', {customConfig: 'config_custom3.js'});
-    }
+        CKEDITOR.replace('blog_body', {customConfig: 'config_custom3.js'});
+    };
 
     return {
         //main function to initiate the module

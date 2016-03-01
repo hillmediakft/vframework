@@ -1,38 +1,39 @@
 <!-- BEGIN CONTENT -->
 	<div class="page-content-wrapper">
 		<div class="page-content">
-				<!-- BEGIN PAGE HEADER-->
-					<!-- BEGIN PAGE TITLE & BREADCRUMB-->
-					<!--
-					<h3 class="page-title">
-						Új hírlevél <small>létrehozása</small>
-					</h3>
-					-->
+        <!-- BEGIN PAGE HEADER-->
+            <!-- BEGIN PAGE TITLE & BREADCRUMB-->
+            <!--
+            <h3 class="page-title">
+                Új hírlevél <small>létrehozása</small>
+            </h3>
+            -->
 
-					<div class="page-bar">
-						<ul class="page-breadcrumb">
-							<li>
-								<i class="fa fa-home"></i>
-								<a href="admin/home">Kezdőoldal</a> 
-								<i class="fa fa-angle-right"></i>
-							</li>
-							<li>
-								<a href="admin/newsletter">Hírlevelek</a>
-								<i class="fa fa-angle-right"></i>
-							</li>
-							<li><span>Új hírlevél</span></li>
-						</ul>
-					</div>
-	
-					<!-- END PAGE TITLE & BREADCRUMB-->
-				<!-- END PAGE HEADER-->
+            <div class="page-bar">
+                <ul class="page-breadcrumb">
+                    <li>
+                        <i class="fa fa-home"></i>
+                        <a href="admin/home">Kezdőoldal</a> 
+                        <i class="fa fa-angle-right"></i>
+                    </li>
+                    <li>
+                        <a href="admin/newsletter">Hírlevelek</a>
+                        <i class="fa fa-angle-right"></i>
+                    </li>
+                    <li><span>Új hírlevél</span></li>
+                </ul>
+            </div>
+
+            <!-- END PAGE TITLE & BREADCRUMB-->
+        <!-- END PAGE HEADER-->
 		
 			<!-- BEGIN PAGE CONTENT-->
 			<div class="row">
 				<div class="col-md-12">
 
-						<!-- echo out the system feedback (error and success messages) -->
-						<?php $this->renderFeedbackMessages(); ?>			
+                    <!-- echo out the system feedback (error and success messages) -->
+                    <div id="ajax_message"></div>
+                    <?php $this->renderFeedbackMessages(); ?>			
 
 					<form action="" method="POST" id="newsletter_insert_form">	
 
@@ -45,7 +46,7 @@
 					                Új hírlevél
 					            </div>
 					            <div class="actions">
-									<button class="btn green submit" type="submit" name="submit_new_newsletter"><i class="fa fa-check"></i> Mentés</button>
+									<button class="btn green submit" type="submit"><i class="fa fa-check"></i> Mentés</button>
 					                <a class="btn default btn-sm" href="admin/newsletter"><i class="fa fa-close"></i> Mégsem</a>
 					            </div>
 					        </div>
@@ -88,8 +89,6 @@
 											<div class="space10"></div>
 									</div>
 								</div>	
-
-<div id="message"></div> 
 
 							</div> <!-- END USER GROUPS PORTLET BODY-->
 						</div> <!-- END USER GROUPS PORTLET-->
