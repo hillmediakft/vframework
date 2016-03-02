@@ -1,7 +1,7 @@
 <?php
 /**
  *	Adatbázis lekérdezés kezelő osztály
- *	v1.0
+ *	v1.1
  *
  *	Metódusok, beállítások:
  *	
@@ -451,19 +451,27 @@ class Query {
 			foreach($columns as &$value) {
 				$value = $this->add_backtick($value); 
 			}
-			$this->orderby = implode(',', $columns);
+			// ha még nincs orderby parancs
+			if(empty($this->orderby)){
+				$this->orderby = implode(',', $columns);
+			} else {
+				$this->orderby .= ', ' . implode(',', $columns);
+			}
 			// hozzáadjuk a kitételt
 			if(!is_null($exposure)){
-				$this->orderby .= " " . strtoupper($exposure);
+				$this->orderby .= ' ' . strtoupper($exposure);
 			}
 		}
 		elseif(is_string($columns)) {
 			
-			$this->orderby = $columns;	
-			
+			if(empty($this->orderby)){
+				$this->orderby = $columns;	
+			} else {
+				$this->orderby .= ', ' . $columns;	
+			}
 			// hozzáadjuk a kitételt
 			if(!is_null($exposure)){
-				$this->orderby .= " " . strtoupper($exposure);
+				$this->orderby .= ' ' . strtoupper($exposure);
 			}
 		}
 		else {
@@ -796,7 +804,7 @@ class Query {
 			return '';
 		}
 		
-		return " ORDER BY " . $this->orderby;
+		return ' ORDER BY ' . $this->orderby . ';';
 	}
 
 	/**
