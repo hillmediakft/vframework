@@ -122,8 +122,7 @@ $link['slider_update'] = array('js' => ADMIN_JS . 'pages/slider_update.js');
 $link['filemanager'] = array('js' => ADMIN_JS . 'pages/file_manager.js');
 
 $link['photo_gallery'] = array('js' => ADMIN_JS . 'pages/photo_gallery.js');
-$link['photo_gallery_insert'] = array('js' => ADMIN_JS . 'pages/photo_gallery_insert.js');
-$link['photo_gallery_update'] = array('js' => ADMIN_JS . 'pages/photo_gallery_update.js');
+$link['photo_gallery_insert_update'] = array('js' => ADMIN_JS . 'pages/photo_gallery_insert_update.js');
 $link['photo_category'] = array('js' => ADMIN_JS . 'pages/photo_category.js');
 $link['photo_category_insert'] = array('js' => ADMIN_JS . 'pages/photo_category_insert.js');
 $link['photo_category_update'] = array('js' => ADMIN_JS . 'pages/photo_category_update.js');
