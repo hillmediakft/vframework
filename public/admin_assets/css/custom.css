@@ -1,0 +1,41 @@
+/* here you can put your own css to customize and override the theme */
+
+/***
+Fonts
+***/	
+	@font-face {
+    font-family: 'Open Sans';
+    src: url('../fonts/OpenSans-Regular-webfont.eot');
+    src: url('../fonts/OpenSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/OpenSans-Regular-webfont.woff') format('woff'),
+         url('../fonts/OpenSans-Regular-webfont.ttf') format('truetype');
+         
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+/* START - tábla sor mozgató elem */
+.table > tbody > tr > td.sortable_mover {
+	color: #CBD5DA;
+	text-align: center;
+	vertical-align: middle !important;
+}
+
+.table > tbody > tr > td.sortable_mover i{
+	font-size: 2em;
+}
+
+.table > tbody > tr > td.sortable_mover:hover {
+	color: #80898E;
+	cursor: move;
+}
+/* END - tábla sor mozgató elem */
+
+
+/* portlet cím ikon mods */
+.portlet > .portlet-title > .caption > i {
+	font-size: 18px;
+	margin-top: 0px;
+}
