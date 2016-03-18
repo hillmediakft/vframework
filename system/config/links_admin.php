@@ -23,19 +23,22 @@ $link['croppic'] = array(
 );
 
 $link['datatable'] = array(
-	'css' => ADMIN_ASSETS . 'plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css',
+	'css' => array(
+		ADMIN_ASSETS . 'plugins/datatables/datatables.min.css',
+		ADMIN_ASSETS . 'plugins/datatables/plugins/bootstrap/datatables.bootstrap.css'
+	),
 	'js' => array(
-		ADMIN_ASSETS . 'plugins/datatables/media/js/jquery.dataTables.min.js',
-		ADMIN_ASSETS . 'plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js',
-		ADMIN_JS . 'datatable.js'
+		ADMIN_JS . 'datatable.js',
+		ADMIN_ASSETS . 'plugins/datatables/datatables.min.js',
+		ADMIN_ASSETS . 'plugins/datatables/plugins/bootstrap/datatables.bootstrap.js'
 	)
 );
 
 $link['datepicker'] = array(
-	'css' => ADMIN_ASSETS . 'plugins/bootstrap-datepicker/css/datepicker.css',
+	'css' => ADMIN_ASSETS . 'plugins/bootstrap-datepicker/css/bootstrap-datepicker.css',
 	'js' => array(
 		ADMIN_ASSETS . 'plugins/bootstrap-datepicker/js/bootstrap-datepicker.js',
-		ADMIN_ASSETS . 'plugins/bootstrap-datepicker/js/locales/bootstrap-datepicker.hu.js'
+		ADMIN_ASSETS . 'plugins/bootstrap-datepicker/locales/bootstrap-datepicker.hu.min.js'
 	)
 );
 
@@ -56,8 +59,13 @@ $link['fancybox'] = array(
 );
 
 $link['jquery-ui'] = array(
-	'css' => ADMIN_ASSETS . 'plugins/jquery-ui/jquery-ui-1.10.3.custom.min.css',
-	'js' => ADMIN_ASSETS . 'plugins/jquery-ui/jquery-ui-1.10.3.custom.min.js'
+	'css' => ADMIN_ASSETS . 'plugins/jquery-ui/jquery-ui.min.css',
+	'js' => ADMIN_ASSETS . 'plugins/jquery-ui/jquery-ui.min.js'
+);
+
+$link['jquery-ui-custom'] = array(
+	'css' => ADMIN_ASSETS . 'plugins/jquery-ui-custom/jquery-ui-1.10.3.custom.min.css',
+	'js' => ADMIN_ASSETS . 'plugins/jquery-ui-custom/jquery-ui-1.10.3.custom.min.js'
 );
 
 $link['mixitup'] = array(
@@ -65,14 +73,15 @@ $link['mixitup'] = array(
 );
 
 $link['select2'] = array(
-	'css' => ADMIN_ASSETS . 'plugins/select2/select2.css',
-	'js' => ADMIN_ASSETS . 'plugins/select2/select2.min.js'
+	'css' => ADMIN_ASSETS . 'plugins/select2/css/select2.css',
+	'js' => ADMIN_ASSETS . 'plugins/select2/js/select2.min.js'
 );
 
 $link['validation'] = array(
 	'js' => array(
 		ADMIN_ASSETS . 'plugins/jquery-validation/jquery.validate.js',
-		ADMIN_ASSETS . 'plugins/jquery-validation/additional-methods.min.js'
+		ADMIN_ASSETS . 'plugins/jquery-validation/additional-methods.min.js',
+		ADMIN_ASSETS . 'plugins/jquery-validation/localization/messages_hu.js'
 	)
 );
 
