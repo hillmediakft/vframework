@@ -42,7 +42,7 @@
 						</div>
 					</div>
 					
-					<div class="space10"></div>
+					<div class="margin-bottom-20"></div>
 					
 					<!-- ÜZENETEK -->
 					<div id="ajax_message"></div>
