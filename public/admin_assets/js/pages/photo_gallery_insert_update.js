@@ -1,11 +1,11 @@
-var PhotoGallery_insert = function () {
+var PhotoGallery_insert_update = function () {
 
 	/**
 	 *	Form adatok elküldése
 	 */
 	var upload_photo = function(){
 
-		$("#photo_insert_form").submit(function (e){
+		$("#photo_form").submit(function (e){
 			e.preventDefault();
 
 			App.blockUI({
@@ -34,5 +34,5 @@ var PhotoGallery_insert = function () {
 }();
 
 jQuery(document).ready(function() {    
-	PhotoGallery_insert.init();	
+	PhotoGallery_insert_update.init();	
 });

@@ -22,14 +22,14 @@
 			<div class="row">
 				<div class="col-md-12">
 
-					<form action="" method="POST" enctype="multipart/form-data" id="edit_photo">	
+					<form action="" method="POST" enctype="multipart/form-data" id="photo_form">	
 
 						<div class="portlet">
 							
 							<div class="portlet-title">
 								<div class="caption"><i class="fa fa-film"></i>Fotó szerkesztése</div>
 								<div class="actions">
-									<button class="btn green btn-sm" type="submit" value="Mentés" name="submit_update_photo"><i class="fa fa-check"></i> Mentés</button>
+									<button class="btn green btn-sm" type="submit" name="submit_update_photo"><i class="fa fa-check"></i> Mentés</button>
 									<a class="btn default btn-sm" href="admin/photo-gallery"><i class="fa fa-close"></i> Mégsem</a>
 								</div>
 							</div>
@@ -46,7 +46,7 @@
 
 												<label class="control-label">Kép feltöltése</label>					
 												<div class="fileupload fileupload-new" data-provides="fileupload">
-													<div class="fileupload-new thumbnail" style="width: 400px; height: 300px;"><img src="<?php echo ADMIN_IMAGE . 'placeholder-400x300.jpg';?>" /></div>
+													<div class="fileupload-new thumbnail" style="width: 400px; height: 300px;"><img src="<?php echo Config::get('photogallery.upload_path') . $photo[0]['photo_filename'];?>" /></div>
 													<div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 400px; max-height: 300px; line-height: 20px;"></div>
 													<div>
 														<span class="btn btn-file green"><span class="fileupload-new">Kiválasztás</span><span class="fileupload-exists">Módosít</span><input id="uploadprofile" class="img" type="file" name="upload_gallery_photo"></span>
@@ -70,9 +70,9 @@
 													<label for="photo_category" class="control-label">Fotó kategória</label>
 													<select class="form-control input-xlarge" name="photo_category" aria-controls="category">
 														<option value="">Válasszon kategóriát</option>
-														<option value="1" <?php echo ($photo[0]['photo_category'] == 1) ? 'selected' : '';?>>Vásárlás után</option>
-														<option value="2" <?php echo ($photo[0]['photo_category'] == 2) ? 'selected' : '';?>>Felújítás közben</option>
-														<option value="3" <?php echo ($photo[0]['photo_category'] == 3) ? 'selected' : '';?>>Felújítás után</option>
+														<?php foreach ($categorys as $value) { ?>
+															<option value="<?php echo $value['category_id']; ?>" <?php echo ($photo[0]['photo_category'] == $value['category_id']) ? 'selected' : '';?>><?php echo $value['category_name']; ?></option>
+														<?php } ?>	
 													</select>
 												</div>											
 												<div class="form-group">
