@@ -37,7 +37,7 @@ Fonts
 /* portlet cím ikon mods */
 .portlet > .portlet-title > .caption > i {
     font-size: 18px;
-    margin-top: 0px;
+    margin-top: 2px;
 }
 
 /* táblázat head */
@@ -48,5 +48,12 @@ Fonts
 /* táblázat rács szín módosítás */
 .table-bordered, .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
     border: 1px solid #ddd;
+}
+
+/* Photo_gallery kiemelt jelzése */
+.photo_slider_label {
+    left: 0px;
+    position: absolute;
+    top: 0px;
 }
 

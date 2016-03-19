@@ -30,7 +30,7 @@
 					<div id="ajax_message"></div>
 					<?php $this->renderFeedbackMessages(); ?>	
 
-					<form action="" method="POST" enctype="multipart/form-data" id="photo_insert_form">	
+					<form action="" method="POST" enctype="multipart/form-data" id="photo_form">	
 						<!-- BEGIN EXAMPLE TABLE PORTLET-->
 						<div class="portlet">
 	

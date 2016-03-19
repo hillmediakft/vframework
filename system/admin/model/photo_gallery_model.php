@@ -161,7 +161,9 @@ class Photo_gallery_model extends Admin_model {
 			}		
 		}
 		
-		$data['photo_filename'] = $filename;
+		if ($flag) {
+			$data['photo_filename'] = $filename;
+		}	
 		$data['photo_caption'] = $this->request->get_post('photo_caption');
 		$data['photo_category'] = $this->request->get_post('photo_category', 'integer');
 		if( $this->request->has_post('photo_slider') ) {
