@@ -3,13 +3,13 @@
 /***
 Fonts
 ***/	
-	@font-face {
+@font-face {
     font-family: 'Open Sans';
     src: url('../fonts/OpenSans-Regular-webfont.eot');
     src: url('../fonts/OpenSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/OpenSans-Regular-webfont.woff') format('woff'),
-         url('../fonts/OpenSans-Regular-webfont.ttf') format('truetype');
-         
+        url('../fonts/OpenSans-Regular-webfont.woff') format('woff'),
+        url('../fonts/OpenSans-Regular-webfont.ttf') format('truetype');
+
     font-weight: normal;
     font-style: normal;
 
@@ -18,26 +18,36 @@ Fonts
 
 /* START - tábla sor mozgató elem */
 .table > tbody > tr > td.sortable_mover {
-	color: #CBD5DA;
-	text-align: center;
-	vertical-align: middle !important;
+    color: #CBD5DA;
+    text-align: center;
+    vertical-align: middle !important;
 }
 
 .table > tbody > tr > td.sortable_mover i{
-	font-size: 2em;
+    font-size: 2em;
 }
 
 .table > tbody > tr > td.sortable_mover:hover {
-	color: #80898E;
-	cursor: move;
+    color: #80898E;
+    cursor: move;
 }
 /* END - tábla sor mozgató elem */
 
 
 /* portlet cím ikon mods */
 .portlet > .portlet-title > .caption > i {
-	font-size: 18px;
-	margin-top: 2px;
+    font-size: 18px;
+    margin-top: 2px;
+}
+
+/* táblázat head */
+.table tr.heading > th {
+    background-color: #eee !important;
+    border-bottom: 3px solid #ddd !important;
+}
+/* táblázat rács szín módosítás */
+.table-bordered, .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+    border: 1px solid #ddd;
 }
 
 /* Photo_gallery kiemelt jelzése */
@@ -46,3 +56,4 @@ Fonts
     position: absolute;
     top: 0px;
 }
+
