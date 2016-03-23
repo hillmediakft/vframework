@@ -145,7 +145,6 @@
 										</div>
 								</div>
 								
-								<div class="space10"></div>
 								
 							</div> <!--END TAB-CONTENT-->
 						</div> <!--END COL-MD-9--> 
