@@ -8,6 +8,8 @@ class Pages extends Admin_controller {
 
 	public function index()
 	{
+		$this->view = new View();
+
 		$this->view->title = 'Admin pages oldal';
 		$this->view->description = 'Admin pages oldal description';
 		
@@ -15,6 +17,7 @@ class Pages extends Admin_controller {
 		
 		$this->view->all_pages = $this->pages_model->all_pages();
 		
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('pages/tpl_pages');
 	}
 	
@@ -37,6 +40,8 @@ class Pages extends Admin_controller {
 			}
 		}	
 		
+		$this->view = new View();
+		
 		$this->view->title = 'Oldal szerkesztése';
 		$this->view->description = 'Oldal szerkesztése description';
 		
@@ -45,6 +50,7 @@ class Pages extends Admin_controller {
 		// visszadja a szerkesztendő oldal adatait egy tömbben (page_id, page_title ... stb.)
 		$this->view->data_arr = $this->pages_model->page_data_query($id);
 		
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('pages/tpl_page_update');
 	}
 

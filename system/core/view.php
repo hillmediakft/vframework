@@ -17,7 +17,7 @@ class View {
 	private $dirname = '';
 
 	/**
-	 *	Betöltendő template file neve (kiterjesztés nélküll)
+	 *	Betöltendő template file neve (kiterjesztés nélkül)
 	 *	@var string	 
 	 */
 	private $filename = '';
@@ -27,13 +27,13 @@ class View {
 	 *	@var string	 
 	 */
 	private $view_path = '';
-
+    
 	/**
-	 *	Csak egy template file betöltése (render() metódus paraméter)
-	 *	@var bool
+	 *	layout sablon pl.: layout1
+	 *	@var string	 
 	 */
-	private $one_file_render = false;
-		
+	private $layout = null;
+    
 	/**
 	 *	Ebbe a tömbbe kerülnek az adatok, amit berakunk a template-ekbe
 	 *	a set() metódussal adjuk meg az adatokat
@@ -127,62 +127,112 @@ HTML;
 			die();		
 		}			
  
+    
     /**
-	 *	Template betöltése
+     * Tartalmi elem betöltése
+     *
+     * @param string $template  	file neve kiterjesztés nélkül (az egyedi "tartalmi" elem esetén értéke 'content' vagy $this->filename )
+     */
+    public function load($template)
+    {
+    	if($template == 'content'){
+    		$template = $this->filename;
+    	}
+
+    	try{
+
+			if (file_exists('system/' . $this->area . '/view/' . $this->dirname . '/' . $template . '.php')) {
+				include('system/' . $this->area . '/view/' . $this->dirname . '/' . $template . '.php');
+			}
+			elseif (file_exists('system/' . $this->area . '/view/_template/' . $template . '.php')) {
+				include('system/' . $this->area . '/view/_template/' . $template . '.php');
+			}
+			else {
+				throw new Exception('A ' . $template . '.php template file nem toltheto be!');
+			}
+
+		} catch (Exception $e)  {
+			die($e->getMessage());
+		}
+    }
+    
+    /**
+     * Layout nevének megadása (egyébként a default értéke null)
+     */
+    public function set_layout($layout)
+    {
+    	$this->layout = $layout;
+    }
+
+    /**
+	 * HTML template betöltése
+	 * Ha ezen metódus meghívása előtt megadjunk layout fájlt a set_layout() metódusal, akkor azt tölti be,
+	 * ha nincs layout megadva, akkor csak a paraméterben megadott template fájlt tölti be 
 	 *
-	 *	@param	string	mappa/file neve kiterjesztés nélkül (pl.: home/tpl_home)	 
-	 *	@param	bool	ha true, akkor csak egy file-t tölt be (nem lesz automatikusan header és footer)	 
+	 * @param string $view_path 		mappa/fileneve kiterjesztés nélkül (pl.: home/tpl_home)	 
 	 */
-    public function render($view_path, $one_file_render = false)
+    public function render($view_path)
 	{
 		$this->view_path = $view_path;
-		$this->one_file_render = $one_file_render;
-	
+		unset($view_path);
+
 		try{
 			// megnézzük, hogy a $this->view_path stringben van e / jel (ha a strpos() függvény nem false-ot ad vissza, akkor van benne / jel)
 			if (strpos($this->view_path,'/') !== false) {
 				// felbontjuk a $this->view_path stringet a / jel mentén, és az első elemet (a mappa nevét) vátozóhoz rendeljük
 				list($this->dirname, $this->filename) = explode('/', $this->view_path);
-			} else {
+			}
+			else {
 				throw new Exception('Hibas parameteratadas a view objektum render() fuggvenyenek <br /> A ' . $this->view_path . '.php template file nem nyithato meg!');
 			}		
-		} catch (Exception $e)  {
+		} catch (Exception $e) {
 			die($e->getMessage());
 		}
-		
+
 		// A template-be kerülő (tömb) adatok változókká bontása
 		// ha már van ilyen nevű változó, akkor a változó neve elé beteszi a prefix-et pl.: $wddx_valtozoneve
+		/*
 		if(count($this->vars) > 0) {
 			extract($this->vars, EXTR_PREFIX_SAME, "wddx");
 		}
-		
-		
-        // egy file betöltése
-        if ($one_file_render == true) {
-            include ('system/' . $this->area . '/view/' . $this->dirname . '/' . $this->filename . '.php');
-        } else {
-		// header - content - footer betöltése
-			// header betöltése 
-			if (file_exists('system/' . $this->area . '/view/' . $this->dirname . '/tpl_head.php')) {
-				// ha van helyi header
-				include('system/' . $this->area . '/view/' . $this->dirname . '/tpl_head.php');
-			} else {
-				// template header
-				include('system/' . $this->area . '/view/_template/tpl_head.php');
+		*/
+
+		// ha be van állítva layout template
+		if(!is_null($this->layout)) {
+	        try{
+				if (file_exists('system/' . $this->area . '/view/' . $this->dirname . '/' . $this->layout . '.php')) {
+					// ha van helyi layout
+					include('system/' . $this->area . '/view/' . $this->dirname . '/' . $this->layout . '.php');
+				}
+				else if (file_exists('system/' . $this->area . '/view/_template/' . $this->layout . '.php')) {
+					// template layout
+					include('system/' . $this->area . '/view/_template/' . $this->layout . '.php');
+				}
+				else {
+					throw new Exception('A ' . $template . '.php template file nem toltheto be!');
+				} 
+	        } catch (Exception $e) {
+	        	die($e->getMessage());
+	        }
+			
+		}
+		// ha nincs beállítva layout template
+		else {
+			try{
+				if (file_exists('system/' . $this->area . '/view/' . $this->dirname . '/' . $this->filename . '.php')) {
+					include('system/' . $this->area . '/view/' . $this->dirname . '/' . $this->filename . '.php');
+				}
+				elseif (file_exists('system/' . $this->area . '/view/_template/' . $this->filename . '.php')) {
+					include('system/' . $this->area . '/view/_template/' . $this->filename . '.php');
+				}
+				else {
+					throw new Exception('A ' . $this->filename . '.php template file nem toltheto be!');
+				}
+			} catch (Exception $e)  {
+				die($e->getMessage());
 			}
-	 
-			// változó tartalmi elem betöltése 
-			include ('system/' . $this->area . '/view/' . $this->view_path . '.php');      
-				 
-			// footer betöltése 
-			if (file_exists('system/' . $this->area . '/view/' . $this->dirname . '/tpl_foot.php')) {
-				// ha van helyi footer
-				include('system/' . $this->area . '/view/' . $this->dirname . '/tpl_foot.php');
-			} else {
-				// template footer
-				include('system/' . $this->area . '/view/_template/tpl_foot.php');
-			}
-        }		
+		}
+
     }
 	
     /**

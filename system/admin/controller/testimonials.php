@@ -8,7 +8,8 @@ class Testimonials extends Admin_controller {
 
 	public function index()
 	{
-		// adatok bevitele a view objektumba
+		$this->view = new View();
+		
 		$this->view->title = 'testimonials oldal';
 		$this->view->description = 'testimonials oldal description';
 		
@@ -16,6 +17,7 @@ class Testimonials extends Admin_controller {
 		
 		$this->view->all_testimonials = $this->testimonials_model->all_testimonials();	
 		
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('testimonials/tpl_testimonials');
 	}
 	
@@ -31,6 +33,8 @@ class Testimonials extends Admin_controller {
 			$this->testimonials_model->insert_testimonial();
 			Util::redirect('testimonials');
 		}
+		
+		$this->view = new View();
 			
 		$this->view->title = 'Új testimonials oldal';
 		$this->view->description = 'Új testimonials oldal description';
@@ -39,6 +43,7 @@ class Testimonials extends Admin_controller {
 	
 //		$this->view->testimonials = $this->testimonials_model->get_testimonials_data();	
 		
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('testimonials/tpl_testimonial_insert');	
 	}
 	
@@ -54,16 +59,17 @@ class Testimonials extends Admin_controller {
 			Util::redirect('testimonials');
 		}
 		
-		// adatok bevitele a view objektumba
+		$this->view = new View();
+		
 		$this->view->title = 'Rólunk mondták szerkesztése';
 		$this->view->description = 'Rólunk mondták szerkesztése description';
 		
-		$this->view->js_link[] = $this->make_link('js', ADMIN_ASSETS, 'plugins/bootbox/bootbox.min.js');
-		$this->view->js_link[] = $this->make_link('js', ADMIN_JS, 'pages/testimonial_update.js');
+		$this->view->add_links(array('bootbox', 'testimonial_update'));
 		
 		// visszadja a szerkesztendő oldal adatait egy tömbben (page_id, page_title ... stb.)
 		$this->view->data_arr = $this->testimonials_model->testimonial_data_query($id);
 		
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('testimonials/tpl_testimonial_update');
 	
 	}

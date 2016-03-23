@@ -8,7 +8,8 @@ class Languages extends Admin_controller {
 
 	public function index()
 	{
-		// adatok bevitele a view objektumba
+		$this->view = new View();
+		
 		$this->view->title = 'Nyelvek oldal';
 		$this->view->description = 'Nyelvek oldal description';
 		
@@ -17,6 +18,7 @@ class Languages extends Admin_controller {
 		
 		$this->view->languages = $this->languages_model->get_language_data();
 		
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('languages/tpl_languages');
 	}
 	

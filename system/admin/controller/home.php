@@ -9,13 +9,15 @@ class Home extends Admin_controller {
 
     public function index()
     {
-        // adatok bevitele a view objektumba
+        $this->view = new View();
+
         $this->view->title = 'Admin kezdő oldal';
         $this->view->description = 'Admin kezdő oldal description';
 
         $this->view->add_link('js', ADMIN_JS . 'pages/common.js');
 
-        $this->view->render('home/tpl_home', false);
+        $this->view->set_layout('tpl_layout');
+        $this->view->render('home/tpl_home');
     }
 
 }

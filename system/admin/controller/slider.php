@@ -10,6 +10,8 @@ class Slider extends Admin_controller {
 
     public function index()
     {
+        $this->view = new View();
+
         $this->view->title = 'Slider oldal';
         $this->view->description = 'Slider oldal description';
 
@@ -17,6 +19,7 @@ class Slider extends Admin_controller {
 
         $this->view->slider = $this->slider_model->all_slides_query();
 
+        $this->view->set_layout('tpl_layout');    
         $this->view->render('slider/tpl_slider');
     }
 
@@ -35,11 +38,14 @@ class Slider extends Admin_controller {
             }
         }
 
+        $this->view = new View();
+        
         $this->view->title = 'Új slide oldal';
         $this->view->description = 'Új slide oldal description';
 
         $this->view->add_links(array('ckeditor','bootstrap-fileupload', 'slider_insert'));
 
+        $this->view->set_layout('tpl_layout');
         $this->view->render('slider/tpl_slider_insert');
     }
 
@@ -59,6 +65,9 @@ class Slider extends Admin_controller {
                 Util::redirect('slider');
             }
         }
+
+        $this->view = new View();
+        
         $this->view->title = 'Slider szerkesztése oldal';
         $this->view->description = 'Slider szerkesztése description';
 
@@ -66,6 +75,7 @@ class Slider extends Admin_controller {
 
         $this->view->slider = $this->slider_model->one_slide_query($id);
 
+        $this->view->set_layout('tpl_layout');
         $this->view->render('slider/tpl_slider_update');
     }
 

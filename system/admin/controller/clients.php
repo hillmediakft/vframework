@@ -11,6 +11,8 @@ class Clients extends Admin_controller {
      */
     public function index()
     {
+        $this->view = new View();
+        
         $this->view->title = 'Partnereink oldal';
         $this->view->description = 'Partnereink description';
 
@@ -18,6 +20,7 @@ class Clients extends Admin_controller {
 
         $this->view->all_client = $this->clients_model->all_client_query();
 //$this->view->debug(true);
+        $this->view->set_layout('tpl_layout');        
         $this->view->render('clients/tpl_clients');
     }
 
@@ -35,11 +38,14 @@ class Clients extends Admin_controller {
             }
         }
 
+        $this->view = new View();
+
         $this->view->title = 'Új partner oldal';
         $this->view->description = 'Új partner description';
 
         $this->view->add_links(array('select2', 'bootstrap-fileupload', 'croppic', 'vframework', 'client_insert'));
 //$this->view->debug(true);
+        $this->view->set_layout('tpl_layout');
         $this->view->render('clients/tpl_client_insert');
     }
 
@@ -78,6 +84,8 @@ class Clients extends Admin_controller {
             }
         }
 
+        $this->view = new View();
+
         $this->view->title = 'Partner módosítása oldal';
         $this->view->description = 'Partner módosítása description';
 
@@ -86,6 +94,7 @@ class Clients extends Admin_controller {
         // a módosítandó kliens adatai
         $this->view->actual_client = $this->clients_model->one_client_query($this->request->get_params('id'));
 
+        $this->view->set_layout('tpl_layout');
         $this->view->render('clients/tpl_client_update');
     }
 

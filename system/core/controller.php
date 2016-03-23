@@ -8,14 +8,13 @@ class Controller {
      */
     protected $view;
     public $registry;
+    public $request;
 
     function __construct() {
         Session::init();
 
         $this->registry = Registry::get_instance();
         $this->request = $this->registry->request;
-        // létrehozzuk a view objektumot és hozzárendeljük a $view tulajdonsághoz
-        $this->view = new View();
     }
 
     /*
@@ -47,46 +46,26 @@ class Controller {
         $this->$model = new $model();
     }
 
-    /**
-     * 	Kezdetleges link összeállító metódus
-     *
-     * 	@param	string	$type	a link/script típusa: css vagy js
-     * 	@param	string	$path	a link útvonala, ami állandókban van (pl.: ADMIN_CSS, SITE_ASSETS)
-     * 	@param	string	$link	a link további útvonala (pl.: plugins/data-tables/DT_bootstrap.css)
-     */
-    public function make_link($type, $path, $link) {
-        $string = '';
-        switch ($type) {
-            case 'css':
-                $string .= '<link rel="stylesheet" href="' . $path . $link . '" type="text/css" />' . "\r\n";
-                break;
-            case 'js':
-                $string .= '<script type="text/javascript" src="' . $path . $link . '"></script>' . "\r\n";
-                break;
-        }
-        return $string;
-    }
 
-    /**
-     * 	Verziőval ellátott link összeállító metódus
-     *
-     * 	@param	string	$type	a link/script típusa: css vagy js
-     * 	@param	string	$path	a link útvonala, ami állandókban van (pl.: ADMIN_CSS, SITE_ASSETS)
-     * 	@param	string	$link	a link további útvonala (pl.: plugins/data-tables/DT_bootstrap.css)
-     */
-    public function make_versioned_link($type, $path, $link) {
-        $string = '';
-        switch ($type) {
-            case 'css':
-                $string .= '<link rel="stylesheet" href="' . Util::auto_version($path . $link) . '" type="text/css" />' . "\r\n";
-                break;
-            case 'js':
-                $string .= '<script type="text/javascript" src="' . Util::auto_version($path . $link) . '"></script>' . "\r\n";
-                break;
-        }
-        return $string;
-    }
+                    /**
+                     * 	Verziőval ellátott link összeállító metódus
+                     *
+                     * 	@param	string	$type	a link/script típusa: css vagy js
+                     * 	@param	string	$path	a link útvonala, ami állandókban van (pl.: ADMIN_CSS, SITE_ASSETS)
+                     * 	@param	string	$link	a link további útvonala (pl.: plugins/data-tables/DT_bootstrap.css)
+                     */
+                    public function make_versioned_link($type, $path, $link) {
+                        $string = '';
+                        switch ($type) {
+                            case 'css':
+                                $string .= '<link rel="stylesheet" href="' . Util::auto_version($path . $link) . '" type="text/css" />' . "\r\n";
+                                break;
+                            case 'js':
+                                $string .= '<script type="text/javascript" src="' . Util::auto_version($path . $link) . '"></script>' . "\r\n";
+                                break;
+                        }
+                        return $string;
+                    }
 
 }
-
 ?>

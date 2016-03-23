@@ -8,7 +8,8 @@ class Photo_gallery extends Admin_controller {
 
 	public function index()
 	{
-		// adatok bevitele a view objektumba
+		$this->view = new View();
+
 		$this->view->title = 'Fotó galériák oldal';
 		$this->view->description = 'Fotó galériák oldal description';
 		
@@ -17,9 +18,8 @@ class Photo_gallery extends Admin_controller {
 		
 		$this->view->categorys = $this->photo_gallery_model->category_query();
 		$this->view->all_photos = $this->photo_gallery_model->photo_data_query();
-
 // $this->view->debug(true);
-		
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('photo_gallery/tpl_photo_gallery');
 	}
 	
@@ -34,16 +34,17 @@ class Photo_gallery extends Admin_controller {
 			$this->photo_gallery_model->insert_photo();
 			Util::redirect('photo_gallery');
 		}
-			
+		
+		$this->view = new View();
+
 		$this->view->title = 'Új fotó oldal';
 		$this->view->description = 'Új fotó oldal description';
 		
 		$this->view->add_links(array('bootstrap-fileupload', 'vframework', 'photo_gallery_insert_update'));
 
 		$this->view->categorys = $this->photo_gallery_model->category_query();
-
 // $this->view->debug(true);			
-
+		$this->view->set_layout('tpl_layout');	
 		$this->view->render('photo_gallery/tpl_photo_insert');	
 	}
 	
@@ -60,7 +61,9 @@ class Photo_gallery extends Admin_controller {
 			$result = $this->photo_gallery_model->update_photo($id);
 			Util::redirect('photo-gallery');
 		}
-			
+		
+		$this->view = new View();
+
 		$this->view->title = 'Fotó szerkesztése oldal';
 		$this->view->description = 'Fotó szerkesztése description';
 
@@ -69,6 +72,7 @@ class Photo_gallery extends Admin_controller {
 		$this->view->categorys = $this->photo_gallery_model->category_query();
 		$this->view->photo = $this->photo_gallery_model->photo_data_query($id);	
 // $this->view->debug(true);		
+		$this->view->set_layout('tpl_layout');	
 		$this->view->render('photo_gallery/tpl_photo_update');	
 	}
 	
@@ -99,14 +103,17 @@ class Photo_gallery extends Admin_controller {
 	 */
 	public function category()
 	{
+		$this->view = new View();
+
 		$this->view->title = 'Admin fotó kategóriák oldal';
 		$this->view->description = 'Admin fotó kategóriák oldal description';	
-        // linkek	
+
 		$this->view->add_links(array('bootbox', 'datatable', 'bootstrap-editable', 'vframework', 'photo_category'));
 
 		$this->view->all_category = $this->photo_gallery_model->category_query();
 		$this->view->category_counter = $this->photo_gallery_model->category_counter_query();
 //$this->view->debug(true);			
+		$this->view->set_layout('tpl_layout');	
 		$this->view->render('photo_gallery/tpl_photo_category');	
 
 	}

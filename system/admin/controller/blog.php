@@ -8,6 +8,8 @@ class Blog extends Admin_controller {
     
 	public function index()
 	{
+		$this->view = new View();
+
 		$this->view->title = 'Admin blog oldal';
 		$this->view->description = 'Admin blog oldal description';	
 
@@ -15,6 +17,7 @@ class Blog extends Admin_controller {
 
 		$this->view->all_blog = $this->blog_model->blog_query2();
 // $this->view->debug(true);		
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('blog/tpl_blog');
 	}
     
@@ -34,6 +37,8 @@ class Blog extends Admin_controller {
 			}
 		}
 
+		$this->view = new View();
+		
 		$this->view->title = 'Admin blog oldal';
 		$this->view->description = 'Admin blog oldal description';	
 
@@ -41,6 +46,7 @@ class Blog extends Admin_controller {
 
 		$this->view->category_list = $this->blog_model->category_query();
 		
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('blog/tpl_blog_insert');
 	}
     
@@ -59,6 +65,8 @@ class Blog extends Admin_controller {
 			}
 		}
 
+		$this->view = new View();
+
 		$this->view->title = 'Admin blog oldal';
 		$this->view->description = 'Admin blog oldal description';	
 
@@ -67,6 +75,7 @@ class Blog extends Admin_controller {
 		$this->view->category_list = $this->blog_model->category_query();
 		$this->view->content = $this->blog_model->blog_query2($this->request->get_params('id'));
 //$this->view->debug(true);		
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('blog/tpl_blog_update');
 	}  
 
@@ -95,14 +104,17 @@ class Blog extends Admin_controller {
 	 */
 	public function category()
 	{
+		$this->view = new View();
+
 		$this->view->title = 'Admin blog oldal';
 		$this->view->description = 'Admin blog oldal description';	
-        // linkek	
+
 		$this->view->add_links(array('datatable', 'bootbox', 'vframework', 'blog_category'));
 
 		$this->view->all_blog_category = $this->blog_model->category_query();
 		$this->view->category_counter = $this->blog_model->category_counter_query();
 //$this->view->debug(true);			
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('blog/tpl_blog_category');	
 	}
 
@@ -137,7 +149,6 @@ class Blog extends Admin_controller {
 	        }
         }
 	}	
-
 
 }
 ?>

@@ -1,5 +1,3 @@
-<!-- BEGIN CONTENT -->
-<div class="page-content-wrapper">
     <div class="page-content">
         <!-- BEGIN PAGE HEADER-->
         <!-- BEGIN PAGE TITLE & BREADCRUMB-->
@@ -212,8 +210,4 @@
         -->
 
 
-    </div> <!-- END PAGE CONTENT-->    
-
-</div> <!-- END PAGE CONTENT WRAPPER -->
-
-</div>  <!-- END CONTAINER -->
+    </div> <!-- END PAGE CONTENT-->

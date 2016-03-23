@@ -1,5 +1,3 @@
-<!-- BEGIN CONTENT -->
-	<div class="page-content-wrapper">
 		<div class="page-content">
 				<!-- BEGIN PAGE HEADER-->
 					<!-- BEGIN PAGE TITLE & BREADCRUMB-->
@@ -36,36 +34,34 @@
 							<div class="portlet-body">
 
 								
-<h2 class='cim1'><?php echo $data_arr[0]['content_title'];?> szerkesztése</h2>
-<br />
-<form action='' name='update_content_form' id='update_content_form' method='POST'>
-	
-	<input type="hidden" name="content_id" id="content_id" value="<?php echo $data_arr[0]['content_id'] ?>">
-	
-	<div class="form-group">
-		<label for="content_name">A tartalmi elem neve</label>	
-		<input type="text" name="content_name" class="form-control input-large" disabled value="<?php echo $data_arr[0]['content_name'];?>"/>
-	</div>
-	
-	<div class="form-group">
-		<label for="content_title">A tartalmi elem megnevezése</label>	
-		<input type='text' name='content_title' class='form-control input-large' value="<?php echo $data_arr[0]['content_title'];?>"/>
-	</div>
-	
-	<div class="form-group">
-		<label for="content_body">Tartalom</label>
-		<textarea type='text' name='content_body' class='form-control'><?php echo $data_arr[0]['content_body'] ?></textarea>
-	</div>
-	
+								<h2 class='cim1'><?php echo $this->data_arr[0]['content_title'];?> szerkesztése</h2>
+								<br />
+								<form action='' name='update_content_form' id='update_content_form' method='POST'>
+									
+									<input type="hidden" name="content_id" id="content_id" value="<?php echo $this->data_arr[0]['content_id'] ?>">
+									
+									<div class="form-group">
+										<label for="content_name">A tartalmi elem neve</label>	
+										<input type="text" name="content_name" class="form-control input-large" disabled value="<?php echo $this->data_arr[0]['content_name'];?>"/>
+									</div>
+									
+									<div class="form-group">
+										<label for="content_title">A tartalmi elem megnevezése</label>	
+										<input type='text' name='content_title' class='form-control input-large' value="<?php echo $this->data_arr[0]['content_title'];?>"/>
+									</div>
+									
+									<div class="form-group">
+										<label for="content_body">Tartalom</label>
+										<textarea type='text' name='content_body' class='form-control'><?php echo $this->data_arr[0]['content_body'] ?></textarea>
+									</div>
+									
 
-		<input class="btn green submit" type="submit" name="submit_update_content" value="Mentés">
-		
-</form>									
+										<input class="btn green submit" type="submit" name="submit_update_content" value="Mentés">
+										
+								</form>									
 
 							</div> <!-- END USER GROUPS PORTLET BODY-->
 						</div> <!-- END USER GROUPS PORTLET-->
 				</div> <!-- END COL-MD-12 -->
 			</div> <!-- END ROW -->	
-		</div> <!-- END PAGE CONTENT-->    
-	</div> <!-- END PAGE CONTENT WRAPPER -->
-</div> <!-- END CONTAINER -->
+		</div> <!-- END PAGE CONTENT-->

@@ -8,6 +8,8 @@ class Newsletter extends Admin_controller {
 
 	public function index()
 	{
+		$this->view = new View();
+
 		$this->view->title = 'Hírlevél oldal';
 		$this->view->description = 'Hírlevél oldal description';
 
@@ -15,6 +17,7 @@ class Newsletter extends Admin_controller {
 
 		$this->view->newsletters = $this->newsletter_model->newsletter_query();	
 //$this->view->debug(true);	
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('newsletter/tpl_newsletter');	
 	}
 	
@@ -28,11 +31,14 @@ class Newsletter extends Admin_controller {
 			Util::redirect('newsletter');
 		}
 
+		$this->view = new View();
+
 		$this->view->title = 'Hírlevél hozzáadása';
 		$this->view->description = 'Hírlevél oldal description';
 		
 		$this->view->add_links(array('bootbox', 'ckeditor', 'vframework', 'newsletter_insert'));
 		
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('newsletter/tpl_newsletter_insert');	
 	}
 	
@@ -46,6 +52,8 @@ class Newsletter extends Admin_controller {
 			Util::redirect('newsletter');
 		}
 
+		$this->view = new View();
+
 		$this->view->title = 'Hírlevél szerkesztése';
 		$this->view->description = 'Hírlevél oldal description';
 		
@@ -53,6 +61,7 @@ class Newsletter extends Admin_controller {
 		
 		$this->view->newsletter = $this->newsletter_model->newsletter_query($this->request->get_params('id'));
 	
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('newsletter/tpl_newsletter_update');	
 	}
 
@@ -97,6 +106,8 @@ class Newsletter extends Admin_controller {
 	 */
 	public function newsletter_stats()
 	{
+		$this->view = new View();
+		
 		$this->view->title = 'Elküldött hírlevelek oldal';
 		$this->view->description = 'Elküldött hírlevél oldal description';
 
@@ -104,6 +115,7 @@ class Newsletter extends Admin_controller {
 		
 		$this->view->newsletters = $this->newsletter_model->newsletter_stats_query();	
 //$this->view->debug(true);	
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('newsletter/tpl_newsletter_stats');	
 	}	
 	

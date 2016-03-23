@@ -8,6 +8,8 @@ class Users extends Admin_controller {
 
 	public function index()
 	{
+		$this->view = new View();
+
 		$this->view->title = 'Users oldal';
 		$this->view->description = 'Users oldal description';
 		
@@ -16,6 +18,7 @@ class Users extends Admin_controller {
         // userek adatainak lekérdezése
         $this->view->all_user = $this->users_model->user_data_query();	
 //$this->view->debug(true);	
+        $this->view->set_layout('tpl_layout');
 		$this->view->render('users/tpl_users');
 	}
 
@@ -38,11 +41,14 @@ class Users extends Admin_controller {
 			}
 		}
 
+		$this->view = new View();
+
 		$this->view->title = 'Új felhasználó oldal';
 		$this->view->description = 'Új felhasználó description';
 
 		$this->view->add_links(array('bootstrap-fileupload','croppic','validation','user_insert'));
 		
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('users/tpl_user_insert');
 	}
 	
@@ -68,6 +74,8 @@ class Users extends Admin_controller {
 			}
 		}
 		
+		$this->view = new View();
+
 		$this->view->title = 'Profilom oldal';
 		$this->view->description = 'Profilom description';
 		
@@ -75,13 +83,16 @@ class Users extends Admin_controller {
         
 		// visszadja a bejelentkezett user adatait egy tömbbe (id, név, telefon, password... stb.)
 		$this->view->data_arr = $this->users_model->user_data_query($id);
-	// $this->view->debug(true);
+
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('users/tpl_profile');
 	}
 	
 	
     public function user_roles()
     {
+    	$this->view = new View();
+
         $this->view->title = 'Felhasználói csoportok oldal';
         $this->view->description = 'Felhasználói csoportok description';
         
@@ -90,6 +101,7 @@ class Users extends Admin_controller {
         $this->view->roles = $this->users_model->getRoles();
         $this->view->roles_counter = $this->users_model->roles_counter_query();
 
+		$this->view->set_layout('tpl_layout');
         $this->view->render('users/tpl_user_roles');
     }
 	
@@ -104,7 +116,8 @@ class Users extends Admin_controller {
 
         }
 
-        // adatok bevitele a view objektumba
+		$this->view = new View();
+
         $this->view->title = 'Felhasználói jogosultságok szerkesztése oldal';
         $this->view->description = 'Felhasználói jogosultságok szerkesztése description';
         
@@ -116,6 +129,7 @@ class Users extends Admin_controller {
         // a szerkesztendő role-hoz tartozó engedélyek
         $this->view->role_permissions = $this->users_model->getRolePerms($role_id);
  
+		$this->view->set_layout('tpl_layout');
         $this->view->render('users/tpl_edit_roles');
     }
 	

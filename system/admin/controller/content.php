@@ -8,7 +8,8 @@ class Content extends Admin_controller {
 
 	public function index()
 	{
-		// adatok bevitele a view objektumba
+		$this->view = new View();
+
 		$this->view->title = 'Egyéb tartalom oldal';
 		$this->view->description = 'Egyéb tartalom oldal description';
 		
@@ -16,6 +17,7 @@ class Content extends Admin_controller {
 		
 		$this->view->all_content = $this->content_model->all_content();
 		
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('content/tpl_content');
 	}
 	
@@ -33,7 +35,8 @@ class Content extends Admin_controller {
 			Util::redirect('content');
 		}
 		
-		// adatok bevitele a view objektumba
+		$this->view = new View();
+
 		$this->view->title = 'Tartalom szerkesztése';
 		$this->view->description = 'Tartalom szerkesztése description';
 		
@@ -43,6 +46,7 @@ class Content extends Admin_controller {
 		// visszadja a szerkesztendő oldal adatait egy tömbben (page_id, page_title ... stb.)
 		$this->view->data_arr = $this->content_model->content_data_query($id);
 		
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('content/tpl_edit_content');
 	}
 

@@ -13,6 +13,8 @@ class Settings extends Admin_controller {
 			Util::redirect('settings');
 		}
 
+		$this->view = new View();
+		
 		$this->view->title = 'Beállítások oldal';
 		$this->view->description = 'Beállítások oldal description';
 		
@@ -20,6 +22,7 @@ class Settings extends Admin_controller {
 		
 		$this->view->settings = $this->settings_model->get_settings();
 
+		$this->view->set_layout('tpl_layout');
 		$this->view->render('settings/tpl_settings');
 	}
 }

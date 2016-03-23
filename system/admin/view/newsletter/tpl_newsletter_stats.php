@@ -1,6 +1,3 @@
-<!-- BEGIN CONTENT -->
-<div class="page-content-wrapper">
-
 	<div class="page-content">
 	
 		<!-- BEGIN PAGE HEADER-->
@@ -81,7 +78,7 @@
 								</thead>
 								<tbody>
 
-							<?php foreach($newsletters as $value) { ?>
+							<?php foreach($this->newsletters as $value) { ?>
 
 								<tr class="odd gradeX">
 
@@ -127,8 +124,4 @@
 
 			</div>
 		</div>
-	</div><!-- END PAGE CONTAINER-->    
-		
-</div> <!-- END PAGE CONTENT WRAPPER -->
-
-</div><!-- END CONTAINER -->
+	</div><!-- END PAGE CONTAINER-->
