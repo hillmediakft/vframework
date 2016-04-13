@@ -26,7 +26,7 @@
 		<?php $this->renderFeedbackMessages();?>			
 		
 			<!-- BEGIN FORM-->			
-			<form action="admin/users/insert" method="POST" id="user_insert_form" name="user_insert_form">	
+			<form action="" method="POST" id="user_insert_form" name="user_insert_form">	
 
 				<div class="portlet">
 					<div class="portlet-title">
@@ -94,14 +94,16 @@
 									<h3>Profilkép feltöltése</h3>
 				
 									<div id="user_image"></div>	
-							
 									<input type="hidden" name="img_url" id="OutputId" >
 									
-									<div class="space10"></div>
 									<div class="clearfix"></div>
-									<p><span class="label label-danger">INFO</span>
-										<span>Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!</span></p>
-									<div class="space10"></div>
+
+									<div class="margin-bottom-10"></div>
+
+									<div class="note note-info">
+										Kép feltöltéséhez kattintson a képmező jobb felső sarkában lévő ikonra! A kiválasztott kép méreteit a + - ikonnal változtathatja meg. Ha másik képet szeretne kiválasztani, kattintson a piros x ikonra! A kép elmentéséhez klikkeljen a zöld vágó ikonra.
+									</div>
+
 								</div>
 <!-- ****************************** JELSZÓ MEGADÁSA ***************************** -->									
 								<div id="tab_3_3" class="tab-pane">
@@ -121,28 +123,28 @@
 								
 									<h3>Felhasználói jogosultság</h3>
 										
-										<p><span class="label label-danger">INFO</span><span> A felhasználói jogosultság (felhasználói csoport) megadásával beállítható, hogy a felhasználó mihez férhet hozzá, milyen műveleteket hajthat végre.</span></p>
-																				
-										<div class="space10"></div>
+									<div class="note note-info">
+										A felhasználói jogosultság (felhasználói csoport) megadásával beállítható, hogy a felhasználó mihez férhet hozzá, milyen műveleteket hajthat végre.
+									</div>
 										
-										<div class="form-group">
-											<label><strong>Felhasználói csoportok</strong></label>
-											<div class="radio-list">
-												<label>
-												<input type="radio" name="user_group" value="1" />
-												Szuper adminisztrátor - teljes jogkör
-												</label>
-													
-												<label>
-												<input type="radio" name="user_group" value="2" checked />
-												Adminisztrátor - széles körű jogkör
-												</label>  
-									<!--			<label>
-												<input type="radio" name="user_group" value="3" />
-												Regisztrált felhasználó - korlátozott jogkör
-												</label>   --> 
-											</div>
+									<div class="form-group">
+										<label><strong>Felhasználói csoportok</strong></label>
+										<div class="radio-list">
+											<label>
+											<input type="radio" name="user_group" value="1" />
+											Szuper adminisztrátor - teljes jogkör
+											</label>
+												
+											<label>
+											<input type="radio" name="user_group" value="2" checked />
+											Adminisztrátor - széles körű jogkör
+											</label>  
+								<!--			<label>
+											<input type="radio" name="user_group" value="3" />
+											Regisztrált felhasználó - korlátozott jogkör
+											</label>   --> 
 										</div>
+									</div>
 								</div>
 								
 								

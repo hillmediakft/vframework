@@ -26,7 +26,7 @@
 				</div>
 				
 				<div class="col-md-4">
-				<h3><?php echo $this->data_arr[0]['user_first_name'] . " " . $this->data_arr[0]['user_last_name'];?></h3>
+				<h3 style="margin-top: 0px;"><?php echo $this->data_arr[0]['user_first_name'] . " " . $this->data_arr[0]['user_last_name'];?></h3>
 			
 				
 				<table class="table table-striped">  
@@ -40,6 +40,8 @@
 				</div>
 			</div>
 			
+			<div class="margin-bottom-20"></div>
+
 			<!-- ÜZENETEK -->
 			<div id="ajax_message"></div>
 			<?php $this->renderFeedbackMessages(); ?>
@@ -114,13 +116,13 @@
 									<input type="hidden" name="img_url" id="OutputId" >			
 									<input type="hidden" id="old_img"  value="<?php echo Config::get('user.upload_path') . $this->data_arr[0]['user_photo'];?>" name="old_img">
 									
-									<div class="space10"></div>
 									<div class="clearfix"></div>
-									<p>
-										<span class="label label-danger">INFO</span>
-										<span>Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!</span>
-									</p>
-									<div class="space10"></div>
+
+									<div class="margin-bottom-10"></div>
+
+									<div class="note note-info">
+										Kép feltöltéséhez kattintson a képmező jobb felső sarkában lévő ikonra! A kiválasztott kép méreteit a + - ikonnal változtathatja meg. Ha másik képet szeretne kiválasztani, kattintson a piros x ikonra! A kép elmentéséhez klikkeljen a zöld vágó ikonra.
+									</div>
 							
 								</div>
 								
@@ -146,14 +148,11 @@
 								<div id="tab_4_4" class="tab-pane">
 								
 									<h3>Felhasználói jogosultság</h3>
-									
-									<p>
-										<span class="label label-danger">INFO</span>
-										<span>A felhasználói jogosultság (felhasználói csoport) megadásával beállítható, hogy a felhasználó mihez férhet hozzá, milyen műveleteket hajthat végre.</span>
-									</p>
+
+									<div class="note note-info">
+										A felhasználói jogosultság (felhasználói csoport) megadásával beállítható, hogy a felhasználó mihez férhet hozzá, milyen műveleteket hajthat végre.
+									</div>
 																		
-									<div class="space10"></div>
-								
 									<div class="form-group">
 										<label><strong>Felhasználói csoportok</strong></label>
 										<div class="radio-list">
