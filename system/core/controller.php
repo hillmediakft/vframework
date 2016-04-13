@@ -22,7 +22,6 @@ class Controller {
      *
      * 	@param	string	(a model file neve kiterjesztés nélkül)
      */
-
     public function loadModel($model) {
         // model file elérési útja
         $file = 'system/' . $this->request->get_uri('area') . '/model/' . $model . '.php';

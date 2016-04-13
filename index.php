@@ -46,7 +46,7 @@ if (version_compare(PHP_VERSION, '5.3.7', '<')) {
 }
 
 
-	// Registry objektum létrehozása, és hozzárendelése a registry tulajdonsághoz
+	// Registry objektum létrehozása
 	$registry = Registry::get_instance();
 	// uri objektum példányosítása a registry-be
 	$uri = new Uri(Config::get('language_default'), Config::get('allowed_languages'));

@@ -9,8 +9,7 @@ class Admin_controller extends Controller {
         if($this->request->get_controller() != 'login'){
             Auth::handleLogin();
         }
-        // kapcsolat objektum
-        $this->connect = db::get_connect();
+
         // model betöltése
         $this->loadModel($this->request->get_controller() . '_model');
     }
