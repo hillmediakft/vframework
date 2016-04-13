@@ -32,6 +32,8 @@
                     </div>
                 </div>
 
+                <div class="margin-top-20"></div>
+
                 <div class="portlet-body">
                     <table class="table table-striped table-bordered table-hover" id="content">
                         <thead>
@@ -40,7 +42,7 @@
                                 <th>Vélemény</th>
                                 <th style="width:150px">Név</th>
                                 <th>Beosztás</th>
-                                <th style="width:110px"></th>
+                                <th style="width:0px"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -55,9 +57,7 @@
                                     <td>
                                         <div class="actions">
                                             <div class="btn-group">
-                                                <a class="btn btn-sm grey-steel" title="Műveletek" href="#" data-toggle="dropdown">
-                                                    <i class="fa fa-cogs"></i> Műveletek <i class="fa fa-angle-down"></i>
-                                                </a>
+                                                <a class="btn btn-sm grey-steel" title="Műveletek" href="#" data-toggle="dropdown"><i class="fa fa-cogs"></i></a>
                                                 <ul class="dropdown-menu pull-right">
                                                     <li><a href="admin/testimonials/update/<?php echo $value['id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
                                                     <li><a href="admin/testimonials/delete/<?php echo $value['id']; ?>" id="delete_<?php echo $value['id']; ?>"><i class="fa fa-trash"></i> Töröl</a></li>

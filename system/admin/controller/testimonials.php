@@ -39,10 +39,8 @@ class Testimonials extends Admin_controller {
 		$this->view->title = 'Új testimonials oldal';
 		$this->view->description = 'Új testimonials oldal description';
 		
-		$this->view->add_links(array('bootbox', 'testimonial_insert'));
+		$this->view->add_links(array('testimonial_insert'));
 	
-//		$this->view->testimonials = $this->testimonials_model->get_testimonials_data();	
-		
 		$this->view->set_layout('tpl_layout');
 		$this->view->render('testimonials/tpl_testimonial_insert');	
 	}
@@ -64,7 +62,7 @@ class Testimonials extends Admin_controller {
 		$this->view->title = 'Rólunk mondták szerkesztése';
 		$this->view->description = 'Rólunk mondták szerkesztése description';
 		
-		$this->view->add_links(array('bootbox', 'testimonial_update'));
+		$this->view->add_links(array('bootbox', 'vframework', 'testimonial_update'));
 		
 		// visszadja a szerkesztendő oldal adatait egy tömbben (page_id, page_title ... stb.)
 		$this->view->data_arr = $this->testimonials_model->testimonial_data_query($id);

@@ -20,40 +20,41 @@
 	<div class="row">
 		<div class="col-md-12">
 
-				<div class="row">
-					<div class="col-lg-12 margin-bottom-20">
-						<a class ='btn btn-default' href='admin/testimonials'><i class='fa fa-arrow-left'></i>  Vissza a rólunk mondták elemekhez</a>
-					</div>
-				</div>	
+			<form action="" id="testimonial_form" method="POST">
 
 				<!-- BEGIN EXAMPLE TABLE PORTLET-->
 				<div class="portlet">
 
+	                <div class="portlet-title">
+	                    <div class="caption"><i class="fa fa-file"></i>Vélemény hozzáadása</div>
+	                    <div class="actions">
+                            <button class="btn green btn-sm" type="submit" id="send_testimonial_form" name="send_testimonial_form"><i class="fa fa-check"></i> Mentés</button>
+							<a class="btn default btn-sm" href="admin/testimonials"><i class="fa fa-close"></i> Mégsem</a>
+	                    </div>
+	                </div>
+
 					<div class="portlet-body">
-
-						<form action='' name='new_testimonial_form' id='new_testimonial_form' method='POST'>
 							
-								<div class="form-group">
-								<label for="testimonial_name">Név</label>	
-								<input type="text" name="testimonial_name" class="form-control input-large" value=""/>
-							</div>
-							
-							<div class="form-group">
-								<label for="testimonial_title">Beosztás</label>	
-								<input type='text' name='testimonial_title' class='form-control input-large' value=""/>
-							</div>
-							
-							<div class="form-group">
-								<label for="testimonial_text">Vélemény</label>
-								<textarea type='text' name='testimonial_text' class='form-control'></textarea>
-							</div>
-
-								<input class="btn green submit" type="submit" name="submit_new_testimonial" value="Mentés">
-								
-						</form>									
+						<div class="form-group">
+							<label for="testimonial_name">Név</label>	
+							<input type="text" name="testimonial_name" class="form-control input-large" value=""/>
+						</div>
+						
+						<div class="form-group">
+							<label for="testimonial_title">Beosztás</label>	
+							<input type='text' name='testimonial_title' class='form-control input-large' value=""/>
+						</div>
+						
+						<div class="form-group">
+							<label for="testimonial_text">Vélemény</label>
+							<textarea type='text' name='testimonial_text' class='form-control'></textarea>
+						</div>
 
 					</div> <!-- END USER GROUPS PORTLET BODY-->
 				</div> <!-- END USER GROUPS PORTLET-->
+
+			</form>									
+
 		</div> <!-- END COL-MD-12 -->
 	</div> <!-- END ROW -->	
 </div> <!-- END PAGE CONTENT-->
