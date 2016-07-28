@@ -1,7 +1,7 @@
 <?php
 /**
  *	Adatbázis lekérdezés kezelő osztály
- *	v1.1
+ *	v1.2
  *
  *	Metódusok, beállítások:
  *	
@@ -514,6 +514,9 @@ class Query {
 		// Execute the sql statement
 		$result = $sth->execute();
 		
+		// beállítások alapértékre állítása
+		$this->reset();
+
 		if(!$result) {
 			throw new Exception('Adatbazis lekerdezes hiba (SELECT)!');
 			return false;
@@ -550,6 +553,9 @@ class Query {
 		// Execute the DB
 		$result = $sth->execute($attributes);
 		
+		// beállítások alapértékre állítása
+		$this->reset();
+
 		if(!$result) {
 			throw new Exception('Adatbazis lekerdezes hiba (INSERT)!');
 			return false;
@@ -594,6 +600,9 @@ class Query {
 	
 		// Execute the DB
 		$result = $sth->execute( $attributes );
+
+		// beállítások alapértékre állítása
+		$this->reset();		
 		
 		if(!$result) {
 			throw new Exception('Adatbazis lekerdezes hiba (UPDATE)!');
@@ -640,6 +649,9 @@ class Query {
 			
 			// Lekérdezés végrehajtása (visszatérés: true vagy false )
 			$result = $sth->execute();
+
+			// beállítások alapértékre állítása
+			$this->reset();			
 			
 			if($result) {
 				// ha nincs hiba az sql parancsban visszatér a törölt sorok számával (lehet 0 is)
@@ -673,6 +685,9 @@ class Query {
 			
 			// Lekérdezés végrehajtása
 			$result = $sth->execute();
+
+			// beállítások alapértékre állítása
+			$this->reset();			
 
 			if($result) {
 			// ha nincs hiba az sql parancsban
