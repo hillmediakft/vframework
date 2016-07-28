@@ -1,4 +1,4 @@
-<?php 
+<?php
 class Filter {
 
 	/**
@@ -42,7 +42,7 @@ class Filter {
 		*/
 
 		if(is_null($filter)){
-			$filter = 'global';
+			$filter = 'default';
 		}
 
 		$filter_arr = explode('|', $filter);
@@ -62,7 +62,7 @@ class Filter {
 				}
 
 				switch ($filter_name) {
-					case 'global':
+					case 'default':
 						$data = $this->_filter_trim($data);
 						$data = $this->_filter_strip_tags($data);
 						break;
