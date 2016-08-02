@@ -12,6 +12,10 @@ class Model {
 	{
 		// adatbáziskapcsolat létrehozása
 		$this->connect = db::get_connect();
+		// hiba visszaadás beállítása a PDO objektumban a fejlesztői környezet alapján
+		if(ENV == 'development'){
+			$this->connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		}		
 		
 		$this->registry = Registry::get_instance();
 		
