@@ -34,6 +34,7 @@ if (isset($_SERVER['SERVER_ADDR']) && ($_SERVER['SERVER_ADDR'] == '127.0.0.1' ||
 
     define('BASE_URL', 'http://vframework/'); //Az oldal elérési útjának beállítása
 	define('BASE_PATH', ''); //A domainnév utáni elérési út beállítása
+	define('ENV', 'development'); //fejlesztői környezet
     
 	//db adatok
     Config::load('db_local');
@@ -45,11 +46,13 @@ if (isset($_SERVER['SERVER_ADDR']) && ($_SERVER['SERVER_ADDR'] == '127.0.0.1' ||
 }
 else {
     //ONLINE
+	// error_reporting(0);
 	error_reporting(E_ALL);
 	ini_set("display_errors", 1);
 	
-	define('BASE_URL', 'http://vframework.onlinemarketingguru.hu/'); //Az oldal elérési útjának beállítása
+	define('BASE_URL', 'http://xxx/'); //Az oldal elérési útjának beállítása
 	define('BASE_PATH', ''); //A domainnév utáni elérési út beállítása
+	define('ENV', 'production'); //online éles környezet
 
 	//db adatok	
     Config::load('db_online');
