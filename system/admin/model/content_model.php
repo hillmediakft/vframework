@@ -11,22 +11,16 @@ class Content_model extends Admin_model {
 	
 	public function all_content()
 	{
-		// a query tulajdonság ($this->query) tartalmazza a query objektumot
 		$this->query->set_table(array('content')); 
 		$this->query->set_columns(array('content_id', 'content_name', 'content_title')); 
-		$result = $this->query->select(); 
-	
-		return $result;
+		return $this->query->select(); 
 	}
 	
 	public function update_content($id)
 	{
 		$data['content_title'] = $this->request->get_post('content_title');
-		$data['content_body'] = $this->request->get_post('content_body');
-		
+		$data['content_body'] = $this->request->get_post('content_body', 'strip_danger_tags');
 
-		// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
-		$this->query->reset();
 		$this->query->set_table(array('content'));
 		$this->query->set_where('content_id', '=', $id['id']);
 		$result = $this->query->update($data);
@@ -39,7 +33,6 @@ class Content_model extends Admin_model {
 			Message::set('error', 'unknown_error');
 			return false;
 		}
-
 	}
 	
 	/**
@@ -50,11 +43,9 @@ class Content_model extends Admin_model {
 	 */
 	public function content_data_query($id)
 	{
-		$this->query->reset();
 		$this->query->set_table(array('content'));
 		$this->query->set_columns(array('content_id', 'content_name', 'content_title', 'content_body'));
 		$this->query->set_where('content_id', '=', $id);
-		
 		return $this->query->select();
 	}
 	
