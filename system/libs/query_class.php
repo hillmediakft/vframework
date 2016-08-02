@@ -1,7 +1,7 @@
 <?php
 /**
  *	Adatbázis lekérdezés kezelő osztály
- *	v1.2
+ *	v1.3.1
  *
  *	Metódusok, beállítások:
  *	
@@ -163,7 +163,7 @@ class Query {
 	private $offset = null;
 
 	/**
-	 * Bindings for where sql statement
+	 * Ebbe a tömbbe kerülnek (átmenetileg) a lekérdezésbe kerülő adatok
 	 *
 	 * @access private
 	 * @var Array $bindings
@@ -173,23 +173,25 @@ class Query {
 	// SQL parancs és attribútumok tesztelése
 	private $debug = false;	
 
+
 	/**
 	 * Constructor (elindítja (illetve megkapja) az adatbáziskapcsolatot)
 	 *
 	 * @access public
+	 * @param string $env 	(development vagy production) 		
 	 */
 	function __construct($db_connect)
 	{
-		// adatbáziskapcsolat létrehozása
 		$this->connect = $db_connect;
 	}
 	
-	
+	/**
+	 * A lekérdezés string és adatok kiíratása
+	 */
 	public function debug($value)
 	{
 		$this->debug = (bool)$value;
 	}
-	
 	
 	/**
 	 *	Megvizsgálja, hogy a where tömb utolsó eleme tartalmaz-e ( karaktert
@@ -211,7 +213,7 @@ class Query {
 			// visszadjuk az utolsó tömbelem utolsó karakterét
 			$result = substr($last, -1);
 			// megvizsgáljuk, hogy az utolsó karakter ( karakter-e ... (ha igen, akkor true-t ad vissza a metódus)
-			if($result == "("){
+			if($result == '('){
 				return true;
 			}
 			else {
@@ -233,18 +235,18 @@ class Query {
 	 */
 	private function add_backtick($string)
 	{
-		if(strpos($string, ".") !== false){
+		if(strpos($string, '.') !== false){
 			//felbontjuk a stringet tömbelemekre
-			$temp_arr = explode(".", $string); 
+			$temp_arr = explode('.', $string); 
 				//a bömbelemekt backtickeljük
 				foreach($temp_arr as &$v) {
-					$v = "`" . $v . "`"; 
+					$v = '`' . $v . '`'; 
 				}
 			//összefőzzük a backtickelt ideiglenes tömbelemeket string-gé . karakterrel	
-			$string = implode(".", $temp_arr); 			
+			$string = implode('.', $temp_arr); 			
 		}
 		else {
-			$string = "`" . $string . "`"; 
+			$string = '`' . $string . '`'; 
 		}
 		return $string;
 	} 
@@ -287,7 +289,7 @@ class Query {
 		}
 		else {
 			throw new Exception('Nem megfelelo tipusu parameter lett atadva a query osztaly set_table() metodusanak!');
-			return false;		
+			exit;		
 		}
 	}
 
@@ -313,7 +315,7 @@ class Query {
 		}
 		else {
 			throw new Exception('Nem megfelelo tipusu parameter lett atadva a query osztaly set_columns() metodusanak!');
-			return false;
+			exit;
 		}
 	}	
 
@@ -330,7 +332,7 @@ class Query {
 	{
 	//első parameter string és van operátor, és van data, ami string, vagy integer tipusú
 		if(is_string($column) && !is_null($oper) && (is_string($data) || is_int($data))) {
-			$string = strtoupper($type) . ' ' . $column.' '.$oper.' '."?";
+			$string = strtoupper($type) . ' ' . $column . ' ' . $oper . ' ' . "?";
 			$this->bindings[] = $data;
 		
 			//megvizsgáljuk, hogy zárójelben lesz-e a feltétel (és ennek megfelelően vágunk belőle)
@@ -476,7 +478,7 @@ class Query {
 		}
 		else {
 			throw new Exception('Nem megfelelo tipusu parameter lett atadva a query osztaly set_orderby() metodusanak!');
-			return false;		
+			exit;		
 		}
 	}
 	
@@ -491,9 +493,9 @@ class Query {
 	 */
 	public function select()
 	{
-		if(is_null($this->table) && is_null($this->columns)){
+		if(is_null($this->table) || is_null($this->columns)){
 			throw new Exception('Nincs beallitva tabla vagy oszlop a lekerdezeshez!');
-			return false;
+			exit;
 		}
 	
 		$sql = "SELECT " . $this->columns . " FROM " . $this->table . $this->getJoins() . $this->getWhere() . $this->getOrderby() . $this->getLimit();
@@ -508,17 +510,15 @@ class Query {
 			//sql parancs és attribútumok tesztelése
 			if($this->debug === true) {
 				var_dump($sth); var_dump($this->bindings);
-				die('');
+				exit;
 			}	
-		
-		// Execute the sql statement
+
+		// lekérdezés végrehajtása (development környezetben hiba esetén kivételt dob)
 		$result = $sth->execute();
-		
 		// beállítások alapértékre állítása
 		$this->reset();
 
 		if(!$result) {
-			throw new Exception('Adatbazis lekerdezes hiba (SELECT)!');
 			return false;
 		}
 
@@ -537,34 +537,29 @@ class Query {
 	{
 		if(is_null($this->table)){
 			throw new Exception('Nincs beallitva tabla a lekerdezeshez!');
-			return false;
+			exit;
 		}
 		
 		$sql = $this->getInsert($attributes);
-		// Prepare sql statement 
+		// lekérdezés előkészítése 
 		$sth = $this->connect->prepare($sql);
 		
 			//sql parancs és attribútumok tesztelése
 			if($this->debug === true) {
 				var_dump($sth); var_dump($attributes);
-				die('');
+				exit;
 			}		
-		
-		// Execute the DB
+
+		// Lekérdezés végrehajtása (development környezetben hiba esetén kivételt dob)
 		$result = $sth->execute($attributes);
-		
 		// beállítások alapértékre állítása
 		$this->reset();
 
 		if(!$result) {
-			throw new Exception('Adatbazis lekerdezes hiba (INSERT)!');
 			return false;
 		}
 		
-		// ha sikerült a lekérdezés true-val tér vissza
-		//return true;
-		
-		// a metódus utolsó elem id-jével tér vissza
+		// a last insert id -vel tér vissza
 		return (int)$this->connect->lastinsertid();
 	}
 			
@@ -578,10 +573,10 @@ class Query {
 	 */
 	public function update($attributes, $fix_attributes = array())
 	{
-		// megvizsálja, hogy van-e beállítva tábla
+		// megvizsálja, hogy van-e beállítva tábla vagy where feltétel
 		if(is_null($this->table) || empty($this->where)){
 			throw new Exception('Nincs beallitva tabla, vagy WHERE feltetel az UPDATE lekerdezeshez!!');
-			return false;
+			exit;
 		}
 
 		$sql = $this->getUpdate($attributes, $fix_attributes);
@@ -589,28 +584,26 @@ class Query {
 		// összeolvasztjuk az attributumok (csak értékek!) és a bindings tömböt egy számmal indexelt tömbbe, hogy passzoljanak a ?-es helyörzőkhöz	
 		$attributes = array_merge(array_values($attributes), $this->bindings); 
 				
-		// Prepare sql statement 
+		// Előkészítjük a lekérdezést 
 		$sth = $this->connect->prepare( $sql );
 			
 			//sql parancs és attribútumok tesztelése
 			if($this->debug === true) {
 				var_dump($sth); var_dump($attributes); var_dump($fix_attributes);
-				die('');
+				exit;
 			}
 	
-		// Execute the DB
+		// Lekérdezés végrehajtása (development környezetben hiba esetén kivételt dob)
 		$result = $sth->execute( $attributes );
-
 		// beállítások alapértékre állítása
 		$this->reset();		
 		
 		if(!$result) {
-			throw new Exception('Adatbazis lekerdezes hiba (UPDATE)!');
 			return false;
-		} else {
-			// ha nincs hiba az sql parancsban visszatér az update-elt sorok számával
-			return $sth->rowCount();
 		}
+		
+		// visszatér az update-elt sorok számával
+		return $sth->rowCount();
 	}
 
 	/**
@@ -622,13 +615,12 @@ class Query {
 	 * @param Int or String $data
 	 * @return Integer or false
 	 */
-	//public function delete($column, $data)
 	public function delete($column = null, $oper = null, $data = null)
 	{
 		// megvizsálja, hogy van-e beállítva tábla
 		if(is_null($this->table)){
 			throw new Exception('Nincs beallitva tabla a lekerdezeshez!');
-			return false;
+			exit;
 		}
 		
 		// ha nincs beállítva where feltétel (a delete metódus kapja az adatokat)
@@ -644,25 +636,20 @@ class Query {
 				//sql parancs és attribútumok tesztelése
 				if($this->debug === true) {
 					var_dump($sth); var_dump($data);
-					die('');
+					exit;
 				}			
 			
-			// Lekérdezés végrehajtása (visszatérés: true vagy false )
+			// Lekérdezés végrehajtása (development környezetben hiba esetén kivételt dob)
 			$result = $sth->execute();
-
 			// beállítások alapértékre állítása
 			$this->reset();			
 			
-			if($result) {
-				// ha nincs hiba az sql parancsban visszatér a törölt sorok számával (lehet 0 is)
-				return $sth->rowCount();
-			}
-			else {
-				// ha a törlési sql parancsban hiba van
-				throw new Exception('Adatbazis lekerdezes hiba (DELETE)!');
+			if(!$result) {
 				return false;
 			}
 
+			// visszatér a törölt sorok számával (lehet 0 is)
+			return $sth->rowCount();
 		}
 		// ha van beállítva where feltétel
 		elseif(!empty($this->where) && is_null($column) && is_null($oper) && is_null($data)) {
@@ -680,29 +667,24 @@ class Query {
 				//sql parancs és attribútumok tesztelése
 				if($this->debug === true) {
 					var_dump($sth); var_dump($this->bindings);
-					die('');
+					exit;
 				}			
 			
-			// Lekérdezés végrehajtása
+			// Lekérdezés végrehajtása (development környezetben hiba esetén kivételt dob)
 			$result = $sth->execute();
-
 			// beállítások alapértékre állítása
 			$this->reset();			
 
-			if($result) {
-			// ha nincs hiba az sql parancsban
-				// Visszadja a törölt sorok számát
-				return $sth->rowCount();
-			}
-			else {
-				// ha a törlési sql parancsban hiba van (hibaüzenet és leállás)
-				throw new Exception('Adatbazis lekerdezes hiba (DELETE)!');
+			if(!$result) {
 				return false;
 			}
+
+			// Visszadja a törölt sorok számát
+			return $sth->rowCount();
 		}
 		else {
 			throw new Exception('Rossz parameterezes, vagy beallitas a query class delete() metodusanak meghivasakor!');
-			return false;			
+			exit;			
 		}
 	}
 
@@ -743,11 +725,11 @@ class Query {
 		$updates = '';
 		foreach ($attributes as $key => $value)
 		{
-			$updates .= "`" . $key . "` = ?, ";
+			$updates .= '`' . $key . '` = ?, ';
 		}
-		$updates = rtrim($updates, ", ");
+		$updates = rtrim($updates, ', ');
 
-		return "UPDATE ". $this->table . " SET " . $fix_element . $updates . $this->getWhere();
+		return 'UPDATE '. $this->table . ' SET ' . $fix_element . $updates . $this->getWhere();
 	}
 
 	/**
@@ -798,7 +780,7 @@ class Query {
 	 */
 	private function getJoins()
 	{
-		// If where is empty return empty string
+		// ha nincs where feltétel, akkor üres stringet ad vissza
 		if(is_null($this->joins)) {
 			return '';
 		}
