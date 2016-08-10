@@ -1,7 +1,7 @@
 <?php
 /**
  *	Adatbázis lekérdezés kezelő osztály
- *	v1.3.1
+ *	v1.4
  *
  *	Metódusok, beállítások:
  *	
@@ -9,6 +9,7 @@
  *	reset(); nincs paraméter (visszaállítja a tulajdonságok alapértékét)	
  *	count(); paraméter: tábla neve (string) - Lekérdezi a paraméterben megadott tábla rekordjainak számát	
  *	found_rows();	visszaadja az előző SELECT SQL_CALC_FOUND_ROWS opcióval lekérdezett sorok számát (akkor kell, ha limit van beállítva)	
+ *  set_default_table();  beállít egy default táblát a lekérdezésekhez. Ha nincs beállítva tábla a set_table() metódussal, akkor ez a tábla lesz a default 
  *
  *	Táblák megadása (string) (vesszővel elválsztva az oszlopnevek), vagy (array)
  *	1. (string) ebben az esteben nem lesz automatikusan backtick-elve a táblanév!! 	
@@ -16,7 +17,8 @@
  *	2. (array)	ebben az esteben backtick-elve lesznek az táblanevek!!		
  *		set_table(array('users','colors','lakhely'));
  *
- *	Lekérdezés során visszadott OSZLOPOK megadása:
+ *	Lekérdezés során visszadott OSZLOPOK megadása (opcionális!):
+ *	DEFAULT beállítás: '*' (vagyis nem muszáj megadni ezt a tulajdonságot)
  *	1. (string) ebben az esteben nem lesz automatikusan backtick-elve az oszlopnév!!... itt lehet valamilyen valamilyen sql függvényt használni
  *		set_columns( 'COUNT(*)' );
  *		set_columns( 'MAX(datum)' );
@@ -49,7 +51,17 @@
  *	
  *		4. első tag (string) - operátor (string) - második tag (array - számmal indexelt (lehet asszociatív is, de csak az értékek lesznek használva)) -
  *		kötőszó (string) (AND, OR ...stb.) (a kötőszó paraméter elhagyható: default az AND)
- *			set_where('kerulet', '=', array('sanyi','ede','egon','huba','feri'), 'or');
+ *			
+ *			set_where('name', '=', array('sanyi','ede','egon','huba','feri'));
+ *		
+ *		  IN vagy NOT IN operátorral:			
+ *			set_where('color', 'in', array('piros','zold','kek','barna'));
+ *			set_where('color', 'not in', array('piros','zold','kek','barna'), 'or');
+ *
+ *		  BETWEEN vagy NOT BETWEEN operátorral (az adatot tartalmazó tömbnek 2 elemet kell tartalmaznia!!!):
+ *			set_where('ertek', 'between', array('20','55'));
+ *			set_where('date', 'between', array('2016-01-04-19:41', '2016-05-08-20:08'));
+ *			set_where('ertek', 'not between', array('3200','15600'));
  *	
  *		5. első tag (null) - operátor (string) - második tag (array - asszociatív) - kötőszó (string) (AND, OR ...stb.) (a kötőszó paraméter elhagyható: default az AND)
  *			set_where(null, '!=', array('vezeteknev' => 'Bugyi', 'utonev' => 'sanyi', 'lakohyely' => 'Budapest'), 'and');
@@ -121,6 +133,13 @@ class Query {
 	private $connect;
 
 	/**
+	 * Alap tábla neve, ezt használja a lekérdezésekhez, ha nincs beállítva érték a $table tulajdonsághoz
+	 * @access private
+	 * @var String $default_table
+	 */
+	public $default_table;	
+
+	/**
 	 * @access private
 	 * @var String or Array $table
 	 */
@@ -130,7 +149,7 @@ class Query {
 	 * @access private
 	 * @var String or Array $columns
 	 */
-	private $columns = null;
+	private $columns = '*';
 
 	/**
 	 * @access private
@@ -178,7 +197,7 @@ class Query {
 	 * Constructor (elindítja (illetve megkapja) az adatbáziskapcsolatot)
 	 *
 	 * @access public
-	 * @param string $env 	(development vagy production) 		
+	 * @param object $db_connect 		(adatbázis kapcsolat objetum) 		
 	 */
 	function __construct($db_connect)
 	{
@@ -186,9 +205,20 @@ class Query {
 	}
 	
 	/**
+	 * Alap tábla nevet állít be a lekérdezésekhez
+	 *
+	 * @access public
+	 * @param string $default
+	 */
+	public function set_default_table($default)
+	{
+		$this->default_table = $default;
+	}
+
+	/**
 	 * A lekérdezés string és adatok kiíratása
 	 */
-	public function debug($value)
+	public function debug($value = true)
 	{
 		$this->debug = (bool)$value;
 	}
@@ -253,13 +283,12 @@ class Query {
 	
 	
 	/**
-	 *	Visszaállítja az alapbeállításokat
-	 *	(mindent tulajdonságot 'lenulláz')
+	 *	Visszaállítja az alapértékeket
 	 */
 	public function reset()
 	{
 		$this->table = null;
-		$this->columns = null;
+		$this->columns = '*';
 		$this->joins = null;
 		$this->orderby = null;
 		$this->limit = null;
@@ -345,19 +374,54 @@ class Query {
 				$this->where[] = $string;
 			}
 		}
+		
 	//csak egy string a paraméter
 		elseif(is_string($column) && is_null($oper) && is_null($data)) {
 			$this->where[] = $column;
  		} 
+		
 	//első parameter string és van operátor és van data (ami egy tömb! - számmal indexelt)
 		elseif(is_string($column) && !is_null($oper) && is_array($data)) {
 	
 			$string = '';
+
+				// IN vagy NOT IN operátor esetén
+				if($oper == 'in' || $oper == 'not in'){
+					$data_number = count($data);
+					$substring = '(';
+					for ($i=0; $i < $data_number; $i++) { 
+						$substring .= '?';
+						if($i < $data_number-1) {
+							$substring .= ',';
+						}
+					}
+					$substring .= ')';
+
+					$string .= ' ' . strtoupper($type) . ' ' . $column . ' ' . strtoupper($oper) . ' ' . $substring;
+				
+					// adatok a bindings tömbbe
+					foreach($data as $v) {
+						$this->bindings[] = $v;
+					} 
+
+				}
+				// BETWEEN vagy NOT BETWEEN operátor esetén
+				elseif ($oper == 'between' || $oper == 'not between') {
+
+					$string .= ' ' . strtoupper($type) . ' ' . $column . ' ' . strtoupper($oper) . ' ' . '? AND ?';
+
+					$this->bindings[] = $data[0];
+					$this->bindings[] = $data[1];
+					
+				}
+				// Ha az operátor = vagy !=
+				else {
+					foreach($data as $v) {
+						$string .= ' ' . strtoupper($type) . ' ' . $column . ' ' . $oper . ' ' . '?';
+						$this->bindings[] = $v;
+					} 
+				}
 			
-			foreach($data as $v) {
-				$string .= ' ' . strtoupper($type) . ' ' . $column . ' ' . $oper . ' ' . "?";
-				$this->bindings[] = $v;
-			} 
 			//megvizsgáljuk, hogy zárójelben lesz-e a feltétel (és ennek megfelelően vágunk belőle)
 			if($this->check_bracket()) {
 				$string = ltrim($string);
@@ -368,7 +432,8 @@ class Query {
 			else {
 				$this->where[] = ltrim($string);
 			}
-		}		
+		}
+		
 	//első parameter null, vagy false - van operátor - és van $data ami egy tömb (asszociatív) 
 		elseif((is_null($column) || $column === false) && !is_null($oper) && is_array($data)) {
 
@@ -493,12 +558,15 @@ class Query {
 	 */
 	public function select()
 	{
-		if(is_null($this->table) || is_null($this->columns)){
-			throw new Exception('Nincs beallitva tabla vagy oszlop a lekerdezeshez!');
+		if(is_null($this->table) && is_null($this->default_table)){
+			throw new Exception('Nincs beallitva tabla a lekerdezeshez!');
 			exit;
 		}
-	
-		$sql = "SELECT " . $this->columns . " FROM " . $this->table . $this->getJoins() . $this->getWhere() . $this->getOrderby() . $this->getLimit();
+		
+		// alaptábla a lekérdezésbe, ha nincs külön beállítva táblanév
+		$tablename = (!is_null($this->table)) ? $this->table : $this->add_backtick($this->default_table); 
+
+		$sql = "SELECT " . $this->columns . " FROM " . $tablename . $this->getJoins() . $this->getWhere() . $this->getOrderby() . $this->getLimit();
 		
 	    // Prepare to be executed
 		$sth = $this->connect->prepare($sql);
@@ -509,7 +577,10 @@ class Query {
 
 			//sql parancs és attribútumok tesztelése
 			if($this->debug === true) {
-				var_dump($sth); var_dump($this->bindings);
+				echo '<pre>';
+				print_r($sth);
+				echo '</pre>';
+				var_dump($this->bindings);
 				exit;
 			}	
 
@@ -535,18 +606,21 @@ class Query {
 	 */
 	public function insert($attributes = array())
 	{
-		if(is_null($this->table)){
+		if(is_null($this->table) && is_null($this->default_table)){
 			throw new Exception('Nincs beallitva tabla a lekerdezeshez!');
 			exit;
 		}
-		
+				
 		$sql = $this->getInsert($attributes);
 		// lekérdezés előkészítése 
 		$sth = $this->connect->prepare($sql);
 		
 			//sql parancs és attribútumok tesztelése
 			if($this->debug === true) {
-				var_dump($sth); var_dump($attributes);
+				echo '<pre>';
+				print_r($sth);
+				echo '</pre>';
+				var_dump($attributes);
 				exit;
 			}		
 
@@ -574,7 +648,7 @@ class Query {
 	public function update($attributes, $fix_attributes = array())
 	{
 		// megvizsálja, hogy van-e beállítva tábla vagy where feltétel
-		if(is_null($this->table) || empty($this->where)){
+		if((is_null($this->table) && is_null($this->default_table)) || empty($this->where)){
 			throw new Exception('Nincs beallitva tabla, vagy WHERE feltetel az UPDATE lekerdezeshez!!');
 			exit;
 		}
@@ -589,7 +663,10 @@ class Query {
 			
 			//sql parancs és attribútumok tesztelése
 			if($this->debug === true) {
-				var_dump($sth); var_dump($attributes); var_dump($fix_attributes);
+				echo '<pre>';
+				print_r($sth);
+				echo '</pre>';
+				var_dump($attributes); var_dump($fix_attributes);
 				exit;
 			}
 	
@@ -618,7 +695,7 @@ class Query {
 	public function delete($column = null, $oper = null, $data = null)
 	{
 		// megvizsálja, hogy van-e beállítva tábla
-		if(is_null($this->table)){
+		if(is_null($this->table) && is_null($this->default_table)){
 			throw new Exception('Nincs beallitva tabla a lekerdezeshez!');
 			exit;
 		}
@@ -635,7 +712,10 @@ class Query {
 			
 				//sql parancs és attribútumok tesztelése
 				if($this->debug === true) {
-					var_dump($sth); var_dump($data);
+					echo '<pre>';
+					print_r($sth);
+					echo '</pre>';
+					var_dump($data);
 					exit;
 				}			
 			
@@ -666,7 +746,10 @@ class Query {
 			
 				//sql parancs és attribútumok tesztelése
 				if($this->debug === true) {
-					var_dump($sth); var_dump($this->bindings);
+					echo '<pre>';
+					print_r($sth);
+					echo '</pre>';
+					var_dump($this->bindings);
 					exit;
 				}			
 			
@@ -697,8 +780,12 @@ class Query {
 	 */
 	private function getInsert($attributes = array())
 	{
+		// alaptábla a lekérdezésbe, ha nincs külön beállítva táblanév
+		$tablename = (!is_null($this->table)) ? $this->table : $this->add_backtick($this->default_table);
+		
 		$keys = array_keys($attributes);
-		return "INSERT INTO ". $this->table . "(". implode("," , $keys  ) .")" . " VALUES(:". implode(",:", $keys  ) .")";		
+		
+		return "INSERT INTO ". $tablename . "(". implode("," , $keys  ) .")" . " VALUES(:". implode(",:", $keys  ) .")";		
 	}
 
 	/**
@@ -711,6 +798,9 @@ class Query {
 	 */
 	private function getUpdate($attributes, $fix_attributes)
 	{
+		// alaptábla a lekérdezésbe, ha nincs külön beállítva táblanév
+		$tablename = (!is_null($this->table)) ? $this->table : $this->add_backtick($this->default_table);		
+
 		// nem helyörzős elemek hozzáadása
 		$fix_element = '';
 		if(is_array($fix_attributes) && !empty($fix_attributes)){
@@ -729,7 +819,7 @@ class Query {
 		}
 		$updates = rtrim($updates, ', ');
 
-		return 'UPDATE '. $this->table . ' SET ' . $fix_element . $updates . $this->getWhere();
+		return 'UPDATE '. $tablename . ' SET ' . $fix_element . $updates . $this->getWhere();
 	}
 
 	/**
@@ -742,13 +832,16 @@ class Query {
 	 */
 	private function getDelete($column = null, $oper = null)
 	{
+		// alaptábla a lekérdezésbe, ha nincs külön beállítva táblanév
+		$tablename = (!is_null($this->table)) ? $this->table : $this->add_backtick($this->default_table);
+
 		// ha nincs beállítva külön where feltétel
 		if(empty($this->where) && !is_null($column) && !is_null($oper)){
-			return "DELETE FROM ". $this->table . " WHERE " . $column . " " . $oper . " ?";
+			return "DELETE FROM ". $tablename . " WHERE " . $column . " " . $oper . " ?";
 		}
 		// ha a where tömb nem üres
 		elseif(!is_null($this->where) && is_null($column) && is_null($oper)){
-			return "DELETE FROM ". $this->table . $this->getWhere();
+			return "DELETE FROM ". $tablename . $this->getWhere();
 		}
 		else {
 			return '';
