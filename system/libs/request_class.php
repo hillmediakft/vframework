@@ -77,6 +77,17 @@ class Request {
 		return $this->uri->get($name);
 	}
 
+    /**
+     * 	Visszaadja a jelenlegi url-t a paraméterben megadott nyelvi kóddal módosítva
+     *
+     * 	@param	String	$lang_code	(nyelvi kód)
+     * 	@return	String
+     */
+	public function url_with_language($lang_code = 'hu')
+	{
+		return $this->uri->get_url_with_language($lang_code);
+	}
+
 	/**
 	 * Adatok visszaadása a $_POST tömbből
 	 *
