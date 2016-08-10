@@ -97,6 +97,20 @@ class Uri {
 		}
 	}
 
+    /**
+     * 	Visszaadja a jelenlegi url-t a paraméterben megadott nyelvi kóddal módosítva
+     *
+     * 	@param	String	$lang_code	(nyelvi kód)
+     * 	@return	String
+     */
+    public function get_url_with_language($lang_code)
+    {
+        $lang = ($lang_code == 'hu') ? '' : $lang_code . '/';
+        $area = ($this->area == 'site') ? '' : $this->area . '/';
+        $query_string = (empty($this->query)) ? '' : '?' . $this->query;
+        return BASE_URL . $area . $lang . $this->path . $query_string;
+    }
+
 	/**
 	 * Beállítja a request uri-t
 	 * Kivágja a BASE_PATH-t, és trimmeli a / jeleket a string végeiről
@@ -222,12 +236,13 @@ class Uri {
 	}
 
 	/**
-	 * Visszadja a query stringet
+	 * Beállítja a query stringet
 	 *
 	 * @return string
 	 */
 	public function _query_string()
 	{
+		$this->query = $this->uri_parts['query'];
 		$this->set('query', $this->uri_parts['query']);
 	}
 
