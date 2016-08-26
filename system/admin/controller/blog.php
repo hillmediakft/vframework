@@ -124,7 +124,7 @@ class Blog extends Admin_controller {
 	public function category_insert_update()
 	{
 		if ($this->request->is_ajax()) {
-			$id = $this->request->get_post('id', 'integer');
+			$id = $this->request->get_post('id');
 			$category_name = $this->request->get_post('data');
 			$result = $this->blog_model->category_insert_update($id, $category_name);
 			echo json_encode($result);
