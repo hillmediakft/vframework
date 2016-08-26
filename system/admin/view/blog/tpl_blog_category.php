@@ -70,7 +70,8 @@
 							</thead>
 							<tbody>
 							<?php foreach($this->all_blog_category as $value) { ?>
-								<tr class="odd gradeX" data-id="<?php echo $value['category_id'];?>">
+								<tr data-id="<?php echo $value['category_id'];?>">
+									
 									<td><?php echo $value['category_name'];?></td>
 										<?php
 										// megszámoljuk, hogy az éppen aktuális kategóriának mennyi eleme van a blog tábla blog_category oszlopában
@@ -89,24 +90,6 @@
                                     <td>
                                         <a class="delete" href="javascript:;"><i class="fa fa-trash"></i> Töröl </a>
                                     </td>
-
-
-<!--
-									<td>									
-										<div class="actions">
-											<div class="btn-group">
-												<a class="btn btn-sm grey-steel" data-toggle="dropdown" title="műveletek"><i class="fa fa-cogs"></i></a>
-												<ul class="dropdown-menu pull-right">
-												<?php //if (1) { ?>	
-													<li><a href="admin/blog/category_update/<?php //echo $value['category_id'];?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
-												<?php //} ?>
-												</ul>
-											</div>
-										</div>
-									</td>
--->
-
-
 
 								</tr>
 							<?php } ?>	
