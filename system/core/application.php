@@ -35,6 +35,7 @@ class Application {
 	{
 		$controller_name = $this->request->get_controller();
 		$action_name = $this->request->get_action();
+		$parameters = $this->request->get_params();
 
 		// Először is betölti a megfelelő controller fájlt (ha betölthető), az url első paramétere alapján.
 		$file = 'system/' . $this->request->get_uri('area') . '/controller/' . $controller_name . '.php';
@@ -50,7 +51,8 @@ class Application {
 		
 			// meghívjuk az action metódust, ha nincs, akkor az index metódust hívjuk meg
 			if(method_exists($controller, $action_name)) {
-				$controller->{$action_name}();
+				//$controller->{$action_name}();
+				call_user_func_array(array($controller, $action_name), $parameters);
 			} else {
 				$controller->index();
 			}
