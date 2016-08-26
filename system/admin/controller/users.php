@@ -58,13 +58,13 @@ class Users extends Admin_controller {
      *
 	 * A metódusnak szüksége van egy user id-jére amit módosítani akarunk ($this->request->get_params('id'))
 	 */
-	public function profile()
+	public function profile($id)
 	{
-		$id = (int)$this->request->get_params('id');	
+		//$id = (int)$this->request->get_params('id');	
 
 		if($this->request->has_post('submit_edit_user')) {
             
-			$result = $this->users_model->update_user($id);
+			$result = $this->users_model->update_user((int)$id);
 			
 			if($result) {
 				Util::redirect('users');
