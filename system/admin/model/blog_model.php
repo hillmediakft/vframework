@@ -1,10 +1,11 @@
 <?php
 class blog_model extends Admin_model {
 
+	protected $table = 'blog';	
+
 	function __construct()
 	{
 		parent::__construct();
-		$this->query->set_default_table('blog');
 	}
    
 	/**
@@ -15,9 +16,6 @@ class blog_model extends Admin_model {
 	 */
 	public function blog_query($id = null)
 	{
-		$this->query->reset(); 
-		$this->query->set_table(array('blog')); 
-		$this->query->set_columns('*'); 
 		if(!is_null($id)){
 			$id = (int)$id;
 			$this->query->set_where('blog_id', '=', $id); 
@@ -33,8 +31,6 @@ class blog_model extends Admin_model {
 	 */
 	public function blog_query2($id = null)
 	{
-		//$this->query->reset(); 
-		//$this->query->set_table(array('blog'));
 		$this->query->set_columns(array('blog.blog_id','blog.blog_title','blog.blog_body','blog.blog_picture','blog.blog_add_date', 'blog_category.category_name')); 
 		$this->query->set_join('left', 'blog_category', 'blog.blog_category', '=', 'blog_category.category_id'); 
 		if(!is_null($id)){
@@ -53,9 +49,7 @@ class blog_model extends Admin_model {
 	 */
 	public function category_query($id = null)
 	{
-		// $this->query->reset(); 
 		$this->query->set_table(array('blog_category')); 
-		//$this->query->set_columns('*'); 
 		if(!is_null($id)){
 			$id = (int)$id;
 			$this->query->set_where('category_id', '=', $id); 
@@ -69,8 +63,6 @@ class blog_model extends Admin_model {
 	 */
 	public function category_counter_query()
 	{
-		// $this->query->reset(); 
-		// $this->query->set_table(array('blog')); 
 		$this->query->set_columns('blog_category');
 		return $this->query->select(); 
 	}
@@ -100,8 +92,6 @@ class blog_model extends Admin_model {
 		$data['blog_add_date'] = date('Y-m-d-G:i');
 
 	// adatbázis lekérdezés	
-		// $this->query->reset();
-		// $this->query->set_table(array('blog'));
 		$result = $this->query->insert($data);
 	
 	// ha sikeres az insert visszatérési érték true
@@ -153,8 +143,6 @@ class blog_model extends Admin_model {
 		$data['blog_add_date'] = date('Y-m-d-G:i');
 
 	// adatbázis lekérdezés	
-		// $this->query->reset();
-		// $this->query->set_table(array('blog'));
 		$this->query->set_where('blog_id','=', $id);
 		$result = $this->query->update($data);
 	
@@ -203,15 +191,11 @@ class blog_model extends Admin_model {
 			$value = (int)$value;
 			
 			//lekérdezzük a törlendő blog képének a nevét, hogy törölhessük a szerverről
-			// $this->query->reset();
-			// $this->query->set_table('blog');
 			$this->query->set_columns(array('blog_picture'));
 			$this->query->set_where('blog_id', '=', $value);
 			$photo_name = $this->query->select();			
 
 			//blog törlése	
-			// $this->query->reset();
-			// $this->query->set_table(array('blog'));
 			//a delete() metódus integert (lehet 0 is) vagy false-ot ad vissza
 			$result = $this->query->delete('blog_id', '=', $value);
 			
@@ -276,7 +260,7 @@ class blog_model extends Admin_model {
 	/**
 	 * Kategória hozzáadása és módosítása
 	 *
-	 * @param integer $id
+	 * @param integer||null $id
 	 * @param string $new_name
 	 * @return array
 	 */
@@ -303,10 +287,9 @@ class blog_model extends Admin_model {
 			}	
 		} 
 
-		//insert
-		if ($id == 0) {
+		//insert (ha az $id értéke null)
+		if ($id == null) {
 			
-			$this->query->reset();
 			$this->query->set_table(array('blog_category'));
 			$result = $this->query->insert(array('category_name' => $new_name));
 
@@ -314,7 +297,7 @@ class blog_model extends Admin_model {
 				return array(
 					'status' => 'success',
 					'message' => 'Kategória hozzáadva.',
-					'action' => 'insert'
+					'inserted_id' => $result
 				);
 			}
 			if($result === false){ 
@@ -326,7 +309,7 @@ class blog_model extends Admin_model {
 		}
 		// update
 		else {
-			$this->query->reset();
+			$id = (int)$id;
 			$this->query->set_table(array('blog_category'));
 			$this->query->set_where('category_id', '=', $id);
 			$result = $this->query->update(array('category_name' => $new_name));
@@ -360,8 +343,6 @@ class blog_model extends Admin_model {
 		$fail_counter = 0; 
 
 			// lekérdezzük a törlendő képek nevét
-			// $this->query->reset();
-			// $this->query->set_table('blog');
 			$this->query->set_columns(array('blog_picture'));
 			$this->query->set_where('blog_category', '=', $id);
 			$photo_names_temp = $this->query->select();			
@@ -373,8 +354,6 @@ class blog_model extends Admin_model {
 			unset($photo_names_temp);
 
 			// képekhez tartozó rekordok törlése
-			// $this->query->reset();
-			// $this->query->set_table(array('blog'));
 			$result = $this->query->delete('blog_category', '=', $id);
 			
 			// képek törlése
@@ -402,7 +381,6 @@ class blog_model extends Admin_model {
 			}
 
 			// kategória törlése
-			$this->query->reset();
 			$this->query->set_table(array('blog_category'));
 			//a delete() metódus integert (lehet 0 is) vagy false-ot ad vissza
 			$result = $this->query->delete('category_id', '=', $id);
