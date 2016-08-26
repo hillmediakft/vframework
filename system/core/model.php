@@ -7,6 +7,13 @@ class Model {
 	public $query; //adatbaziskezelő objektumot rendeljük hozzá 
 
 	public $registry; //registry objektum
+
+	/**
+	 *	Default tábla név, amivel a query objektum dolgozni fog, ha nem adunk meg külön táblát a lekérdezéskor
+	 *  Ha megadjuk a leszármazott modelben ezt a tulajdonságot, akkor az lesz a default tábla a query objektumban
+	 *  Ha nem adunk meg a leszármazott modelben $tabla tulajdonságot, akkor a contoroller neve lasz a default tábla név.
+	 */
+	protected $table;
 	
 	function __construct()
 	{
@@ -25,7 +32,8 @@ class Model {
 		// ez a query tulajdonság a gyerek model-ek bármelyik metódusában elérhető
 		// megkapja paraméterként az adatbáziskapcsolatot
 		$this->query = new Query($this->connect);
-		
+		//default tábla beállítása 
+		$this->query->set_default_table($this->table);
 	}
 
 	function __destruct()
@@ -34,6 +42,19 @@ class Model {
 		$this->connect = db::close_connect();
 	}
 
+    /**
+     * Jelszó kompatibilitás library betöltése
+     *
+     * @access private
+     */
+    protected function load_password_compatibility()
+    {
+        if (version_compare(PHP_VERSION, '5.5.0', '<')) {
+            // if you are using PHP 5.3 or PHP 5.4 you have to include the password_api_compatibility_library.php
+            // (this library adds the PHP 5.5 password hashing functions to older versions of PHP)
+            require_once(LIBS . '/password_compatibility_library.php');
+        }
+    }
 	
 	/**
 	 * Adat lekérdezése egy táblából 
