@@ -8,6 +8,8 @@ class Users_model extends Admin_model {
      */
     private $email_verify;
 
+    protected $table = 'users';
+
     /**
      * Constructor, létrehozza az adatbáziskapcsolatot
      */
@@ -20,30 +22,6 @@ class Users_model extends Admin_model {
         $this->email_verify = false;
     }
 
-    /*
-     * Felhasználók adatainak lekérdezése
-     */
-/*    public function all_user()
-    {
-        $this->query->reset();
-        $this->query->set_table(array('users'));
-        $this->query->set_columns(array(
-            'users.user_id',
-            'users.user_name',
-            'users.user_first_name',
-            'users.user_last_name',
-            'users.user_active',
-            'users.user_email',
-            'users.user_role_id',
-            'users.user_phone',
-            'users.user_photo',
-            'roles.role_name'
-        ));
-        $this->query->set_join('left', 'roles', 'users.user_role_id', '=', 'roles.role_id');
-        return $this->query->select();
-    }
-*/    
-
     /**
      *  Felhasználók adatainak lekérdezése
      *
@@ -52,8 +30,6 @@ class Users_model extends Admin_model {
      */
     public function user_data_query($user_id = null)
     {
-        $this->query->reset();
-        $this->query->set_table(array('users'));
         $this->query->set_columns(array(
             'users.user_id',
             'users.user_name',
@@ -148,6 +124,8 @@ class Users_model extends Admin_model {
 
             $data['user_role_id'] = $this->request->get_post('user_group', 'integer');
 
+                // jelszó kompatibilitás library betöltése régebbi php verzió esetén
+                $this->load_password_compatibility();
                 // crypt the user's password with the PHP 5.5's password_hash() function, results in a 60 character
                 // hash string. the PASSWORD_DEFAULT constant is defined by the PHP 5.5, or if you are using PHP 5.3/5.4,
                 // by the password hashing compatibility library. the third parameter looks a little bit shitty, but that's
@@ -188,8 +166,6 @@ class Users_model extends Admin_model {
 
 
             // Új felhasználó adatainak beírása az adatbázisba
-            $this->query->reset();
-            $this->query->set_table(array('users'));
             $last_inserted_id = $this->query->insert($data);
             if (!$last_inserted_id) {
                 Message::set('error', 'account_creation_failed');
@@ -222,11 +198,6 @@ class Users_model extends Admin_model {
 
 
 
-
-
-
-
-
     /**
      * Admin user törlése AJAX-al
      *
@@ -251,15 +222,12 @@ class Users_model extends Admin_model {
             $value = (int) $value;
 
             //lekérdezzük a törlendő user avatar képének a nevét, hogy törölhessük a szerverről
-            $this->query->reset();
-            $this->query->set_table('users');
             $this->query->set_columns(array('user_photo'));
             $this->query->set_where('user_id', '=', $value);
             $photo_name = $this->query->select();
 
             //felhasználó törlése 
             $this->query->reset();
-            $this->query->set_table(array('users'));
             //a delete() metódus integert (lehet 0 is) vagy false-ot ad vissza
             $result = $this->query->delete('user_id', '=', $value);
 
@@ -379,6 +347,9 @@ class Users_model extends Admin_model {
 
             //ha nem létezik a $password_empty változó, vagyis nem üres mindkét password mező	
             if (!isset($password_empty)) {
+
+                // jelszó kompatibilitás library betöltése régebbi php verzió esetén
+                $this->load_password_compatibility();                
                 // crypt the user's password with the PHP 5.5's password_hash() function, results in a 60 character
                 // hash string. the PASSWORD_DEFAULT constant is defined by the PHP 5.5, or if you are using PHP 5.3/5.4,
                 // by the password hashing compatibility library. the third parameter looks a little bit shitty, but that's
@@ -400,8 +371,6 @@ class Users_model extends Admin_model {
             }
 
             // Megvizsgáljuk, hogy van-e már ilyen nevű user (de nem az amit módosítani akarunk)
-            $this->query->reset();
-            $this->query->set_table(array('users'));
             $this->query->set_columns(array('user_id'));
             $this->query->set_where('user_name', '=', $data['user_name']);
             //itt megadjuk, hogy nem vonatkozik a bejelentkezett user-re (mert ha nem módosítja a nevet akkor már van ilyen user név)
@@ -435,8 +404,6 @@ class Users_model extends Admin_model {
 
 
             // új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
-            $this->query->reset();
-            $this->query->set_table(array('users'));
             $this->query->set_where('user_id', '=', $user_id);
             $result = $this->query->update($data);
 
@@ -611,8 +578,6 @@ class Users_model extends Admin_model {
      */
     public function change_status_query($id, $data)
     {
-        $this->query->reset();
-        $this->query->set_table(array('users'));
         $this->query->set_where('user_id', '=', $id);
         $result = $this->query->update(array('user_active' => $data));
         return ($result) ? true : false;
@@ -623,18 +588,12 @@ class Users_model extends Admin_model {
      *
      * @return true ha superadmin, false ha nem
      */
-    public function is_user_superadmin($id) {
-        $this->query->reset();
-        $this->query->set_table(array('users'));
+    public function is_user_superadmin($id)
+    {
         $this->query->set_columns(array('user_role_id'));
         $this->query->set_where('user_id', '=', $id);
         $result = $this->query->select();
-
-        if ($result[0]['user_role_id'] == '1') {
-            return true;
-        } else {
-            return false;
-        }
+        return ($result[0]['user_role_id'] == '1') ? true : false;
     }
 
     /**
@@ -690,17 +649,15 @@ class Users_model extends Admin_model {
      * 	Visszaadja a userss tábla user_role_id oszlop tartalmát
      * 	A felhasználói szerepek számának meghatározásához kell
      */
-    public function roles_counter_query() {
-        $this->query->reset();
-        $this->query->set_table(array('users'));
+    public function roles_counter_query()
+    {
         $this->query->set_columns('user_role_id');
         return $this->query->select();
     }
 
     // a felhasználó szerepeket (szuperadmin, admin stb.) tölti be 
-    public function getRoles($id = NULL) {
-
-        $this->query->reset();
+    public function getRoles($id = NULL)
+    {
         $this->query->set_table(array('roles'));
         $this->query->set_columns(array('role_id', 'role_name', 'role_desc'));
         if (isset($id)) {
@@ -710,9 +667,8 @@ class Users_model extends Admin_model {
     }
 
     // a felhasználó szerepeket (szuperadmin, admin stb.) tölti be 
-    public function getPermissionList() {
-
-        $this->query->reset();
+    public function getPermissionList()
+    {
         $this->query->set_table(array('permissions'));
         $this->query->set_columns(array('perm_id', 'perm_key', 'perm_desc'));
         return $this->query->select();
@@ -723,7 +679,8 @@ class Users_model extends Admin_model {
      * @param   int     $role_id a felhasználó csoport id-je
      * @return 	array   $permission_list az enegdélyek listája
      */
-    public function getRolePerms($role_id) {
+    public function getRolePerms($role_id)
+    {
         $sql = "SELECT permissions.perm_key, permissions.perm_desc, permissions.perm_id FROM permissions
                 JOIN role_perm ON role_perm.perm_id = permissions.perm_id
                 WHERE role_perm.role_id = :role_id";
@@ -749,8 +706,9 @@ class Users_model extends Admin_model {
      * @param   int     $role_id a felhasználó csoport id-je
      * @return 	boolean true ha sikeres, false ha sikertelen
      */
-    public function save_role_permissions($role_id) {
-        $data = $_POST;
+    public function save_role_permissions($role_id)
+    {
+        $data = $this->request->get_post();
         unset($data['submit_edit_roles']);
 
         $permission_list = $this->getPermissionList();
