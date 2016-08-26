@@ -28,12 +28,15 @@ class Login_model extends Admin_model
      */
     public function login()
     {
+        // jelszó kompatibilitás library betöltése régebbi php verzió esetén
+        $this->load_password_compatibility(); 
+
         // we do negative-first checks here
-        if ( !$this->request->has_post('user_name') OR empty( $this->request->get_post('user_name') ) ) {
+        if ( !$this->request->has_post('user_name') OR $this->request->get_post('user_name') === '' ) {
             Message::set('error', 'username_field_empty');
             return false;
         }
-        if ( !$this->request->has_post('user_password') OR empty( $this->request->get_post('user_password') ) ) {
+        if ( !$this->request->has_post('user_password') OR $this->request->get_post('user_password') === '' ) {
             Message::set('error', 'password_field_empty');
             return false;
         }
