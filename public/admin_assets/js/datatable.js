@@ -188,7 +188,8 @@ var Datatable = function() {
                 var set = $('tbody > tr > td:nth-child(1) input[type="checkbox"]', table);
                 var checked = $(this).is(":checked");
                 $(set).each(function() {
-                    $(this).attr("checked", checked);
+                    $(this).prop("checked", checked);
+                    // $(this).attr("checked", checked);
                 });
                 $.uniform.update(set);
                 countSelectedRecords();
