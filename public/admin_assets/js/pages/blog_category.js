@@ -1,79 +1,8 @@
 var Blog_category = function () {
 
-
-/*
-    var blogCategoryTable = function () {
-
-        var table = $('#blog_category');
-	
-		table.dataTable({
-
-            "language": {
-                // metronic specific
-                    //"metronicGroupActions": "_TOTAL_ sor kiválasztva: ",
-                    //"metronicAjaxRequestGeneralError": "A kérés nem hajtható végre, ellenőrizze az internet kapcsolatot!",
-
-                // data tables specific                
-                "decimal":        "",
-                "emptyTable":     "Nincs megjeleníthető adat!",
-                "info":           "_START_ - _END_ elem &nbsp; _TOTAL_ elemből",
-                "infoEmpty":      "Nincs megjeleníthető adat!",
-                "infoFiltered":   "(Szűrve _MAX_ elemből)",
-                "infoPostFix":    "",
-                "thousands":      ",",
-                "lengthMenu":     " _MENU_ elem/oldal",
-                "loadingRecords": "Betöltés...",
-                "processing":     "Feldolgozás...",
-                "search":         "Keresés:",
-                "zeroRecords":    "Nincs egyező elem",
-                "paginate": {
-                    "previous":   "Előző",
-                    "next":       "Következő",
-                    "last":       "Utolsó",
-                    "first":      "Első",
-                    "pageOf":     "&nbsp;/&nbsp;"
-                },
-                "aria": {
-                    "sortAscending":  ": aktiválja a növekvő rendezéshez",
-                    "sortDescending": ": aktiválja a csökkenő rendezéshez"
-                }            
-            },
-            
-            // set default column settings
-            "columnDefs": [
-                {"orderable": true, "searchable": true, "targets": 0},
-                {"orderable": true, "searchable": false, "targets": 1},
-                {"orderable": false, "searchable": false, "targets": 2},
-                {"orderable": false, "searchable": false, "targets": 3}
-            ],
-
-            // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
-            // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js). 
-            // So when dropdowns used the scrollable div should be removed. 
-            // "dom": "<'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
-
-            "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-        
-            "lengthMenu": [
-                [5, 15, 20, -1],
-                [5, 15, 20, "All"] // change per page values here
-            ],
-            // set the initial value
-            "pageLength": 20,            
-            "pagingType": "bootstrap_full_number",
-            "order": [
-                [0, "asc"]
-            ] // set column as a default sort by asc
-		
-        });
-
-    };
-*/
-
-
-
     var handleTable = function () {
 
+// ------ ALAPFÜGGVÉNYEK ------------
         function restoreRow(oTable, nRow) {
             var aData = oTable.fnGetData(nRow);
             var jqTds = $('>td', nRow);
@@ -98,7 +27,6 @@ var Blog_category = function () {
             var jqInputs = $('input', nRow);
 
             oTable.fnUpdate(jqInputs[0].value, nRow, 0, false);
-            //oTable.fnUpdate('huba', nRow, 1, false);
             oTable.fnUpdate('<a class="edit" href=""><i class="fa fa-edit"></i> Szerkeszt</a>', nRow, 2, false);
             oTable.fnUpdate('<a class="delete" href=""><i class="fa fa-trash"></i> Töröl</a>', nRow, 3, false);
             oTable.fnDraw();
@@ -110,6 +38,8 @@ var Blog_category = function () {
             oTable.fnUpdate('<a class="edit" href=""><i class="fa fa-edit"></i> Szerkeszt</a>', nRow, 2, false);
             oTable.fnDraw();
         }
+// ------ ALAPFÜGGVÉNYEK VÉGE ------------
+
 
 
         // tábla beállítások
@@ -146,7 +76,6 @@ var Blog_category = function () {
                     "sortDescending": ": aktiválja a csökkenő rendezéshez"
                 }            
             },
-            
             // set default column settings
             "columnDefs": [
                 {"orderable": true, "searchable": true, "targets": 0},
@@ -154,17 +83,12 @@ var Blog_category = function () {
                 {"orderable": false, "searchable": false, "targets": 2},
                 {"orderable": false, "searchable": false, "targets": 3}
             ],
-
-            // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
-            // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js). 
-            // So when dropdowns used the scrollable div should be removed. 
-            // "dom": "<'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
-
-            "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-        
+            // save datatable state(pagination, sort, etc) in cookie.
+            "bStateSave": true,
+            // change per page values here
             "lengthMenu": [
                 [5, 15, 20, -1],
-                [5, 15, 20, "All"] // change per page values here
+                [5, 15, 20, "All"]
             ],
             // set the initial value
             "pageLength": 20,            
@@ -176,13 +100,17 @@ var Blog_category = function () {
         });
 
 
+
+
+        // szerkesztett és új elem értékének alapbeállítása
         var nEditing = null;
         var nNew = false;
+
 
         // kategória hozzáadása
         $('#category_insert_button').click(function (e) {
             e.preventDefault();
-
+			
             // ha van szerkesztett elem, VAGY létre van hozva egy új hozzáadása elem
             if (nNew || nEditing) {
                 
@@ -197,23 +125,26 @@ var Blog_category = function () {
                     closeInSeconds: 10 // auto close after defined seconds
                     // icon: "warning" // put icon before the message
                 });
-
-                return;
+				
+                return false;
+				
             }
+			
+			var aiNew = oTable.fnAddData(['', '', '', '']);
+			var nRow = oTable.fnGetNodes(aiNew[0]);
+			
+			editRow(oTable, nRow);
+			nEditing = nRow;
+			nNew = true;
 
-
-            var aiNew = oTable.fnAddData(['', '', '', '']);
-            var nRow = oTable.fnGetNodes(aiNew[0]);
-            
-            editRow(oTable, nRow);
-            nEditing = nRow;
-            nNew = true;
         });
+
 
         // törlés
         table.on('click', '.delete', function (e) {
             e.preventDefault();
             reference = $(this);
+			
             bootbox.setDefaults({
                 locale: "hu"
             });
@@ -300,10 +231,12 @@ var Blog_category = function () {
 
         });
 
-        // cancel
+
+        // mégsem gomb megnyomásakor
         table.on('click', '.cancel', function (e) {
             e.preventDefault();
             if (nNew) {
+                // sor törlése a DOM-ból
                 oTable.fnDeleteRow(nEditing);
                 nEditing = null;
                 nNew = false;
@@ -312,6 +245,7 @@ var Blog_category = function () {
                 nEditing = null;
             }
         });
+
 
         // elem szerkesztése
         table.on('click', '.edit', function (e) {
@@ -334,10 +268,13 @@ var Blog_category = function () {
                 bootbox.confirm("Biztosan menteni akarja a módosítást?", function (result) {
                     if (result) {
 
+                        // sor id-jének meghatározása
                         var id = reference.closest('tr').attr('data-id');
+                        // új elem létrehozásakor még nincs data-id attribútum, ezért az id-nek adunk egy 0 értéket, ebből a php feldolgozó tuni fogja, hogy insert lekérdezést kell csinálni
                         if (typeof id === 'undefined') {
-                            id = 0;
-                        }    
+                            id = null;
+                        }
+
                         var data = reference.closest('tr').find('input').val();
                         var ajax_message = $('#ajax_message');    
 
@@ -371,14 +308,21 @@ var Blog_category = function () {
                                         closeInSeconds: 4 // auto close after defined seconds
                                         // icon: "warning" // put icon before the message
                                     });
-                                    
-                                    saveRow(oTable, nEditing);
-                                    nEditing = null;
 
-                                    // új kategória hozzáadásakor a bejegyzések száma oszlopba berakunk egy 0-át
-                                    if (result.action == 'insert') {
+
+                                    // ha új sor került a táblázatba (mert van a result objektumnak inserted_id tulajdonsága)
+                                    if (result.inserted_id) {
+                                        // az új tr elemnek adunk egy data-id attribútumot az új id-vel    
+                                        $(nEditing).attr('data-id', result.inserted_id);
+                                        // a táblázatban az ehhez a listaelemhez kapcsolódó elemek alapból 0 
                                         $(nRow).find(':nth-child(2)').text('0');
                                     }
+
+                                    // sor mentése
+                                    saveRow(oTable, nEditing);
+                                    // alapbeállítások visszaállítása
+                                    nEditing = null;
+                                    nNew = false;
                                 }
 
                                 if (result.status == 'error') {
