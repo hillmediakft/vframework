@@ -15,6 +15,9 @@ class Controller {
 
         $this->registry = Registry::get_instance();
         $this->request = $this->registry->request;
+
+        // model betöltése
+        $this->loadModel($this->request->get_controller() . '_model');
     }
 
     /*
