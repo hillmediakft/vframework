@@ -247,10 +247,11 @@ HTML;
 	/**
 	 * Template menü elem class-t active-ra állítja, ha a controller és az action a megadott paraméterekkel egyezik
 	 *
-	 * @param string $controller 	- vizsgálandó controller neve illetve nevek 
-	 * @param string $action 		- action neve illetve nevek
+	 * @param string $controller 			- vizsgálandó controller neve illetve nevek 
+	 * @param string $action 				- action neve illetve nevek
+	 * @param string $attribute_name 		- html elem class neve
 	 */		
-	public function menu_active($controller, $action = null)
+	public function menu_active($controller, $action = null, $attribute_name = 'active')
 	{
 		$active_controller = $this->request->get_controller();
 		$active_action = $this->request->get_action();
@@ -261,7 +262,7 @@ HTML;
 			$controller = explode('|', $controller);
 			// megnézzük, hogy az aktuális controller neve benne van-e a $controller tömbben 
 			if (in_array($active_controller, $controller)) {
-				echo 'active';
+				echo $attribute_name;
 			}
 			return;
 		}
@@ -272,7 +273,7 @@ HTML;
 			$action = explode('|', $action);
 			// megnézzük, hogy az aktuális action neve benne van-e a $action tömbben 
 			if (in_array($active_action, $action)) {
-				echo 'active';
+				echo $attribute_name;
 			}
 			return;
 		}
@@ -284,7 +285,7 @@ HTML;
 			$action = explode('|', $action);
 
 			if (in_array($active_controller, $controller) && in_array($active_action, $action)) {
-				echo 'active';
+				echo $attribute_name;
 			}
 			return;
 		}
