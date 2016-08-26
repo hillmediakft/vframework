@@ -12,10 +12,10 @@
 *			'max' => 8,
 *			'min' => 2, 		
 *			'email' => true, 		
-*			'match' => 'password', 		
+*			'matches' => 'password', 		
 *		));
 *	
-*	A match szabálynál egy másik mező nevét kell megadni, amivel egyeznie kell. 
+*	A matches szabálynál egy másik mező nevét kell megadni, amivel egyeznie kell. 
 *
 *	2. Egyedi üzenet megadása (opcionális)
 *		1. param - egy szabály neve, amihez az üzenetet rendelni akarjuk
