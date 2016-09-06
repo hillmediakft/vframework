@@ -1,7 +1,7 @@
 <?php
 /**
  *	Adatbázis lekérdezés kezelő osztály
- *	v1.4
+ *	v1.5
  *
  *	Metódusok, beállítások:
  *	
@@ -570,10 +570,13 @@ class Query {
 		
 	    // Prepare to be executed
 		$sth = $this->connect->prepare($sql);
-		// Bind parameters
+		
+		// Adatok megadása bindParam metódus meghívással
+		/*
 		for($i = 1; $i <= count($this->bindings); $i++) {
 			$sth->bindParam($i, $this->bindings[$i-1]);
 		}
+		*/
 
 			//sql parancs és attribútumok tesztelése
 			if($this->debug === true) {
@@ -585,7 +588,7 @@ class Query {
 			}	
 
 		// lekérdezés végrehajtása (development környezetben hiba esetén kivételt dob)
-		$result = $sth->execute();
+		$result = $sth->execute($this->bindings);
 		// beállítások alapértékre állítása
 		$this->reset();
 
@@ -614,6 +617,9 @@ class Query {
 		$sql = $this->getInsert($attributes);
 		// lekérdezés előkészítése 
 		$sth = $this->connect->prepare($sql);
+
+		// ':' jelek berakása a kulcsok elé 
+		$attributes = $this->_key_colon($attributes);
 		
 			//sql parancs és attribútumok tesztelése
 			if($this->debug === true) {
@@ -740,9 +746,11 @@ class Query {
 			$sth = $this->connect->prepare($sql);
 			
 			// Bind parameters
+			/*
 			for($i = 1; $i <= count($this->bindings); $i++) {
 				$sth->bindParam($i, $this->bindings[$i-1]);
 			}
+			*/
 			
 				//sql parancs és attribútumok tesztelése
 				if($this->debug === true) {
@@ -754,7 +762,7 @@ class Query {
 				}			
 			
 			// Lekérdezés végrehajtása (development környezetben hiba esetén kivételt dob)
-			$result = $sth->execute();
+			$result = $sth->execute($this->bindings);
 			// beállítások alapértékre állítása
 			$this->reset();			
 
@@ -940,6 +948,21 @@ class Query {
 		$result = $sth->fetch(PDO::FETCH_NUM);
 		return (int)$result[0];
 	}
+
+	/**
+	 *  A visszadott tömb kulcsai elé betesz egy ':' jelet.	
+	 *
+	 *  @param array $data
+	 *  @return array 	
+	 */
+	private function _key_colon($arr)
+	{
+		foreach ($arr as $key => $value) {
+			$temp[':' . $key] = $value;
+		}
+		return $temp; 
+	}
+
 
 } //osztaly vege
 ?>
