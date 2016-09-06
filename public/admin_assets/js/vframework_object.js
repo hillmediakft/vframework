@@ -366,8 +366,9 @@ var vframework = function () {
             _printTable(options);
 		},
 
-        hideAlert: function () {
-            $('div.alert.alert-success, div.alert.alert-danger').delay( 3000 ).slideUp( 750 );                                
+        hideAlert: function (delay) {
+            var delay = (typeof delay !== 'undefined') ? delay : 3000;
+            $('div.alert.alert-success, div.alert.alert-danger').delay( delay ).slideUp( 750 );                                
         },
 
         // ckeditor bekapcsolása (options: { textarea_name_attr: "config_name" })
