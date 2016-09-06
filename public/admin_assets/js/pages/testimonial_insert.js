@@ -25,7 +25,7 @@ var Testimonial_insert = function () {
     return {
         init: function () {
             send_form();
-            // vframework.hideAlert();
+            vframework.hideAlert(6000);
         },
     };
 }();

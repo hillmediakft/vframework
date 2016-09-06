@@ -20,6 +20,10 @@
 	<div class="row">
 		<div class="col-md-12">
 
+
+			<!-- Üzenetek -->
+			<?php $this->renderFeedbackMessages();?>
+
 			<form action="" id="testimonial_form" method="POST">
 
 				<!-- BEGIN EXAMPLE TABLE PORTLET-->
@@ -37,17 +41,17 @@
 							
 						<div class="form-group">
 							<label for="testimonial_name">Név</label>	
-							<input type="text" name="testimonial_name" class="form-control input-large" value=""/>
+							<input type="text" name="testimonial_name" class="form-control input-large" value="<?php echo Session::get('testimonial_input.name') ?>"/>
 						</div>
 						
 						<div class="form-group">
 							<label for="testimonial_title">Beosztás</label>	
-							<input type='text' name='testimonial_title' class='form-control input-large' value=""/>
+							<input type='text' name='testimonial_title' class='form-control input-large' value="<?php echo Session::get('testimonial_input.title') ?>"/>
 						</div>
 						
 						<div class="form-group">
 							<label for="testimonial_text">Vélemény</label>
-							<textarea type='text' name='testimonial_text' class='form-control'></textarea>
+							<textarea type='text' name='testimonial_text' class='form-control'><?php echo Session::get('testimonial_input.text') ?></textarea>
 						</div>
 
 					</div> <!-- END USER GROUPS PORTLET BODY-->

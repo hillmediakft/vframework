@@ -30,8 +30,16 @@ class Testimonials extends Admin_controller {
 	public function insert()
 	{
 		if($this->request->has_post()) {
-			$this->testimonials_model->insert_testimonial();
-			Util::redirect('testimonials');
+
+			$result = $this->testimonials_model->insert_testimonial();
+			
+			if ($result) {
+				Session::delete('testimonial_input');
+				Util::redirect('testimonials');
+			} else {
+				Util::redirect('testimonials/insert');
+			}
+
 		}
 		
 		$this->view = new View();
@@ -39,10 +47,11 @@ class Testimonials extends Admin_controller {
 		$this->view->title = 'Új testimonials oldal';
 		$this->view->description = 'Új testimonials oldal description';
 		
-		$this->view->add_links(array('testimonial_insert'));
+		$this->view->add_links(array('testimonial_insert','vframework'));
 	
 		$this->view->set_layout('tpl_layout');
-		$this->view->render('testimonials/tpl_testimonial_insert');	
+		$this->view->render('testimonials/tpl_testimonial_insert');
+		Session::delete('testimonial_input');
 	}
 	
 	/**
