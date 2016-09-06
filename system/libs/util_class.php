@@ -53,9 +53,9 @@ class Util {
     public static function thumb_path($path, $dir = false, $suffix = 'thumb')
     {
         $path_parts = pathinfo($path);
-        $dirname = $path_parts['dirname'];
-        $filename = $path_parts['filename'];
-        $extension = $path_parts['extension'];
+        $dirname = (isset($path_parts['dirname'])) ? $path_parts['dirname'] : '';
+        $filename = (isset($path_parts['filename'])) ? $path_parts['filename'] : '';
+        $extension = (isset($path_parts['extension'])) ? $path_parts['extension'] : '';
 
         if (!$dir) {
             if (($dirname == '.') || ($dirname == '\\')) {
