@@ -63,13 +63,13 @@
                     <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte; -->
                     <li class="dropdown dropdown-user">
                         <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-                            <img alt="" class="img-circle" src="<?php echo Config::get('user.upload_path') . Session::get('user_photo'); ?>" />
-                            <span class="username username-hide-on-mobile"><?php echo Session::get('user_name'); ?></span>
+                            <img alt="" class="img-circle" src="<?php echo Config::get('user.upload_path') . Auth::getUser('user_photo'); ?>" />
+                            <span class="username username-hide-on-mobile"><?php echo Auth::getUser('user_name'); ?></span>
                             <i class="fa fa-angle-down"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-default">
                             <li>
-                                <a href="admin/users/profile/<?php echo Session::get('user_id'); ?>">
+                                <a href="admin/users/profile/<?php echo Auth::getUser('user_id'); ?>">
                                     <i class="fa fa-user"></i> Profilom </a>
                             </li>
                             <li class="divider"> </li>
