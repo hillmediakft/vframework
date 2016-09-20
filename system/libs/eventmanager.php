@@ -137,7 +137,7 @@ class EventManager
      * @throws \Exception
      * @return void
      */
-    public static function trigger($event, array $params = [])
+    public static function trigger($event, array $params = array())
     {
         if (!self::has($event)) {
             throw new \Exception('Event is not registered');
