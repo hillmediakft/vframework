@@ -37,7 +37,7 @@
                             <?php
                             $loggedin_user_id = Session::get('user_id');
 
-                            if (Acl::check('insert_user')) { ?>
+                            if (Auth::hasAccess('insert_user')) { ?>
                                 <a href="admin/users/insert" class="btn blue-steel btn-sm"><i class="fa fa-plus"></i> Új felhasználó</a>
                             <?php } ?>
                             <button class="btn red btn-sm" id="delete_group" type="button"><i class="fa fa-trash"></i> Csoportos törlés</button>
@@ -81,7 +81,7 @@
                                 <?php foreach ($this->all_user as $value) { ?>
                                 <tr class="odd gradeX">
                                     <td>
-                                    <?php if (Acl::check('delete_user') && $value['user_id'] != $loggedin_user_id) { ?>
+                                    <?php if (Auth::hasAccess('delete_user') && $value['user_id'] != $loggedin_user_id) { ?>
                                         <input type="checkbox" class="checkboxes" name="user_id_<?php echo $value['user_id']; ?>" value="<?php echo $value['user_id']; ?>"/>
                                     <?php } ?>	
                                     </td>
@@ -103,18 +103,18 @@
 
                                                 <a class="btn btn-sm grey-steel" title="műveletek" data-toggle="dropdown"><i class="fa fa-cogs"></i></a>
                                                 <ul class="dropdown-menu pull-right">
-                                                    <?php if (Acl::check('update_user')) { ?>	
+                                                    <?php if (Auth::hasAccess('update_user')) { ?>	
                                                         <li><a href="admin/users/profile/<?php echo $value['user_id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
                                                     <?php } else { ?>
                                                         <!-- <li class="disabled-link"><a class="disable-target"><i class="fa fa-pencil"></i> Szerkeszt</a></li> -->
                                                     <?php } 
-                                                        if (Acl::check('delete_user') && $value['user_id'] != $loggedin_user_id) { ?>
+                                                        if (Auth::hasAccess('delete_user') && $value['user_id'] != $loggedin_user_id) { ?>
                                                         <li><a class="delete_item" data-id="<?php echo $value['user_id']; ?>"> <i class="fa fa-trash"></i> Töröl</a></li>
                                                     <?php } else { ?>
                                                         <!-- <li class="disabled-link"><a class="disable-target" title="Nem törölhető"><i class="fa fa-trash"></i> Töröl</a></li> -->
                                                     <?php } ?>
 
-                                                    <?php if (Acl::check('change_status_user') && $value['user_id'] != $loggedin_user_id) { ?>	
+                                                    <?php if (Auth::hasAccess('change_status_user') && $value['user_id'] != $loggedin_user_id) { ?>	
                                                         <?php if ($value['user_active'] == 1) { ?>
                                                             <li><a class="change_status" data-id="<?php echo $value['user_id']; ?>" data-action="make_inactive"><i class="fa fa-ban"></i> Blokkol</a></li>
                                                         <?php } ?>
