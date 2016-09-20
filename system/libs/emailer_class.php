@@ -1,11 +1,9 @@
 <?php
-
 /**
  * 	Emailer class v1.0
  *
  * 	Használat (példa):
  * 		 
-
  */
 class Emailer {
 
@@ -25,9 +23,9 @@ class Emailer {
     private $template;
 
     /**
-     * $_POST adatok
+     * Adatok a template-be
      */
-    private $form_data;
+    private $template_data;
 
     /**
      * E-mail tárgya
@@ -45,46 +43,66 @@ class Emailer {
     private $to_name;
 
     /**
-     * Címzett neve
+     * Csatolmányok file-nevei
+     */
+    private $attachments = array();
+
+    /**
+     * Csatolmányok elérési útja
+     */
+    private $attachments_path = '';
+
+    /**
+     * SMTP kapcsoló
      */
     private $use_smtp = false;
 
     /**
-     * Email küldés sikeressége (sikeres: true, sikertelen: false)
+     * site vagy admin
      */
-    public $status;
+    private $area = 'site';
 
     /**
      * CONSTRUCTOR
      *
-     * @param  string   $pagename 	GET paraméter neve ami a lapozáshoz kapcsolódik
-     * @param  integer  $limit 		egyszerre ennyi elem jelenik meg az oldalon	
-     * @param  integer  $stages 	a jelenlegi oldal mindkét oldalán hány elem legyen az oldalszámozásnál
+     * @param  string   $from_email
+     * @param  string   $from_name
+     * @param  string   $to_email
+     * @param  string   $to_name
+     * @param  string   $subject
+     * @param  string   $template_data
+     * @param  string   $template
      */
-    function __construct($from_email, $from_name, $to_email, $to_name, $subject, $form_data, $template) {
+    public function __construct($from_email, $from_name, $to_email, $to_name, $subject, $template_data, $template, $attachments = array())
+    {
         $this->from_name = $from_name;
         $this->from_email = $from_email;
         $this->to_email = $to_email;
         $this->to_name = $to_name;
         $this->subject = $subject;
         $this->template = $template;
-        $this->form_data = $form_data;
+        $this->template_data = $template_data;
+        $this->attachments = $attachments;
+
+        $this->use_smtp = Config::get('email.server.use_smtp', false);
     }
 
     /**
-     * e-mail küldése
-     *
-     * 
+     * use_smtp tulajdonság értékének beállítása
+     * @param bool
      */
-    public function send() {
+    public function setSmtp($use_smtp = true)
+    {
+        $this->use_smtp = (bool)$use_smtp;
+    }
 
-        if ($this->use_smtp) {
-            // küldés SMTP-vel
-            $this->send_with_smtp();
-        } else {
-            // egyszerű küldés 
-            $this->simple_send();
-        }
+    /**
+     * Area tulajdonság értékének beállítása (site vagy admin, ahonnan betölti a template-et)
+     * @param bool
+     */
+    public function setArea($area)
+    {
+        $this->area = $area;
     }
 
     /**
@@ -92,35 +110,33 @@ class Emailer {
      *
      * @return 
      */
-    public function send_with_smtp() {
-
-// küldés PHPMailer-el
+    public function send()
+    {
         include(LIBS . '/PHPMailer/PHPMailerAutoload.php');
-
         $mail = new PHPMailer;
 
-        $host = Config::get('email.server.smtp_host');
-        $user_name = Config::get('email.server.smtp_username');
-        $password = Config::get('email.server.smtp_password');
-        $port = Config::get('email.server.smtp_port');
-        $auth = Config::get('email.server.smtp_auth');
-
-
-        //Enable SMTP debugging. 
-        $mail->SMTPDebug = 0;
-//Set PHPMailer to use SMTP.
-        $mail->isSMTP();
-//Set SMTP host name                          
-        $mail->Host = $host;
-//Set this to true if SMTP host requires authentication to send email
-        $mail->SMTPAuth = $auth;
-//Provide username and password     
-        $mail->Username = $user_name;
-        $mail->Password = $password;
-//If SMTP requires TLS encryption then set it
-        $mail->SMTPSecure = "tls";
-//Set TCP port to connect to 
-        $mail->Port = $port;
+        if ($this->use_smtp) {
+            //Set PHPMailer to use SMTP.
+            $mail->isSMTP();
+            //Enable SMTP debugging. 
+            $mail->SMTPDebug = Config::get('email.server.phpmailer_debug_mode');
+            //Set SMTP host name                          
+            $mail->Host = Config::get('email.server.smtp_host');
+            //Set this to true if SMTP host requires authentication to send email
+            $mail->SMTPAuth = Config::get('email.server.smtp_auth');
+// SMTP connection will not close after each email sent, reduces SMTP overhead
+// $mail->SMTPKeepAlive = true;
+            //Provide username and password     
+            $mail->Username = Config::get('email.server.smtp_username');
+            $mail->Password = Config::get('email.server.smtp_password');
+            //If SMTP requires TLS encryption then set it
+            $mail->SMTPSecure = Config::get('email.server.smtp_encryption');
+            //Set TCP port to connect to 
+            $mail->Port = Config::get('email.server.smtp_port');
+        } 
+        else {
+            $mail->isSendmail();
+        }
 
         $mail->CharSet = 'UTF-8'; //karakterkódolás beállítása
         $mail->WordWrap = 78; //sortörés beállítása (a default 0 - vagyis nincs)
@@ -129,29 +145,38 @@ class Emailer {
         $mail->Subject = $this->subject; // Tárgy megadása
         $mail->isHTML(true); // Set email format to HTML                                  
 
-        $body = $this->load_template_with_data($this->template, $this->form_data);
+        if (!empty($this->attachments)) {
+            foreach ($this->attachments as $value) {
+                $mail->addAttachment($this->attachments_path . $value);
+            }
+        }
 
-        $mail->Body = $body;
+// levél tartalom beállítása
+        $mail->Body = $this->_load_template_with_data($this->template, $this->template_data);
+        //$mail->AltBody = '';
 
         $mail->addAddress($this->to_email, $this->to_name);     // Add a recipient (Name is optional)
         // $mail->addAddress($admin_email);
+
 // final sending and check
         if ($mail->send()) {
+            $mail->clearAddresses();
             return true;
         } else {
+            $mail->clearAddresses();
+            //var_dump($mail->ErrorInfo);
             return false;
         }
-
-        $mail->clearAddresses();
     }
 
     /**
-     * e-mail küldése SMTP-vel
+     * e-mail küldése SimpleMail-el
      *
      * @return 
      */
-    public function simple_send() {
-
+    public function sendSimple()
+    {
+        //include(LIBS . '/simplemail_class.php');    
         $mail = new SimpleMail();
         $mail->setTo($this->to_email, $this->to_name);
         $mail->setSubject($this->subject);
@@ -161,11 +186,11 @@ class Emailer {
         $mail->addGenericHeader('Content-Type', 'text/html; charset="utf-8"');
         $mail->addGenericHeader('X-Mailer', 'PHP/' . phpversion());
 
-        $body = $this->load_template_with_data($this->template, $this->form_data);
-
+        $body = $this->_load_template_with_data($this->template, $this->template_data);
         $mail->setMessage($body);
 
         $mail->setWrap(100);
+
 // final sending and check
         if ($mail->send()) {
             return true;
@@ -177,17 +202,18 @@ class Emailer {
     /**
      * template betöltése adatokkal
      *
-     * 
+     * @param string $template
+     * @param array $template_data
+     * @return string 
      */
-    public function load_template_with_data($template, $form_data) {
-
-        $body = file_get_contents('system/site/view/email/tpl_' . $template . '.php');
-        foreach ($form_data as $key => $value) {
+    private function _load_template_with_data($template, $template_data)
+    {
+        $body = file_get_contents('system/' . $this->area . '/view/email/tpl_' . $template . '.php');
+        foreach ($template_data as $key => $value) {
             $body = str_replace('{' . $key . '}', $value, $body);
         }
         return $body;
     }
 
 }
-
 ?>
