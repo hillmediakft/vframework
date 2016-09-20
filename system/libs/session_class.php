@@ -25,6 +25,18 @@ class Session
         }
     }
 
+    /**
+     * Megnézi, hogy létezik-e a megadott kulcs a $_SESSION tömbben
+     *
+	 * @param string $key
+     * @return bool
+     */
+    public static function has($key)
+    {
+    	return isset($_SESSION[$key]);
+    }
+
+
 	/**
 	 * sets a specific value to a specific key of the session
 	 * @param mixed $key
