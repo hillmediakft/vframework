@@ -29,13 +29,13 @@
 		// use SMTP or basic mail() ? SMTP is strongly recommended
 		define("EMAIL_USE_SMTP", true);
 		// name of your host
-		define("EMAIL_SMTP_HOST", 'smtp.gmail.com');
+		define("EMAIL_SMTP_HOST", '');
 		// leave this true until your SMTP can be used without login
 		define("EMAIL_SMTP_AUTH", true);
 		// SMTP provider username
-		define("EMAIL_SMTP_USERNAME", 'varnagyzsolt1975@gmail.com');
+		define("EMAIL_SMTP_USERNAME", '');
 		// SMTP provider password
-		define("EMAIL_SMTP_PASSWORD", 'amiga.k240');
+		define("EMAIL_SMTP_PASSWORD", '');
 		// SMTP provider port
 		define("EMAIL_SMTP_PORT", 587);
 		// SMTP encryption, usually SMTP providers use "tls" or "ssl", for details see the PHPMailer manual
