@@ -52,15 +52,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($this->role_permissions as $value) { ?>
+                                <?php foreach ($this->role_permissions as $value) { 
+                                    $selected = (in_array($value['perm_key'], $this->role['role_permissions']));
+                                    //$value['bool']
+                                ?>
                                 <tr class="odd gradeX">
                                     <td><?php echo $value['perm_key']; ?></td>
                                     <td><?php echo $value['perm_desc']; ?></td>
                                     <td>
                                         <div class="form-group">
                                             <select name="<?php echo $value['perm_key']; ?>" class="form-control small" <?php echo($value['perm_key'] == 'menu_home') ? 'disabled' : '';?>>
-                                                <option value="0" <?php echo(!$value['bool']) ? 'selected' : '';?>>Tiltott</option>
-                                                <option value="1" <?php echo($value['bool']) ? 'selected' : '';?>>Engedélyezett</option>
+                                                <option value="0" <?php echo (!$selected) ? 'selected' : '';?>>Tiltott</option>
+                                                <option value="1" <?php echo ($selected) ? 'selected' : '';?>>Engedélyezett</option>
                                             </select>
                                         </div>
                                     </td>
