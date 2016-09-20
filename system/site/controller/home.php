@@ -10,11 +10,7 @@ class Home extends Site_controller {
 
     public function index()
     {
-    
-// lorem ipsum dolor sit amet        
-
         $this->view = new View();
-        
         $this->view->add_link('js', SITE_ASSETS . 'pages/home.js');
         // lekérdezések
         // $this->view->settings = $this->home_model->get_settings();
