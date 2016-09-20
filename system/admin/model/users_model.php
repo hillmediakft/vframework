@@ -123,6 +123,7 @@ class Users_model extends Admin_model {
             }
 
             $data['user_role_id'] = $this->request->get_post('user_group', 'integer');
+            $data['user_provider_type'] = ($this->request->get_uri('area') == 'admin') ? 'admin' : null;
 
                 // jelszó kompatibilitás library betöltése régebbi php verzió esetén
                 $this->load_password_compatibility();
@@ -177,7 +178,7 @@ class Users_model extends Admin_model {
             if ($this->email_verify === true) {
 
                 // ellenőrző email küldése, ha az ellenőrző email küldése sikertelen: felhasználó törlése az databázisból
-                if ($this->sendVerificationEmail($last_inserted_id, $data['user_email'], $data['user_activation_hash'])) {
+                if ($this->_sendVerificationEmail($last_inserted_id, $data['user_email'], $data['user_activation_hash'])) {
                     Message::set('success', 'account_successfully_created');
                     return true;
                 } else {
@@ -195,6 +196,80 @@ class Users_model extends Admin_model {
         }
     }
 
+                /**
+                 * sends an email to the provided email address
+                 *
+                 * @param string    $user_name                  felhasznalo neve
+                 * @param int       $user_id                    user's id
+                 * @param string    $user_email                 user's email
+                 * @param string    $user_activation_hash       user's mail verification hash string
+
+                 * @return boolean
+                 */
+                private function _sendVerificationEmail($user_name, $user_id, $user_email, $user_activation_hash)
+                {
+                    // Email kezelő osztály behívása
+                    include(LIBS . '/simple_mail_class.php');
+
+                    $subject = Config::get('email.verification.subject');
+                    $link = Config::get('email.verification.link');
+                    $html = '<html><body><h3>Kedves ' . $user_name . '!</h3><p>A ' . $user_email . ' e-mail címmel regisztráltál a ---. Regisztrációd megtörtént, de jelenleg passzív.</p><a href="' . BASE_URL . 'regisztracio/' . $user_id . '/' . $user_activation_hash . '">' . $link . '</a><p>Az aktiválást követően a ----- oldalára jutsz, ahol bejelentkezhetsz a felhasználó neveddel és jelszavaddal. Annak érdekében, hogy segíthessünk a számodra leginkább megfelelő munka megtalálásában, töltsd ki a felhasználói profilodat. </p><p>Üdvözlettel:<br>A Multijob Diákszövetkezet csapata</p></body></html>';
+                    
+                    $from_email = Config::get('email.from_email');
+                    $from_name = Config::get('email.from_name');
+                    
+                    // Létrehozzuk a SimpleMail objektumot
+                    $mail = new SimpleMail();
+                    $mail->setTo($user_email, $user_name)
+                         ->setSubject($subject)
+                         ->setFrom($from_email, $from_name)
+                         ->addMailHeader('Reply-To', 'info@gmail.com', 'Mail Bot')
+                         ->addGenericHeader('MIME-Version', '1.0')
+                         ->addGenericHeader('Content-Type', 'text/html; charset="utf-8"')
+                         ->addGenericHeader('X-Mailer', 'PHP/' . phpversion())
+                         ->setMessage($html)
+                         ->setWrap(78);
+              
+                    // final sending and check
+                    if($mail->send()) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+
+                /**
+                 * checks the email/verification code combination and set the user's activation status to true in the database
+                 * @param int $user_id user id
+                 * @param string $user_activation_verification_code verification token
+                 * @return bool success status
+                 */
+                public function verifyNewUser($user_id, $user_activation_verification_code)
+                {
+                    // megnézzük, hogy már sikerült-e a regisztráció (ha frissíti az oldalt)
+                    $this->query->set_columns(array('user_id'));
+                    $this->query->set_where('user_id', '=', $user_id);
+                    $this->query->set_where('user_active', '=', 1, 'and');
+                    $this->query->set_where('user_activation_hash', '=', null, 'and');
+                    $result = $this->query->select();
+
+                    if($result){
+                        return true;
+                    }
+                            
+                    $data['user_active'] = 1;
+                    $data['user_activation_hash'] = null;
+                    
+                    $this->query->set_where('user_id', '=', $user_id);
+                    $this->query->set_where('user_activation_hash', '=', $user_activation_verification_code, 'and');
+                    $result = $this->query->update($data);
+                    
+                    if ($result == 1) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
 
 
 
@@ -597,166 +672,42 @@ class Users_model extends Admin_model {
     }
 
     /**
-     * Upgrades/downgrades the user's account (for DEFAULT and FACEBOOK users)
-     * Currently it's just the field user_role_id in the database that
-     * can be 1 or 2 (maybe "basic" or "premium"). In this basic method we
-     * simply increase or decrease this value to emulate an account upgrade/downgrade.
-     * Put some more complex stuff in here, maybe a pay-process or whatever you like.
-     */
-    /*
-      public function changeAccountType()
-      {
-      if (isset($_POST["user_account_upgrade"]) AND !empty($_POST["user_account_upgrade"])) {
-
-      // do whatever you want to upgrade the account here (pay-process etc)
-      // ...
-      // ... myPayProcess();
-      // ...
-
-      // upgrade account type
-      $query = $this->connect->prepare("UPDATE users SET user_role_id = 2 WHERE user_id = :user_id");
-      $query->execute(array(':user_id' => $_SESSION["user_id"]));
-
-      if ($query->rowCount() == 1) {
-      // set account type in session to 2
-      Session::set('user_role_id', 2);
-      Message::set('success', 'account_upgrade_successful');
-      } else {
-      Message::set('error', 'account_upgrade_failed');
-      }
-      } elseif (isset($_POST["user_account_downgrade"]) AND !empty($_POST["user_account_downgrade"])) {
-
-      // do whatever you want to downgrade the account here (pay-process etc)
-      // ...
-      // ... myWhateverProcess();
-      // ...
-
-      $query = $this->connect->prepare("UPDATE users SET user_role_id = 1 WHERE user_id = :user_id");
-      $query->execute(array(':user_id' => $_SESSION["user_id"]));
-
-      if ($query->rowCount() == 1) {
-      // set account type in session to 1
-      Session::set('user_role_id', 1);
-      Message::set('success', 'account_downgrade_successful');
-      } else {
-      Message::set('error', 'account_downgrade_failed');
-      }
-      }
-      }
-     */
-
-    /**
      * 	Visszaadja a userss tábla user_role_id oszlop tartalmát
      * 	A felhasználói szerepek számának meghatározásához kell
      */
-    public function roles_counter_query()
+    public function rolesCounter()
     {
         $this->query->set_columns('user_role_id');
         return $this->query->select();
     }
 
-    // a felhasználó szerepeket (szuperadmin, admin stb.) tölti be 
-    public function getRoles($id = NULL)
+
+
+
+    /*
+     * Lekérdezzük egy bizonyos e-mail címmel rendelkező user nevét és password-ját (elfelejtett jelszó esetén)
+     *
+     *  @param  string  $email_address
+     */
+    public function getPasswordHash($email_address)
     {
-        $this->query->set_table(array('roles'));
-        $this->query->set_columns(array('role_id', 'role_name', 'role_desc'));
-        if (isset($id)) {
-            $this->query->set_where('role_id', '=', $id);
-        }
+        $this->query->set_columns(array('user_name', 'user_password_hash'));
+        $this->query->set_where('user_email', '=', $email_address);
         return $this->query->select();
     }
 
-    // a felhasználó szerepeket (szuperadmin, admin stb.) tölti be 
-    public function getPermissionList()
-    {
-        $this->query->set_table(array('permissions'));
-        $this->query->set_columns(array('perm_id', 'perm_key', 'perm_desc'));
-        return $this->query->select();
-    }
-
-    /**
-     * A felhasznnálói csoporthoz (role) tartozó engedély listát adja vissza  
-     * @param   int     $role_id a felhasználó csoport id-je
-     * @return 	array   $permission_list az enegdélyek listája
+    /*
+     * Új jelszó adatbázisba írása (elfelejtett jelszó esetén)
+     *
+     * @param  string  $email_address
+     * @param string  $password_hash
      */
-    public function getRolePerms($role_id)
+    public function setNewPassword($email_address, $password_hash)
     {
-        $sql = "SELECT permissions.perm_key, permissions.perm_desc, permissions.perm_id FROM permissions
-                JOIN role_perm ON role_perm.perm_id = permissions.perm_id
-                WHERE role_perm.role_id = :role_id";
-        $sth = $this->connect->prepare($sql);
-        $sth->execute(array(":role_id" => $role_id));
+        $this->query->set_where('user_email', '=', $email_address);
+        return $this->query->update(array('user_password_hash' => $password_hash));
+    }    
 
-        while ($row = $sth->fetch(PDO::FETCH_ASSOC)) {
-            $this->permissions[] = $row['perm_key'];
-        }
-        $permission_list = $this->getPermissionList();
-        foreach ($permission_list as $key => $value) {
-            if (in_array($permission_list[$key]['perm_key'], $this->permissions)) {
-                $permission_list[$key]['bool'] = true;
-            } else {
-                $permission_list[$key]['bool'] = false;
-            }
-        }
-        return $permission_list;
-    }
 
-    /**
-     * A módosított emgedélyek listájának lementése  
-     * @param   int     $role_id a felhasználó csoport id-je
-     * @return 	boolean true ha sikeres, false ha sikertelen
-     */
-    public function save_role_permissions($role_id)
-    {
-        $data = $this->request->get_post();
-        unset($data['submit_edit_roles']);
-
-        $permission_list = $this->getPermissionList();
-        foreach ($permission_list as $key => $val) {
-            $perm_list[$val['perm_key']] = $val['perm_id'];
-        }
-
-        $error_counter = 0;
-
-        foreach ($data as $key => $value) {
-            // megnézzük, hogy role-hoz engedélyezve van-e már a permission
-            $this->query->reset();
-            //    $this->query->debug(true);
-            $this->query->set_table('role_perm');
-            $this->query->set_columns('id');
-            $this->query->set_where('role_id', '=', $role_id);
-            $this->query->set_where('perm_id', '=', $perm_list[$key]);
-            $result = $this->query->select();
-
-            if (empty($result) && $value == '1') {
-                // adatbázisba írás  $role_id= 2 és $perm_id = $perm_list[$key]
-                $insert_data = array(
-                    'role_id' => $role_id,
-                    'perm_id' => $perm_list[$key]
-                );
-
-                $this->query->reset();
-                $this->query->set_table('role_perm');
-                $insert_result = $this->query->insert($insert_data);
-            } elseif (!empty($result) && $value == '0') {
-                $this->query->reset();
-                $this->query->set_table('role_perm');
-                $this->query->set_where('role_id', '=', $role_id);
-                $this->query->set_where('perm_id', '=', $perm_list[$key]);
-                $delete_result = $this->query->delete();
-            }
-        }
-
-        if ($error_counter == 0) {
-            Message::set('success', 'Módosítások elmentve!');
-            return true;
-        } else {
-            Message::set('error', 'unknown_error');
-            return false;
-        }
-    }
-
-}
-
-// end class
+} // end class
 ?>
