@@ -192,6 +192,35 @@ class Query {
 	// SQL parancs és attribútumok tesztelése
 	private $debug = false;	
 
+	/**
+	 * Adatok visszaadásának formátumát tárolja 
+	 */
+	private $fetchmode = PDO::FETCH_ASSOC;
+
+	/**
+	 * Adatok visszaadási formátumának beállítása
+	 * @param string $mode 	(assoc, object, both)
+	 */
+	public function setFetchMode($mode)
+	{
+		switch ($mode) {
+			case 'assoc':
+				$this->fetchmode = PDO::FETCH_ASSOC;
+				break;
+
+			case 'object':
+				$this->fetchmode = PDO::FETCH_OBJ;
+				break;
+
+			case 'both':
+				$this->fetchmode = PDO::FETCH_BOTH;
+				break;
+			
+			default:
+				$this->fetchmode = PDO::FETCH_ASSOC;
+				break;
+		}
+	}
 
 	/**
 	 * Constructor (elindítja (illetve megkapja) az adatbáziskapcsolatot)
@@ -597,7 +626,7 @@ class Query {
 		}
 
 		// return all fetched
-		return $sth->fetchAll(PDO::FETCH_ASSOC);
+		return $sth->fetchAll($this->fetchmode);
 	}	
 
 	/**
@@ -902,7 +931,7 @@ class Query {
 			return '';
 		}
 		
-		return ' ORDER BY ' . $this->orderby . ';';
+		return ' ORDER BY ' . $this->orderby;
 	}
 
 	/**
