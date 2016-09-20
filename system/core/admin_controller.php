@@ -7,8 +7,12 @@ class Admin_controller extends Controller {
 
         // Authentikáció minden admin oldalra, kivéve a login
         if($this->request->get_controller() != 'login'){
-            Auth::handleLogin();
+            // Auth::handleLogin();
+           	if (!Auth::check()) {
+            	Util::redirect('login');	
+           	} 
         }
+        
     }
 }
 ?>
