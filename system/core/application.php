@@ -13,6 +13,9 @@ class Application {
 		// Betöltjük az aktuális nyelvnek megfelelő üzenet fájlt
 		Message::load('messages_' . $this->request->get_uri('area'), $this->request->get_uri('langcode'));
         
+        // Megadjuk az Auth osztály alapbeállításait (1. config file betöltése, area megadása)
+		Auth::init('auth', $this->request->get_uri('area'));
+
 
 				// nyelvi fájl betöltése
 				//$language = new Language();
