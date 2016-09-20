@@ -4,6 +4,7 @@ class Blog extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
+		$this->loadModel('blog_model');
 	}
     
 	public function index()

@@ -4,6 +4,7 @@ class Pages extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
+		$this->loadModel('pages_model');
 	}
 
 	public function index()

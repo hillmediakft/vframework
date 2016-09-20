@@ -4,6 +4,7 @@ class Testimonials extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
+		$this->loadModel('testimonials_model');
 	}
 
 	public function index()

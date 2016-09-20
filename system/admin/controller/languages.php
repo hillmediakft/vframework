@@ -4,6 +4,7 @@ class Languages extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
+		$this->loadModel('languages_model');
 	}
 
 	public function index()

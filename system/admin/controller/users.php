@@ -4,6 +4,7 @@ class Users extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
+		$this->loadModel('users_model');
 	}
 
 	public function index()
@@ -58,9 +59,9 @@ class Users extends Admin_controller {
      *
 	 * A metódusnak szüksége van egy user id-jére amit módosítani akarunk ($this->request->get_params('id'))
 	 */
-	public function profile($id)
+	public function profile()
 	{
-		//$id = (int)$this->request->get_params('id');	
+		$id = (int)$this->request->get_params('id');	
 
 		if($this->request->has_post('submit_edit_user')) {
             
@@ -98,8 +99,8 @@ class Users extends Admin_controller {
         
         $this->view->add_link('js', ADMIN_JS . 'pages/common.js');
 
-        $this->view->roles = $this->users_model->getRoles();
-        $this->view->roles_counter = $this->users_model->roles_counter_query();
+        $this->view->roles = Auth::instance()->getRoles();
+        $this->view->roles_counter = $this->users_model->rolesCounter();
 
 		$this->view->set_layout('tpl_layout');
         $this->view->render('users/tpl_user_roles');
@@ -108,12 +109,17 @@ class Users extends Admin_controller {
 	
  	public function edit_roles()
  	{
-        $role_id = $this->request->get_params('id');
+        $role_id = (int)$this->request->get_params('id');
         
         if ($this->request->has_post('submit_edit_roles')) {
-            $result = $this->users_model->save_role_permissions($role_id);
-                Util::redirect('users/edit_roles/' . $role_id);
 
+        	$permissions = $this->request->get_post();
+			unset($permissions['submit_edit_roles']);
+
+			Auth::instance()->savePerms($role_id, $permissions);
+    	   	Message::set('success', 'Módosítások elmentve!');
+
+            Util::redirect('users/edit_roles/' . $role_id);
         }
 
 		$this->view = new View();
@@ -122,13 +128,14 @@ class Users extends Admin_controller {
         $this->view->description = 'Felhasználói jogosultságok szerkesztése description';
         
 		$this->view->add_link('js', ADMIN_JS . 'pages/common.js');
-        
-        // a szerkesztendő role neve
-        $this->view->role = $this->users_model->getRoles($role_id);
-        $this->view->role = $this->view->role[0];
-        // a szerkesztendő role-hoz tartozó engedélyek
-        $this->view->role_permissions = $this->users_model->getRolePerms($role_id);
- 
+
+
+		$auth = Auth::instance();
+		// összes permission adata	
+		$this->view->role_permissions = $auth->getAllPerms();
+		// a $role_id-hez tartozó szerep adatai és engedélyei
+		$this->view->role =  $auth->getRoles($role_id);
+
 		$this->view->set_layout('tpl_layout');
         $this->view->render('users/tpl_edit_roles');
     }
@@ -139,7 +146,7 @@ class Users extends Admin_controller {
 	public function delete_user_AJAX()
 	{
         if($this->request->is_ajax()){
-	        if(Acl::check('delete_user')){
+	        if(Auth::hasAccess('delete_user')){
 	        	// a POST-ban kapott user_id egy string ami egy szám vagy számok felsorolása pl.: "23" vagy "12,45,76" 
 	        	$id = $this->request->get_post('item_id');
             	$respond = $this->users_model->delete_user_AJAX($id);
@@ -232,6 +239,115 @@ class Users extends Admin_controller {
 			Util::redirect('error');
 		}
     }	
+
+	/**
+	 *	Új jelszó küldése a felhasználónak (elfelejtett jelszó esetén)
+     *  - lekérdezi, hogy van-e a $_POST-ban kapott email címmel rendelkező felhasználó
+     *  - generál egy 8 karakter hosszú jelszót és egy new_password_hash-t
+     *  - az új password hash-t az adatbázisba írja
+     *  - elküldi email-ben az új jelszót a felhasználónak
+     *  - ha az email küldése sikertelen, visszaírja az adatbázisba a régi password hash-t
+	 */
+	public function forgottenpw_AJAX()
+	{
+		if($this->request->is_ajax()){
+            
+            // a felhasználó email címe, amire küldjük az új jelszót
+            $to_email = $this->request->get_post('user_email');
+            
+            // lekérdezzük, hogy ehhez az email címhez tartozik-e user (lekérdezzük a nevet, és a password hash-t)
+            $result = $this->user_model->getPasswordHash($to_email);
+                // ha nincsen ilyen e-mail címmel regisztrált felhasználó 
+                if(empty($result)){
+                    $message = array(
+                      'status' => 'error',
+                      'message' => 'Nincsen ilyen e-mail címmel regisztrált felhasználó!'
+                    );
+                    echo json_encode($message);
+                    exit();                
+                }
+            
+            $to_name = $result[0]['user_name'];
+            $old_pw = $result[0]['user_password_hash'];
+                  
+                // 8 karakter hosszú új jelszó generálása (str_shuffle összekeveri a stringet, substr levágja az első 8 karaktert)
+                $new_password = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 8);
+                $hash_cost_factor = (Config::get('hash_cost_factor') !== null) ? Config::get('hash_cost_factor') : null;
+                $new_password_hash = password_hash($new_password, PASSWORD_DEFAULT, array('cost' => $hash_cost_factor));            
+            
+            // új jelszó hash beírása az adatbázisba
+            $result = $this->user_model->setNewPassword($to_email, $new_password_hash);
+                // ha hiba történt a adatbázisba íráskor
+                if($result === false){
+                    $message = array(
+                        'status' => 'error',
+                        'message' => 'Adatbázis hiba!'
+                    );
+                    echo json_encode($message);
+                    exit();    
+                }
+            
+            
+
+
+// email küldés !!!!!!!!!!
+
+// settings adatok lekérdezése az adatbázisból
+$data = $this->user_model->get_settings();            
+            
+            $from_email = $data['email'];
+            $from_name = $data['ceg'];
+
+            $subject = "Üzenet érkezett a {$from_name} weblaptól";
+            $msg = <<<_msg
+
+            <html>    
+            <body>
+                <h2>Új jelszó</h2>
+                <div>
+                    <p>
+                        Az ön új jelszava a {$from_name} weblaphoz.
+                    </p>
+                    <p>
+                        <strong>Az ön új jelszava: </strong> {$new_password}
+                    </p>
+                </div> 
+            </body>
+            </html>    
+_msg;
+            
+            $result = $this->user_model->send_email($from_email, $from_name, $subject, $msg, $to_email, $to_name);
+
+
+
+
+
+
+            if ($result) {
+                $message = array(
+                  'status' => 'success',
+                  'message' => 'Új jelszó elküldve!'
+                );
+                echo json_encode($message);
+                exit();
+            } else {
+                // régi password hash visszaírása az adatbázisba
+                $this->user_model->setNewPassword($to_email, $old_pw);
+                
+                $message = array(
+                  'status' => 'error',
+                  'message' => 'Az új jelszó küldése sikertelen!'
+                );
+                echo json_encode($message);
+                exit();
+            }
+
+		} else {
+			Util::redirect('error');
+		}
+		
+	}   
+
 
 }
 ?>

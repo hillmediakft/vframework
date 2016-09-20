@@ -4,6 +4,7 @@ class Clients extends Admin_controller {
     function __construct()
     {
         parent::__construct();
+        $this->loadModel('clients_model');
     }
      
     /**
@@ -55,7 +56,7 @@ class Clients extends Admin_controller {
     public function delete_client_AJAX()
     {
         if($this->request->is_ajax()){
-            if(1){
+            if(Auth::hasAccess('client_delete')){
                 // a POST-ban kapott user_id egy string ami egy szám vagy számok felsorolása pl.: "23" vagy "12,45,76" 
                 $id = $this->request->get_post('item_id');
                 $respond = $this->clients_model->delete_client_AJAX($id);

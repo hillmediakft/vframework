@@ -4,6 +4,7 @@ class Photo_gallery extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
+		$this->loadModel('photo_gallery_model');
 	}
 
 	public function index()

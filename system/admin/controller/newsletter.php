@@ -4,6 +4,7 @@ class Newsletter extends Admin_controller {
 	function __construct()
 	{
 		parent::__construct();
+		$this->loadModel('newsletter_model');
 	}
 
 	public function index()
