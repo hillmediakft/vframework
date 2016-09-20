@@ -8,7 +8,8 @@ class Error extends Site_controller {
 	
 	public function index()
 	{
-		$this->view->render('error/404', true);
+		$this->view = new View();	
+		$this->view->render('error/404');
 	}
 	
 }
