@@ -1,4 +1,9 @@
 <?php
+namespace System\Admin\Controller;
+use System\Core\Admin_controller;
+use System\Core\View;
+use System\Libs\Util;
+
 class Blog extends Admin_controller {
 
 	function __construct()
@@ -9,17 +14,19 @@ class Blog extends Admin_controller {
     
 	public function index()
 	{
-		$this->view = new View();
+		$view = new View();
 
-		$this->view->title = 'Admin blog oldal';
-		$this->view->description = 'Admin blog oldal description';	
+		$view->title = 'Admin blog oldal';
+		$view->description = 'Admin blog oldal description';	
 
-		$this->view->add_links(array('datatable', 'bootbox', 'vframework', 'blog'));
+		$view->add_links(array('datatable', 'bootbox', 'vframework', 'blog'));
 
-		$this->view->all_blog = $this->blog_model->blog_query2();
-// $this->view->debug(true);		
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('blog/tpl_blog');
+		//$view->setHelper(array('str', 'arr'));
+
+		$view->all_blog = $this->blog_model->blog_query2();
+// $view->debug(true);		
+		$view->set_layout('tpl_layout');
+		$view->render('blog/tpl_blog');
 	}
     
     /**
@@ -29,26 +36,54 @@ class Blog extends Admin_controller {
 	{
 		if( $this->request->has_post() ){
 
-			$result = $this->blog_model->insert();
-			
-			if($result){
-				Util::redirect('blog');
-			} else {
-				Util::redirect('blog/insert');
+			// kép feltöltése
+			if(isset($_FILES['upload_blog_picture'])) {
+				// kép feltöltése, upload_blog_picture() metódussal (visszatér a feltöltött kép elérési útjával, vagy false-al)
+				$dest_image = $this->blog_model->upload_blog_picture($_FILES['upload_blog_picture']);
+				
+				// ha kép feltöltés során hiba lépett fel
+				if($dest_image === false){
+					$this->response->redirect('admin/blog/insert');
+				}
+			}
+			else {
+				throw new Exception('Hiba blog kep feltoltesekor: Nem letezik a \$_FILES[\'upload_blog_picture\'] elem!');
+				return false;
+			}
+
+			// az adatbázisba kerülő adatok
+			$data['blog_title'] = $this->request->get_post('blog_title');
+			$data['blog_body'] = $this->request->get_post('blog_body', 'strip_danger_tags');
+			$data['blog_picture'] = $dest_image;
+			$data['blog_category'] = $this->request->get_post('blog_category');
+			$data['blog_add_date'] = date('Y-m-d-G:i');
+
+			// DB lekérdezés
+			$result = $this->blog_model->insert($data);
+
+			if($result) {
+				Message::set('success', 'Blog hozzáadása sikerült!');
+				// Util::redirect('blog');
+				$this->response->redirect('admin/blog');
+			}
+			else {
+				Message::set('error' , 'unknown_error');
+				// Util::redirect('blog/insert');
+				$this->response->redirect('admin/blog/insert');
 			}
 		}
 
-		$this->view = new View();
+		$view = new View();
 		
-		$this->view->title = 'Admin blog oldal';
-		$this->view->description = 'Admin blog oldal description';	
+		$view->title = 'Admin blog oldal';
+		$view->description = 'Admin blog oldal description';	
 
-		$this->view->add_links(array('bootstrap-fileupload', 'ckeditor', 'vframework', 'blog_insert'));
+		$view->add_links(array('bootstrap-fileupload', 'ckeditor', 'vframework', 'blog_insert'));
 
-		$this->view->category_list = $this->blog_model->category_query();
+		$view->category_list = $this->blog_model->category_query();
 		
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('blog/tpl_blog_insert');
+		$view->set_layout('tpl_layout');
+		$view->render('blog/tpl_blog_insert');
 	}
     
     /**
@@ -66,18 +101,18 @@ class Blog extends Admin_controller {
 			}
 		}
 
-		$this->view = new View();
+		$view = new View();
 
-		$this->view->title = 'Admin blog oldal';
-		$this->view->description = 'Admin blog oldal description';	
+		$view->title = 'Admin blog oldal';
+		$view->description = 'Admin blog oldal description';	
 
-		$this->view->add_links(array('bootstrap-fileupload', 'ckeditor', 'vframework', 'blog_update'));
+		$view->add_links(array('bootstrap-fileupload', 'ckeditor', 'vframework', 'blog_update'));
         
-		$this->view->category_list = $this->blog_model->category_query();
-		$this->view->content = $this->blog_model->blog_query2($this->request->get_params('id'));
-//$this->view->debug(true);		
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('blog/tpl_blog_update');
+		$view->category_list = $this->blog_model->category_query();
+		$view->content = $this->blog_model->blog_query2($this->request->get_params('id'));
+//$view->debug(true);		
+		$view->set_layout('tpl_layout');
+		$view->render('blog/tpl_blog_update');
 	}  
 
 	/**
@@ -105,18 +140,18 @@ class Blog extends Admin_controller {
 	 */
 	public function category()
 	{
-		$this->view = new View();
+		$view = new View();
 
-		$this->view->title = 'Admin blog oldal';
-		$this->view->description = 'Admin blog oldal description';	
+		$view->title = 'Admin blog oldal';
+		$view->description = 'Admin blog oldal description';	
 
-		$this->view->add_links(array('datatable', 'bootbox', 'vframework', 'blog_category'));
+		$view->add_links(array('datatable', 'bootbox', 'vframework', 'blog_category'));
 
-		$this->view->all_blog_category = $this->blog_model->category_query();
-		$this->view->category_counter = $this->blog_model->category_counter_query();
-//$this->view->debug(true);			
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('blog/tpl_blog_category');	
+		$view->all_blog_category = $this->blog_model->category_query();
+		$view->category_counter = $this->blog_model->category_counter_query();
+//$view->debug(true);			
+		$view->set_layout('tpl_layout');
+		$view->render('blog/tpl_blog_category');	
 	}
 
 	/**

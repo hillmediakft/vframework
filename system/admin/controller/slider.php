@@ -1,4 +1,9 @@
 <?php
+namespace System\Admin\Controller;
+use System\Core\Admin_controller;
+use System\Core\View;
+use System\Libs\Auth;
+use System\Libs\Util;
 
 class Slider extends Admin_controller {
 

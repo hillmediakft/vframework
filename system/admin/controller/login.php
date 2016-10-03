@@ -1,4 +1,10 @@
 <?php
+namespace System\Admin\Controller;
+use System\Core\Admin_controller;
+use System\Libs\Auth;
+use System\Libs\Message;
+use System\Core\View;
+
 class Login extends Admin_controller {
     /**
      * Construct this object by extending the basic Controller class
@@ -31,8 +37,9 @@ class Login extends Admin_controller {
 			// login status vizsgálata
 			if ($login_successful) {
                 // Sikeres bejelentkezés
-                header('location: ' . BASE_URL . 'admin');
-                exit;
+                $this->response->redirect('admin');
+                //header('location: ' . BASE_URL . 'admin');
+                //exit;
             }
             // Sikertelen bejelentkezés
             else {
@@ -40,28 +47,28 @@ class Login extends Admin_controller {
                 foreach ($auth->getError() as $value) {
                     Message::set('error', $value);
                 }
-				// visszairányítás
-				header('location: ' . BASE_URL . 'admin/login');
-				exit;
+                // visszairányítás
+                $this->response->redirect('admin/login');
+				//header('location: ' . BASE_URL . 'admin/login');
+				//exit;
 			}			
 		}
 
-        // bejelentkezés cookie-val
-        $auth = Auth::instance();
-        $login_status = $auth->loginWithCookie();
-        if ($login_status) {
-            header('location: ' . BASE_URL . 'admin');
-            exit;
-        } else {
-            foreach ($auth->getError() as $value) {
-               Message::set('error', $value);
+            // bejelentkezés cookie-val
+            $auth = Auth::instance();
+            $login_status = $auth->loginWithCookie();
+            if ($login_status) {
+                $this->response->redirect('admin');
+            } else {
+                foreach ($auth->getError() as $value) {
+                   Message::set('error', $value);
+                }
+                // cookie törlése
+                $auth->deleteCookie();
             }
-            // cookie törlése
-            $auth->deleteCookie();
-        }
 
-        $this->view = new View();
-		$this->view->render('login/tpl_login');
+        $view = new View();
+		$view->render('login/tpl_login');
     }
 	
     /**
@@ -72,8 +79,9 @@ class Login extends Admin_controller {
         //$this->login_model->logout();
         Auth::instance()->logout();
         // redirect
-        header('location: ' . BASE_URL);
-        exit;
+        $this->response->redirect();
+        //header('location: ' . BASE_URL);
+        //exit;
     }
 
 }

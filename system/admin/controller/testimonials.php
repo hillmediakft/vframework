@@ -1,4 +1,13 @@
 <?php
+namespace System\Admin\Controller;
+
+use System\Core\Admin_controller;
+use System\Core\View;
+use System\Libs\Util;
+use System\Libs\Session;
+use System\Libs\Message;
+use System\Libs\Validate;
+
 class Testimonials extends Admin_controller {
 
 	function __construct()
@@ -9,17 +18,17 @@ class Testimonials extends Admin_controller {
 
 	public function index()
 	{
-		$this->view = new View();
+		$view = new View();
 		
-		$this->view->title = 'testimonials oldal';
-		$this->view->description = 'testimonials oldal description';
+		$view->title = 'testimonials oldal';
+		$view->description = 'testimonials oldal description';
 		
-		$this->view->add_links(array('bootbox', 'testimonials'));
+		$view->add_links(array('bootbox', 'testimonials'));
 		
-		$this->view->all_testimonials = $this->testimonials_model->all_testimonials();	
+		$view->all_testimonials = $this->testimonials_model->findAll();	
 		
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('testimonials/tpl_testimonials');
+		$view->set_layout('tpl_layout');
+		$view->render('testimonials/tpl_testimonials');
 	}
 	
 	
@@ -32,26 +41,69 @@ class Testimonials extends Admin_controller {
 	{
 		if($this->request->has_post()) {
 
-			$result = $this->testimonials_model->insert_testimonial();
-			
-			if ($result) {
-				Session::delete('testimonial_input');
-				Util::redirect('testimonials');
-			} else {
-				Util::redirect('testimonials/insert');
-			}
+			$data['name'] = $this->request->get_post('testimonial_name');
+			$data['title'] = $this->request->get_post('testimonial_title');
+			$data['text'] = $this->request->get_post('testimonial_text');
 
+			// input adatok tárolása session-ben
+			Session::set('testimonial_input', $data);
+
+			// validátor objektum létrehozása
+	        $validate = new Validate();
+
+	        // szabályok megadása az egyes mezőkhöz (mező neve, label, szabály)
+	        $validate->add_rule('name', 'név', array(
+	            'required' => true,
+	            'min' => 2
+	        ));
+	        $validate->add_rule('title', 'beosztás', array(
+	            'required' => true
+	        ));
+	        $validate->add_rule('text', 'vélemény', array(
+	            'required' => true
+	        ));
+
+	        // üzenetek megadása az egyes szabályokhoz (szabály_neve, üzenet)
+	        $validate->set_message('required', 'A :label mező nem lehet üres!');
+	        $validate->set_message('min', 'A :label mező túl kevés karaktert tartalmaz!');
+
+	        // mezők validálása
+	        $validate->check($data);
+
+	        // HIBAELLENŐRZÉS - ha valamilyen hiba van a form adataiban
+	        if(!$validate->passed()){
+	            
+	            foreach ($validate->get_error() as $value) {
+	                Message::set('error', $value);
+	            }
+
+				$this->response->redirect('admin/testimonials/insert');
+
+	        } else {
+	        	// adatbázisba írás
+				$result = $this->testimonials_model->insert($data);
+
+				if($result) {
+		            Message::set('success', 'new_testimonial_success');
+					Session::delete('testimonial_input');
+					$this->response->redirect('admin/testimonials/insert');
+				}
+				else {
+		            Message::set('error', 'unknown_error');
+					$this->response->redirect('admin/testimonials/insert');
+				}
+	        }
 		}
 		
-		$this->view = new View();
+		$view = new View();
 			
-		$this->view->title = 'Új testimonials oldal';
-		$this->view->description = 'Új testimonials oldal description';
+		$view->title = 'Új testimonials oldal';
+		$view->description = 'Új testimonials oldal description';
 		
-		$this->view->add_links(array('testimonial_insert','vframework'));
+		$view->add_links(array('testimonial_insert','vframework'));
 	
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('testimonials/tpl_testimonial_insert');
+		$view->set_layout('tpl_layout');
+		$view->render('testimonials/tpl_testimonial_insert');
 		Session::delete('testimonial_input');
 	}
 	
@@ -63,22 +115,36 @@ class Testimonials extends Admin_controller {
 		$id = (int)$this->request->get_params('id');
 
 		if($this->request->has_post()) {
-			$this->testimonials_model->update_testimonial($id);
-			Util::redirect('testimonials');
+
+			$data['name'] = $this->request->get_post('testimonial_name');
+			$data['title'] = $this->request->get_post('testimonial_title');
+			$data['text'] = $this->request->get_post('testimonial_text');
+
+			$result = $this->testimonials_model->update($id, $data);
+
+			if($result >= 0) {
+	            Message::set('success', 'testimonial_update_success');
+				$this->response->redirect('admin/testimonials');
+			}
+			else {
+	            Message::set('error', 'unknown_error');
+				$this->response->redirect('admin/testimonials/update');
+			}
+			
 		}
 		
-		$this->view = new View();
+		$view = new View();
 		
-		$this->view->title = 'Rólunk mondták szerkesztése';
-		$this->view->description = 'Rólunk mondták szerkesztése description';
+		$view->title = 'Rólunk mondták szerkesztése';
+		$view->description = 'Rólunk mondták szerkesztése description';
 		
-		$this->view->add_links(array('bootbox', 'vframework', 'testimonial_update'));
+		$view->add_links(array('bootbox', 'vframework', 'testimonial_update'));
 		
 		// visszadja a szerkesztendő oldal adatait egy tömbben (page_id, page_title ... stb.)
-		$this->view->data_arr = $this->testimonials_model->testimonial_data_query($id);
+		$view->data_arr = $this->testimonials_model->find($id);
 		
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('testimonials/tpl_testimonial_update');
+		$view->set_layout('tpl_layout');
+		$view->render('testimonials/tpl_testimonial_update');
 	
 	}
 	
@@ -88,8 +154,17 @@ class Testimonials extends Admin_controller {
 	public function delete()
 	{
 		$id = (int)$this->request->get_params('id');
-		$result = $this->testimonials_model->delete_testimonial($id);
-		Util::redirect('testimonials');
+		$result = $this->testimonials_model->delete($id);
+		
+		// ha sikeres a törlés 1 a vissaztérési érték
+		if($result === 1) {
+            Message::set('success', 'testimonial_delete_success');
+		}
+		else {
+            Message::set('error', 'unknown_error');
+		}
+
+		$this->response->redirect('admin/testimonials');
 	}
 	
 }

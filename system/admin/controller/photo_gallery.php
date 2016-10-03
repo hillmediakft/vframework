@@ -1,4 +1,9 @@
 <?php
+namespace System\Admin\Controller;
+use System\Core\Admin_controller;
+use System\Core\View;
+use System\Libs\Util;
+
 class Photo_gallery extends Admin_controller {
 
 	function __construct()

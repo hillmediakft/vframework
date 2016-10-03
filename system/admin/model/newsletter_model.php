@@ -1,5 +1,11 @@
 <?php 
-class Newsletter_model extends Model {
+namespace System\Admin\Model;
+use System\Core\Admin_model;
+
+class Newsletter_model extends Admin_model {
+
+	protected $table = 'newsletters';
+
 
 	/**
      * Constructor, létrehozza az adatbáziskapcsolatot
@@ -31,9 +37,6 @@ class Newsletter_model extends Model {
 	 */
 	public function newsletter_query($id = null)
 	{
-		$this->query->reset(); 
-		$this->query->set_table(array('newsletters')); 
-		$this->query->set_columns('*'); 
 		if(!is_null($id)){
 			$id = (int)$id;
 			$this->query->set_where('newsletter_id', '=', $id); 
@@ -45,7 +48,6 @@ class Newsletter_model extends Model {
 	
 	public function user_email_query()
 	{
-		$this->query->reset(); 
 		$this->query->set_table(array('site_users')); 
 		$this->query->set_columns(array('user_name', 'user_email')); 
 		$this->query->set_where('user_newsletter', '=', 1); 
@@ -53,56 +55,21 @@ class Newsletter_model extends Model {
 	}
 	
 	
-	
-	public function insert_newsletter()
+	/**
+	 * hírlevél hozzáadása
+	 */
+	public function insert_newsletter($data)
 	{
-		$data['newsletter_name'] = $_POST['newsletter_name'];
-		$data['newsletter_subject'] = $_POST['newsletter_subject'];
-		$data['newsletter_body'] = $_POST['newsletter_body'];
-		$data['newsletter_status'] = (int)$_POST['newsletter_status'];
-		$data['newsletter_create_date'] = date('Y-m-d-G:i');
-		
-		$this->query->reset();
-		$this->query->set_table(array('newsletters'));
-		$result = $this->query->insert($data);
-	
-	// ha sikeres az insert visszatérési érték true
-		if($result) {
-			Message::set('success', 'Új hírlevél hozzáadva!');
-			return true;
-		}
-		else {
-			Message::set('error', 'unknown_error');
-			return false;
-		}
+		return $this->query->insert($data);
 	}
 
-	
-	public function update_newsletter($id)
+	/**
+	 * Hírlevél módosítása
+	 */
+	public function update_newsletter($id, $data)
 	{
-		$id = (int)$id;
-	
-		$data['newsletter_name'] = $_POST['newsletter_name'];
-		$data['newsletter_subject'] = $_POST['newsletter_subject'];
-		$data['newsletter_body'] = $_POST['newsletter_body'];
-		$data['newsletter_status'] = (int)$_POST['newsletter_status'];
-		$data['newsletter_create_date'] = date('Y-m-d-G:i');
-		
-		$this->query->reset();
-		$this->query->set_table(array('newsletters'));
 		$this->query->set_where('newsletter_id', '=', $id);
-		$result = $this->query->update($data);
-	
-	// ha sikeres az insert visszatérési érték true
-		if($result) {
-			Message::set('success', 'Hírlevél módosítva!');
-			return true;
-		}
-		else {
-			Message::set('error', 'unknown_error');
-			return false;
-		}
-	
+		return $this->query->update($data);
 	}	
 	
     /**
@@ -471,7 +438,7 @@ class Newsletter_model extends Model {
 	public function newsletter_stats_query()
 	{
 		$this->query->reset(); 
-		$this->query->set_table('stats_newsletters'); 
+		$this->query->set_table(array('stats_newsletters')); 
 		$this->query->set_columns(array('statid', 'stats_newsletters.newsletter_id', 'sent_date', 'recepients', 'send_success', 'send_fail', 'email_opens', 'unsubscribe_count', 'error', 'newsletters.newsletter_name', 'newsletters.newsletter_subject' )); 
 
 		$this->query->set_join('left', 'newsletters', 'stats_newsletters.newsletter_id', '=', 'newsletters.newsletter_id');

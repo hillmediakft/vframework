@@ -1,4 +1,8 @@
 <?php
+namespace System\Admin\Model;
+use System\Core\Admin_model;
+use System\Libs\Config;
+
 class Slider_model extends Admin_model {
 
     private $slider_width; //slider kép szélessége

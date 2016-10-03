@@ -1,4 +1,8 @@
 <?php 
+namespace System\Core;
+use System\Libs\DI;
+use System\Libs\Query;
+
 
 class Model {
 
@@ -6,7 +10,7 @@ class Model {
 	
 	public $query; //adatbaziskezelő objektumot rendeljük hozzá 
 
-	public $registry; //registry objektum
+	public $request; //request objektum
 
 	/**
 	 *	Default tábla név, amivel a query objektum dolgozni fog, ha nem adunk meg külön táblát a lekérdezéskor
@@ -15,18 +19,18 @@ class Model {
 	 */
 	protected $table;
 	
+	/**
+	 * Egyedi azonosító (id) oszlop neve
+	 */
+	protected $id = 'id';
+	
+
 	function __construct()
 	{
 		// adatbáziskapcsolat létrehozása
-		$this->connect = db::get_connect();
-		// hiba visszaadás beállítása a PDO objektumban a fejlesztői környezet alapján
-		if(ENV == 'development'){
-			$this->connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		}		
-		
-		$this->registry = Registry::get_instance();
-		
-		$this->request = $this->registry->request;
+		$this->connect = DI::get('connect');
+		// request objektum		
+		$this->request = DI::get('request');
 		
 		// hozzárendeljük a query tulajdonsághoz a Query objektumot
 		// ez a query tulajdonság a gyerek model-ek bármelyik metódusában elérhető
@@ -39,7 +43,7 @@ class Model {
 	function __destruct()
 	{
 		// adatbáziskapcsolat lezárása
-		$this->connect = db::close_connect();
+		$this->connect = null;
 	}
 
     /**
@@ -63,38 +67,107 @@ class Model {
 	 *	$args = array(
 	 *		'table' => array('jobs'),
 	 *		'columns' => array('jobs', 'users', 'slider'),
-	 *		'limit' => 5,
+	 *
+	 *		'where' => array('color', '=', 'red');	
+	 *
+	 *		'where' => array(
+	 *				   	 array('color', '=', 'red'),
+	 *				   	 array('name', '=', 'ede')
+	 *				   );	
+	 *
+	 * 		'limit' => 5,
 	 *		'offset' => 3,
 	 *		'orderby' => array(array(vezeteknev), DESC)
 	 *	);
 	 * 
-	 * @param	array	$args		egy tömb, amiben megadjuk a lekérdezés paramétereit
+	 * @param	mixed	$args		egy tömb, amiben megadjuk a lekérdezés paramétereit
 	 * @return 	array
 	 */
-	public function get_data($args = array())
+	public function find($args = null)
 	{
-		$this->query->reset(); 
-		
-		if(isset($args['table'])){
-			$this->query->set_table($args['table']); 
+		if (func_num_args() == 0) {
+			return $this->query->select();
 		}
-		if(isset($args['columns'])){
-			$this->query->set_columns($args['columns']); 
-		} else {
-			$this->query->set_columns('*'); 
+
+		if (is_int($args)) {
+			$this->query->set_where($this->id, '=', $args);
+			return $this->query->select();
 		}
-		if(isset($args['limit'])){
-			$this->query->set_limit($args['limit']); 
-		}
-		if(isset($args['offset'])){
-			$this->query->set_offset($args['offset']); 
-		}
-		if(isset($args['orderby'])){
-			$this->query->set_orderby($args['orderby']); 
-		}
+
+		if (is_array($args)) {
+
+			if(isset($args['table'])){
+				$this->query->set_table($args['table']); 
+			}
+			if(isset($args['columns'])){
+				$this->query->set_columns($args['columns']); 
+			}
+			if(isset($args['where'])){
+
+				foreach ($args['where'] as $where_arr) {
+					if (is_array($where_arr)) {
+						foreach ($where_arr as $v) {
+							if (isset($v[3])) {
+								$this->query->set_where($v[0], $v[1], $v[2], $v[3]);
+							} else {
+								$this->query->set_where($v[0], $v[1], $v[2]);
+							}
+						}
+					} else {
+						if (isset($where_arr[3])) {
+							$this->query->set_where($where_arr[0], $where_arr[1], $where_arr[2], $where_arr[3]);
+						} else {
+							$this->query->set_where($where_arr[0], $where_arr[1], $where_arr[2]);
+						}
+					}
+
+				}
+
+			}
+			if(isset($args['limit'])){
+				$this->query->set_limit($args['limit']); 
+			}
+			if(isset($args['offset'])){
+				$this->query->set_offset($args['offset']); 
+			}
+			if(isset($args['orderby'])){
+				list($columns, $exposure) = $args['orderby'];
+				$this->query->set_orderby($columns, $exposure); 
+			}
 			
-		return $this->query->select();
-	}	
+			return $this->query->select();
+		}
+
+		throw new Exception("Rossz parametert kapott a model find metodusa");
+	}
+
+
+/*
+	/**
+	 * Új rekord a táblába
+	 */
+	// public function insert($data)
+	// {
+	// 	return $this->query->insert($data);
+	// }
+
+	/**
+	 * Rekord módosítása
+	 */
+	// public function update($id, $data)
+	// {
+	// 	$this->query->set_where($this->id, '=', $id);
+	// 	return $this->query->update($data);
+	// }
+
+	/**
+	 * Rekord módosítása
+	 */
+	// public function delete($id)
+	// {
+	// 	$this->query->set_where($this->id, '=', $id);
+	// 	return $this->query->delete();
+	// }
 
 
 }//osztály vége

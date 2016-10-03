@@ -1,4 +1,7 @@
-<?php 
+<?php
+namespace System\Admin\Model;
+use System\Core\Admin_model;
+
 class User_manual_model extends Admin_model {
 
 	/**

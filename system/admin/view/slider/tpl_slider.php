@@ -1,3 +1,4 @@
+<?php use System\Libs\Config, System\Libs\Util;?>
 <div class="page-content">
     <!-- BEGIN PAGE HEADER-->
     <!-- BEGIN PAGE TITLE & BREADCRUMB-->

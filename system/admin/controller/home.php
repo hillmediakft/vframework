@@ -1,4 +1,7 @@
 <?php
+namespace System\Admin\Controller;
+use System\Core\Admin_controller;
+use System\Core\View;
 
 class Home extends Admin_controller {
 

@@ -1,4 +1,9 @@
-<?php 
+<?php
+namespace System\Admin\Controller;
+use System\Core\Admin_controller;
+use System\Core\View;
+use System\Libs\Util;
+
 class Newsletter extends Admin_controller {
 
 	function __construct()
@@ -9,17 +14,17 @@ class Newsletter extends Admin_controller {
 
 	public function index()
 	{
-		$this->view = new View();
+		$view = new View();
 
-		$this->view->title = 'Hírlevél oldal';
-		$this->view->description = 'Hírlevél oldal description';
+		$view->title = 'Hírlevél oldal';
+		$view->description = 'Hírlevél oldal description';
 
-		$this->view->add_links(array('datatable', 'bootbox', 'vframework', 'newsletter_eventsource'));
+		$view->add_links(array('datatable', 'bootbox', 'vframework', 'newsletter_eventsource'));
 
-		$this->view->newsletters = $this->newsletter_model->newsletter_query();	
+		$view->newsletters = $this->newsletter_model->newsletter_query();	
 //$this->view->debug(true);	
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('newsletter/tpl_newsletter');	
+		$view->set_layout('tpl_layout');
+		$view->render('newsletter/tpl_newsletter');	
 	}
 	
 	/**
@@ -28,19 +33,33 @@ class Newsletter extends Admin_controller {
 	public function insert()
 	{
 		if($this->request->has_post()) {
-			$this->newsletter_model->insert_newsletter();
-			Util::redirect('newsletter');
+			
+			$data['newsletter_name'] = $this->request->get_post('newsletter_name');
+			$data['newsletter_subject'] = $this->request->get_post('newsletter_subject');
+			$data['newsletter_body'] = $this->request->get_post('newsletter_body');
+			$data['newsletter_status'] = $this->request->get_post('newsletter_status', 'integer');
+			$data['newsletter_create_date'] = date('Y-m-d-G:i');
+
+			$result = $this->newsletter_model->insert_newsletter($data);
+			
+			if($result !== false) {
+				Message::set('success', 'Új hírlevél hozzáadva!');
+			} else {
+				Message::set('error', 'unknown_error');
+			}
+			// Util::redirect('newsletter');
+			$this->response->redirect('admin/newsletter');
 		}
 
-		$this->view = new View();
+		$view = new View();
 
-		$this->view->title = 'Hírlevél hozzáadása';
-		$this->view->description = 'Hírlevél oldal description';
+		$view->title = 'Hírlevél hozzáadása';
+		$view->description = 'Hírlevél oldal description';
 		
-		$this->view->add_links(array('bootbox', 'ckeditor', 'vframework', 'newsletter_insert'));
+		$view->add_links(array('bootbox', 'ckeditor', 'vframework', 'newsletter_insert'));
 		
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('newsletter/tpl_newsletter_insert');	
+		$view->set_layout('tpl_layout');
+		$view->render('newsletter/tpl_newsletter_insert');	
 	}
 	
 	/**
@@ -49,21 +68,36 @@ class Newsletter extends Admin_controller {
 	public function update()
 	{
 		if($this->request->has_post()) {
-			$this->newsletter_model->update_newsletter($this->request->get_params('id'));
-			Util::redirect('newsletter');
+	
+			$data['newsletter_name'] = $this->request->get_post('newsletter_name');
+			$data['newsletter_subject'] = $this->request->get_post('newsletter_subject');
+			$data['newsletter_body'] = $this->request->get_post('newsletter_body');
+			$data['newsletter_status'] = $this->request->get_post('newsletter_status', 'integer');
+			$data['newsletter_create_date'] = date('Y-m-d-G:i');
+
+			$result = $this->newsletter_model->update_newsletter((int)$this->request->get_params('id'), $data);
+			
+			if($result !== false) {
+				Message::set('success', 'Hírlevél módosítva!');
+			}
+			else {
+				Message::set('error', 'unknown_error');
+			}
+			// Util::redirect('newsletter'); 
+			$this->response->redirect('admin/newsletter');
 		}
 
-		$this->view = new View();
+		$view = new View();
 
-		$this->view->title = 'Hírlevél szerkesztése';
-		$this->view->description = 'Hírlevél oldal description';
+		$view->title = 'Hírlevél szerkesztése';
+		$view->description = 'Hírlevél oldal description';
 		
-		$this->view->add_links(array('bootbox', 'ckeditor', 'vframework', 'newsletter_update'));
+		$view->add_links(array('bootbox', 'ckeditor', 'vframework', 'newsletter_update'));
 		
-		$this->view->newsletter = $this->newsletter_model->newsletter_query($this->request->get_params('id'));
+		$view->newsletter = $this->newsletter_model->newsletter_query($this->request->get_params('id'));
 	
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('newsletter/tpl_newsletter_update');	
+		$view->set_layout('tpl_layout');
+		$view->render('newsletter/tpl_newsletter_update');	
 	}
 
 	/**
@@ -107,17 +141,17 @@ class Newsletter extends Admin_controller {
 	 */
 	public function newsletter_stats()
 	{
-		$this->view = new View();
+		$view = new View();
 		
-		$this->view->title = 'Elküldött hírlevelek oldal';
-		$this->view->description = 'Elküldött hírlevél oldal description';
+		$view->title = 'Elküldött hírlevelek oldal';
+		$view->description = 'Elküldött hírlevél oldal description';
 
-		$this->view->add_links(array('datatable', 'bootbox', 'vframework', 'newsletter_stats'));
+		$view->add_links(array('datatable', 'bootbox', 'vframework', 'newsletter_stats'));
 		
-		$this->view->newsletters = $this->newsletter_model->newsletter_stats_query();	
+		$view->newsletters = $this->newsletter_model->newsletter_stats_query();	
 //$this->view->debug(true);	
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('newsletter/tpl_newsletter_stats');	
+		$view->set_layout('tpl_layout');
+		$view->render('newsletter/tpl_newsletter_stats');	
 	}	
 	
 }	

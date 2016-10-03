@@ -1,4 +1,6 @@
 <?php
+namespace System\Libs;
+
 /**
 * Események betöltése és regisztrálása config fileból
 *   Event_manager::init('config_file_name'); 

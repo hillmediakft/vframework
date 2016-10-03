@@ -1,3 +1,4 @@
+<?php use System\Libs\Auth, System\Libs\Config; ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
@@ -100,21 +101,19 @@
         
         <!-- BEGIN SIDEBAR -->
         <div class="page-sidebar-wrapper">
-            <?php $this->load('tpl_sidebar_menu'); ?>
+            <?php include($this->path('tpl_sidebar_menu')); ?>
         </div>
         <!-- END SIDEBAR WRAPPER -->
                                                             
         <!-- BEGIN CONTENT -->
         <div class="page-content-wrapper">
-            <?php $this->load('content'); ?>
+            <?php include($this->path('content')); ?>
         </div>
         <!-- END PAGE CONTENT WRAPPER -->
                                                                                          
     </div>
     <!-- END CONTAINER -->                                                                                
-                                                                                          
 
-   
     <!-- BEGIN FOOTER -->
     <div class="page-footer">
         <div class="page-footer-inner">

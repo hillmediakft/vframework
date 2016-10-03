@@ -1,20 +1,28 @@
-<?php 
+<?php
+namespace System\Core;
+
+use System\Libs\DI;
+use System\Libs\Message;
+use System\Libs\Auth;
+
 class Application {
 	
-	private $registry;
+	protected $request;
 	
-	public function __construct($registry) 
+	public function __construct() 
 	{
-		$this->registry = $registry;	
-		$this->request = $this->registry->request;
+		// request objektum visszaadása
+		$this->request = DI::get('request');
+		// area állandó létrehozása
+		define('AREA', $this->request->get_uri('area'));
 
-        // Beállítjuk, hogy az üzenetek melyik modulra vonatkozzanak (message_site vagy message_admin)
-        Message::set_area($this->request->get_uri('area'));
+
 		// Betöltjük az aktuális nyelvnek megfelelő üzenet fájlt
-		Message::load('messages_' . $this->request->get_uri('area'), $this->request->get_uri('langcode'));
+		Message::init('messages_' . AREA, $this->request->get_uri('langcode'));
         
-        // Megadjuk az Auth osztály alapbeállításait (1. config file betöltése, area megadása)
-		Auth::init('auth', $this->request->get_uri('area'));
+        // Megadjuk az Auth osztály alapbeállításait ('auth.php' config file betöltése)
+		Auth::init('auth');
+		//DI::get('auth_init');
 
 
 				// nyelvi fájl betöltése
@@ -28,30 +36,24 @@ class Application {
 
 
 		// controller file betöltése és a megfelelő action behívása
-		$this->load_controller();
+		$this->_loadController();
 	}
 	
 	/**
 	 * Controller betöltése
 	 */
-	private function load_controller()
+	private function _loadController()
 	{
-		$controller_name = $this->request->get_controller();
+		$controller_name = ucfirst($this->request->get_controller());
 		$action_name = $this->request->get_action();
 		$parameters = $this->request->get_params();
+		$area = ucfirst($this->request->get_uri('area'));
 
-		// Először is betölti a megfelelő controller fájlt (ha betölthető), az url első paramétere alapján.
-		$file = 'system/' . $this->request->get_uri('area') . '/controller/' . $controller_name . '.php';
-	
-		if(!file_exists($file)) {	
-			require_once ('system/' . $this->request->get_uri('area') . '/controller/error.php');
-			$error = new Error();
-			$error->index();
-		} else {
-			require_once($file);
+		$controller_class = '\System\\' . $area . '\Controller\\' . $controller_name;
+		// ha az osztály létezik
+		if (class_exists($controller_class)) {
 			// Példányosítjuk a controllert
-			$controller = new $controller_name();
-		
+			$controller = new $controller_class();
 			// meghívjuk az action metódust, ha nincs, akkor az index metódust hívjuk meg
 			if(method_exists($controller, $action_name)) {
 				//$controller->{$action_name}();
@@ -60,7 +62,12 @@ class Application {
 				$controller->index();
 			}
 		}
+		else {
+			$error_class = '\System\\' . $area . '\Controller\Error';
+			$error = new $error_class();
+			$error->index();
+		}
 	}
-	
+
 } // osztály vége
 ?>

@@ -1,4 +1,10 @@
 <?php
+namespace System\Libs;
+use PDO;
+//use System\Libs\DB;
+
+
+
 /**
 * Class Auth
 * v2.0
@@ -90,9 +96,8 @@ class Auth {
 
     public function __construct()
     {
-		//$registry = Registry::get_instance();
-		//$this->request = $registry->request;
-        $this->connect = db::get_connect();
+        //$this->request = Registry::getInstance()->request;
+        $this->connect = DB::get_connect();
         //$this->query = new Query($this->connect);
         
         // a felhasználókat tartalmazó tábla neve
@@ -111,11 +116,11 @@ class Auth {
      * @param string $auth_config (az auth config file neve)
      * @param string $area (admin vagy site)
      */
-    public static function init($auth_config, $area)
+    public static function init($auth_config)
     {
         Config::load($auth_config);
         self::$session_expire_time = Config::get('auth.expire_time', 3600);
-        self::$area = $area;
+        self::$area = AREA;
     }
 
     /**
@@ -433,7 +438,7 @@ class Auth {
         $sql = "SELECT * FROM `{$this->table_name}` WHERE (`{$this->username_colname}` = :user_name OR `{$this->email_colname}` = :user_name)" . $role_sql;
         $sth = $this->connect->prepare($sql);
         $sth->execute($data);
-        return $sth->fetch(PDO::FETCH_OBJ);    
+        return $sth->fetch(PDO::FETCH_OBJ);
     }
 
     /**

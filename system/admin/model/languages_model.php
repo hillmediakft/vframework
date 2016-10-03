@@ -1,4 +1,7 @@
 <?php 
+namespace System\Admin\Model;
+use System\Core\Admin_model;
+
 class Languages_model extends Admin_model {
 
 	/**

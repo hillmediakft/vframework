@@ -1,4 +1,8 @@
 <?php
+namespace System\Admin\Controller;
+use System\Core\Admin_controller;
+use System\Core\View;
+
 class User_manual extends Admin_controller {
 
 	function __construct()

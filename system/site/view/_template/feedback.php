@@ -1,4 +1,6 @@
 <?php
+use System\Libs\Message;
+
 $feedback_success = Message::get('success');
 $feedback_error = Message::get('error');
 $feedback_info = Message::get('info');

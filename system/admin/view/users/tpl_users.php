@@ -1,3 +1,4 @@
+<?php use \System\Libs\Auth, \System\Libs\Config; ?>
 <div class="page-content">
     <!-- BEGIN PAGE HEADER-->
     <!-- BEGIN PAGE TITLE & BREADCRUMB-->
@@ -35,7 +36,7 @@
 
                         <div class="actions">
                             <?php
-                            $loggedin_user_id = Session::get('user_id');
+                            $loggedin_user_id = Auth::getUser('user_id');
 
                             if (Auth::hasAccess('insert_user')) { ?>
                                 <a href="admin/users/insert" class="btn blue-steel btn-sm"><i class="fa fa-plus"></i> Új felhasználó</a>

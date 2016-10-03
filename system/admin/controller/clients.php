@@ -1,10 +1,16 @@
 <?php
+namespace System\Admin\Controller;
+use System\Core\Admin_controller;
+use System\Core\View;
+use System\Libs\Auth;
+use System\Libs\Util;
+
 class Clients extends Admin_controller {
 
     function __construct()
     {
         parent::__construct();
-        $this->loadModel('clients_model');
+        $this->loadModel('client_model');
     }
      
     /**

@@ -1,5 +1,12 @@
 <?php
-class blog_model extends Admin_model {
+namespace System\Admin\Model;
+use System\Core\Admin_model;
+use System\Libs\Upload;
+use System\Libs\Config;
+use System\Libs\Util;
+use System\Libs\Message;
+
+class Blog_model extends Admin_model {
 
 	protected $table = 'blog';	
 
@@ -67,42 +74,9 @@ class blog_model extends Admin_model {
 		return $this->query->select(); 
 	}
    
-   
-	public function insert()
+   	public function insert($data)
 	{
-		// kép feltöltése
-		if(isset($_FILES['upload_blog_picture'])) {
-			// kép feltöltése, upload_slider_picture() metódussal (visszatér a feltöltött kép elérési útjával, vagy false-al)
-			$dest_image = $this->upload_blog_picture($_FILES['upload_blog_picture']);
-			
-			if($dest_image === false){
-				return false;
-			}
-		}
-		else {
-			throw new Exception('Hiba blog kep feltoltesekor: Nem letezik a \$_FILES[\'upload_blog_picture\'] elem!');
-			return false;
-		}
-
-	// az adatbázisba kerülő adatok
-		$data['blog_title'] = $this->request->get_post('blog_title');
-		$data['blog_body'] = $this->request->get_post('blog_body', 'strip_danger_tags');
-		$data['blog_picture'] = $dest_image;
-		$data['blog_category'] = $this->request->get_post('blog_category');
-		$data['blog_add_date'] = date('Y-m-d-G:i');
-
-	// adatbázis lekérdezés	
-		$result = $this->query->insert($data);
-	
-	// ha sikeres az insert visszatérési érték true
-		if($result) {
-			Message::set('success', 'Blog hozzáadása sikerült!');
-            return true;
-		}
-		else {
-			Message::set('error' , 'unknown_error');
-			return false;
-		}
+		return $this->query->insert($data);
 	}
 
 	public function update($id)

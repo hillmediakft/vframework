@@ -1,4 +1,8 @@
 <?php
+namespace System\Site\Controller;
+use System\Core\Site_controller;
+Use System\Libs\Util;
+
 class Ajax_request extends Site_controller {
 
     function __construct() {

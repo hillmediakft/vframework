@@ -1,4 +1,7 @@
-<?php 
+<?php
+namespace System\Core;
+// use System\Core\Model;
+
 class Site_model extends Model {
 
 	function __construct()

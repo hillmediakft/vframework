@@ -1,7 +1,10 @@
-<?php 
+<?php
+namespace System\Core;
+use System\Libs\DI;
+use System\Libs\Config;
+
 class View {
 	
-	private $registry;
 	private $request;
 	
 	/**
@@ -42,6 +45,11 @@ class View {
 	private $vars = array();
 
 	/**
+	 * Kimeneti pufferelés kapcsolója
+	 */
+	private $lazy_render = false;
+
+	/**
 	 *	Ebbe a tömbbe kerülnek a css linkkek
 	 *	@var css_link array	 
 	 */
@@ -57,6 +65,11 @@ class View {
 	 * A (linkeket tartalamazó) külső file-ból behívott adatokat tartalamazza
 	 */
 	private $modul_link = array();
+
+	/**
+	 * Debug flag
+	 */
+	private $debug_flag = false;
 	
 /*-----------------------------------------------------------------------------*/
 
@@ -65,10 +78,8 @@ class View {
 	 */
 	public function __construct()
 	{
-		// registry objektum
-		$this->registry = Registry::get_instance();
 		// request objektum
-		$this->request = $this->registry->request;
+		$this->request = DI::get('request');
 		$this->area = $this->request->get_uri('area');
 		// linkek tömb behívása
 		$this->modul_link = include_once(CONFIG . '/links_' . $this->area . '.php');
@@ -92,6 +103,41 @@ class View {
 		return $this->vars[$name];
 	}
 			
+	/**
+	 * Debug lefuttatása
+	 */
+	private function _runDebug($data)
+	{
+		echo <<<HTML
+			<!DOCTYPE html>
+			<html lang="hu">
+			<head>
+				<meta http-equiv="content-type" content="text/html; charset=utf-8">
+				<title>DEBUG VARS</title>
+			</head>
+			<body>
+HTML;
+		echo "<h2>A template-be helyezhető változók: </h2><pre style='background:#DDDDDD; border:1px solid #AAAAAA; padding:10px'>";
+			if($par1 == true) {
+				print_r($this->vars);
+				echo "<hr>";
+				print_r($data);
+
+			} else {
+				print_r(array_keys($this->vars));
+				echo "<hr>";
+				print_r($data);
+			}
+		echo "</pre>";
+		echo "<h2>CSS linkek: </h2><div style='background:#DDDDDD; border:1px solid #AAAAAA; padding:10px'>";
+				var_dump($this->css_link);
+		echo "</div>";
+		echo "<h2>JS linkek: </h2><div style='background:#DDDDDD; border:1px solid #AAAAAA; padding:10px'>";
+				var_dump($this->js_link);
+		echo "</div></body></html>";
+		die();			
+	}
+
 
 		/**
 		 * HIBAKERESÉSHEZ!
@@ -99,62 +145,69 @@ class View {
 		 *
 		 * @param	bool	ha értéke true, akkor csak a tömbelemek nevét írja ki
 		 */
-		public function debug($par1 = false)
+		public function debug($flag = true)
 		{
-			
-			echo <<<HTML
-				<!DOCTYPE html>
-				<html lang="hu">
-				<head>
-					<meta http-equiv="content-type" content="text/html; charset=utf-8">
-					<title>DEBUG VARS</title>
-				</head>
-				<body>
-HTML;
-			echo "<h2>A template-be helyezhető változók: </h2><pre style='background:#DDDDDD; border:1px solid #AAAAAA; padding:10px'>";
-				if($par1 == true) {
-					print_r($this->vars);
-				} else {
-					print_r(array_keys($this->vars));
-				}
-			echo "</pre>";
-			echo "<h2>CSS linkek: </h2><div style='background:#DDDDDD; border:1px solid #AAAAAA; padding:10px'>";
-					var_dump($this->css_link);
-			echo "</div>";
-			echo "<h2>JS linkek: </h2><div style='background:#DDDDDD; border:1px solid #AAAAAA; padding:10px'>";
-					var_dump($this->js_link);
-			echo "</div></body></html>";
-			die();		
+			$this->debug_flag = $flag;		
 		}			
  
-    
-    /**
-     * Tartalmi elem betöltése
-     *
-     * @param string $template  	file neve kiterjesztés nélkül (az egyedi "tartalmi" elem esetén értéke 'content' vagy $this->filename )
-     */
-    public function load($template)
-    {
-    	if($template == 'content'){
-    		$template = $this->filename;
-    	}
+		/**
+		 * Elérési utat adja vissza sima include-hoz !!!
+		 */
+		public function path($filename)
+		{
+	    	if($filename == 'content'){
+	    		$filename = $this->filename;
+	    	}					
 
-    	try{
+			// Elérési út megadása sima Include-hoz
+	    	try{
 
-			if (file_exists('system/' . $this->area . '/view/' . $this->dirname . '/' . $template . '.php')) {
-				include('system/' . $this->area . '/view/' . $this->dirname . '/' . $template . '.php');
-			}
-			elseif (file_exists('system/' . $this->area . '/view/_template/' . $template . '.php')) {
-				include('system/' . $this->area . '/view/_template/' . $template . '.php');
-			}
-			else {
-				throw new Exception('A ' . $template . '.php template file nem toltheto be!');
+				if (file_exists('system/' . $this->area . '/view/' . $this->dirname . '/' . $filename . '.php')) {
+					$file_path = 'system/' . $this->area . '/view/' . $this->dirname . '/' . $filename . '.php';
+				}
+				elseif (file_exists('system/' . $this->area . '/view/_template/' . $filename . '.php')) {
+					$file_path = 'system/' . $this->area . '/view/_template/' . $filename . '.php';
+				}
+				else {
+					throw new \Exception('A ' . $filename . '.php template file nem toltheto be!');
+				}
+
+			} catch (\Exception $e)  {
+				die($e->getMessage());
 			}
 
-		} catch (Exception $e)  {
-			die($e->getMessage());
-		}
-    }
+			return $file_path;	
+		}	
+
+			    /**
+			     * Tartalmi elem betöltése
+			     *
+			     * @param string $template  	file neve kiterjesztés nélkül (az egyedi "tartalmi" elem esetén értéke 'content' vagy $this->filename )
+			     */
+			/*
+			    public function load($template)
+			    {
+			    	if($template == 'content'){
+			    		$template = $this->filename;
+			    	}
+
+			    	try{
+
+						if (file_exists('system/' . $this->area . '/view/' . $this->dirname . '/' . $template . '.php')) {
+							include('system/' . $this->area . '/view/' . $this->dirname . '/' . $template . '.php');
+						}
+						elseif (file_exists('system/' . $this->area . '/view/_template/' . $template . '.php')) {
+							include('system/' . $this->area . '/view/_template/' . $template . '.php');
+						}
+						else {
+							throw new \Exception('A ' . $template . '.php template file nem toltheto be!');
+						}
+
+					} catch (\Exception $e)  {
+						die($e->getMessage());
+					}
+			    }
+			*/
     
     /**
      * Layout nevének megadása (egyébként a default értéke null)
@@ -165,13 +218,23 @@ HTML;
     }
 
     /**
+     * Kimeneti pufferelés kapcsolóját állítja
+     *
+     * @param bool $flag
+     */
+    public function setLazyRender($flag = true)
+    {
+    	$this->lazy_render = (bool) $flag;
+    }
+
+    /**
 	 * HTML template betöltése
 	 * Ha ezen metódus meghívása előtt megadjunk layout fájlt a set_layout() metódusal, akkor azt tölti be,
 	 * ha nincs layout megadva, akkor csak a paraméterben megadott template fájlt tölti be 
 	 *
 	 * @param string $view_path 		mappa/fileneve kiterjesztés nélkül (pl.: home/tpl_home)	 
 	 */
-    public function render($view_path)
+    public function render($view_path, $data = array())
 	{
 		$this->view_path = $view_path;
 		unset($view_path);
@@ -183,21 +246,27 @@ HTML;
 				list($this->dirname, $this->filename) = explode('/', $this->view_path);
 			}
 			else {
-				throw new Exception('Hibas parameteratadas a view objektum render() fuggvenyenek <br /> A ' . $this->view_path . '.php template file nem nyithato meg!');
+				throw new \Exception('Hibas parameteratadas a view objektum render() fuggvenyenek <br /> A ' . $this->view_path . '.php template file nem nyithato meg!');
 			}		
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			die($e->getMessage());
 		}
 
 		// A template-be kerülő (tömb) adatok változókká bontása
-		// ha már van ilyen nevű változó, akkor a változó neve elé beteszi a prefix-et pl.: $wddx_valtozoneve
-		/*
-		if(count($this->vars) > 0) {
-			extract($this->vars, EXTR_PREFIX_SAME, "wddx");
+		if(!empty($data)) {
+			extract($data, EXTR_PREFIX_SAME, "wddx");
 		}
-		*/
 
-		// ha be van állítva layout template
+			// DEBUG elindítása
+			if ($this->debug_flag) {
+				$this->_runDebug();
+			}
+
+		if ($this->lazy_render) {
+			ob_start();
+		}	
+
+		// INCLUDE - ha be van állítva layout template
 		if(!is_null($this->layout)) {
 	        try{
 				if (file_exists('system/' . $this->area . '/view/' . $this->dirname . '/' . $this->layout . '.php')) {
@@ -209,14 +278,14 @@ HTML;
 					include('system/' . $this->area . '/view/_template/' . $this->layout . '.php');
 				}
 				else {
-					throw new Exception('A ' . $template . '.php template file nem toltheto be!');
+					throw new \Exception('A ' . $template . '.php template file nem toltheto be!');
 				} 
-	        } catch (Exception $e) {
+	        } catch (\Exception $e) {
 	        	die($e->getMessage());
 	        }
 			
 		}
-		// ha nincs beállítva layout template
+		// INCLUDE - ha nincs beállítva layout template
 		else {
 			try{
 				if (file_exists('system/' . $this->area . '/view/' . $this->dirname . '/' . $this->filename . '.php')) {
@@ -226,13 +295,16 @@ HTML;
 					include('system/' . $this->area . '/view/_template/' . $this->filename . '.php');
 				}
 				else {
-					throw new Exception('A ' . $this->filename . '.php template file nem toltheto be!');
+					throw new \Exception('A ' . $this->filename . '.php template file nem toltheto be!');
 				}
-			} catch (Exception $e)  {
+			} catch (\Exception $e)  {
 				die($e->getMessage());
 			}
 		}
 
+		if ($this->lazy_render) {
+			return ob_get_clean();
+		}
     }
 	
     /**
@@ -243,6 +315,28 @@ HTML;
 		// echo out the feedback messages
 		require 'system/' . $this->area . '/view/_template/feedback.php';
 	}
+
+	/**
+	 * Adat visszaadása a config-ból
+	 */
+	public function getConfig($key, $default = null)
+	{
+		return Config::get($key, $default);
+	}
+
+
+	/**
+	 * Helperek példányosítása
+	 */
+	public function setHelper(array $helpers)
+	{
+		foreach ($helpers as $helper) {
+			if (!isset($this->$helper)) {
+				$this->$helper = DI::get($helper);
+			}
+		}
+	}
+
 
 	/**
 	 * Template menü elem class-t active-ra állítja, ha a controller és az action a megadott paraméterekkel egyezik

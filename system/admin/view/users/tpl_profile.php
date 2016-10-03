@@ -1,3 +1,4 @@
+<?php use System\Libs\Auth; ?>
 <div class="page-content">
 <!-- BEGIN PAGE HEADER-->
 	<!-- BEGIN PAGE TITLE & BREADCRUMB-->
@@ -22,7 +23,7 @@
 			
 			<div class="row user-profile">
 				<div class="col-md-3">
-					<img class="img-responsive" src="<?php echo Config::get('user.upload_path') . $this->data_arr[0]['user_photo']; ?>" alt="">
+					<img class="img-responsive" src="<?php echo $this->getConfig('user.upload_path') . $this->data_arr[0]['user_photo']; ?>" alt="">
 				</div>
 				
 				<div class="col-md-4">
@@ -114,7 +115,7 @@
 										
 									<div id="user_image"></div>	
 									<input type="hidden" name="img_url" id="OutputId" >			
-									<input type="hidden" id="old_img"  value="<?php echo Config::get('user.upload_path') . $this->data_arr[0]['user_photo'];?>" name="old_img">
+									<input type="hidden" id="old_img"  value="<?php echo $this->getConfig('user.upload_path') . $this->data_arr[0]['user_photo'];?>" name="old_img">
 									
 									<div class="clearfix"></div>
 

@@ -1,26 +1,32 @@
 <?php 
+namespace System\Admin\Controller;
+use System\Core\Admin_controller;
+use System\Core\View;
+use System\Libs\Util;
+use System\Libs\Auth;
+
 class Users extends Admin_controller {
 
 	function __construct()
 	{
 		parent::__construct();
-		$this->loadModel('users_model');
+		$this->loadModel('user_model');
 	}
 
 	public function index()
 	{
-		$this->view = new View();
+		$view = new View();
 
-		$this->view->title = 'Users oldal';
-		$this->view->description = 'Users oldal description';
+		$view->title = 'Users oldal';
+		$view->description = 'Users oldal description';
 		
-		$this->view->add_links(array('datatable', 'bootbox','vframework','users'));
+		$view->add_links(array('datatable', 'bootbox','vframework','users'));
 
         // userek adatainak lekérdezése
-        $this->view->all_user = $this->users_model->user_data_query();	
+        $view->all_user = $this->user_model->user_data_query();	
 //$this->view->debug(true);	
-        $this->view->set_layout('tpl_layout');
-		$this->view->render('users/tpl_users');
+        $view->set_layout('tpl_layout');
+		$view->render('users/tpl_users');
 	}
 
 	
@@ -32,7 +38,7 @@ class Users extends Admin_controller {
 		// új user hozzáadása
 		if($this->request->has_post('submit_new_user')) {
 
-			$result = $this->users_model->insert_user();
+			$result = $this->user_model->insert_user();
 			
 			if($result) {
 				Util::redirect('users');
@@ -42,15 +48,15 @@ class Users extends Admin_controller {
 			}
 		}
 
-		$this->view = new View();
+		$view = new View();
 
-		$this->view->title = 'Új felhasználó oldal';
-		$this->view->description = 'Új felhasználó description';
+		$view->title = 'Új felhasználó oldal';
+		$view->description = 'Új felhasználó description';
 
-		$this->view->add_links(array('bootstrap-fileupload','croppic','validation','user_insert'));
+		$view->add_links(array('bootstrap-fileupload','croppic','validation','user_insert'));
 		
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('users/tpl_user_insert');
+		$view->set_layout('tpl_layout');
+		$view->render('users/tpl_user_insert');
 	}
 	
 	
@@ -65,7 +71,7 @@ class Users extends Admin_controller {
 
 		if($this->request->has_post('submit_edit_user')) {
             
-			$result = $this->users_model->update_user((int)$id);
+			$result = $this->user_model->update_user((int)$id);
 			
 			if($result) {
 				Util::redirect('users');
@@ -75,35 +81,35 @@ class Users extends Admin_controller {
 			}
 		}
 		
-		$this->view = new View();
+		$view = new View();
 
-		$this->view->title = 'Profilom oldal';
-		$this->view->description = 'Profilom description';
+		$view->title = 'Profilom oldal';
+		$view->description = 'Profilom description';
 		
-		$this->view->add_links(array('bootstrap-fileupload', 'croppic', 'validation', 'user_profile'));
+		$view->add_links(array('bootstrap-fileupload', 'croppic', 'validation', 'user_profile'));
         
 		// visszadja a bejelentkezett user adatait egy tömbbe (id, név, telefon, password... stb.)
-		$this->view->data_arr = $this->users_model->user_data_query($id);
+		$view->data_arr = $this->user_model->user_data_query($id);
 
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('users/tpl_profile');
+		$view->set_layout('tpl_layout');
+		$view->render('users/tpl_profile');
 	}
 	
 	
     public function user_roles()
     {
-    	$this->view = new View();
+    	$view = new View();
 
-        $this->view->title = 'Felhasználói csoportok oldal';
-        $this->view->description = 'Felhasználói csoportok description';
+        $view->title = 'Felhasználói csoportok oldal';
+        $view->description = 'Felhasználói csoportok description';
         
-        $this->view->add_link('js', ADMIN_JS . 'pages/common.js');
+        $view->add_link('js', ADMIN_JS . 'pages/common.js');
 
-        $this->view->roles = Auth::instance()->getRoles();
-        $this->view->roles_counter = $this->users_model->rolesCounter();
+        $view->roles = Auth::instance()->getRoles();
+        $view->roles_counter = $this->user_model->rolesCounter();
 
-		$this->view->set_layout('tpl_layout');
-        $this->view->render('users/tpl_user_roles');
+		$view->set_layout('tpl_layout');
+        $view->render('users/tpl_user_roles');
     }
 	
 	
@@ -122,22 +128,22 @@ class Users extends Admin_controller {
             Util::redirect('users/edit_roles/' . $role_id);
         }
 
-		$this->view = new View();
+		$view = new View();
 
-        $this->view->title = 'Felhasználói jogosultságok szerkesztése oldal';
-        $this->view->description = 'Felhasználói jogosultságok szerkesztése description';
+        $view->title = 'Felhasználói jogosultságok szerkesztése oldal';
+        $view->description = 'Felhasználói jogosultságok szerkesztése description';
         
-		$this->view->add_link('js', ADMIN_JS . 'pages/common.js');
+		$view->add_link('js', ADMIN_JS . 'pages/common.js');
 
 
 		$auth = Auth::instance();
 		// összes permission adata	
-		$this->view->role_permissions = $auth->getAllPerms();
+		$view->role_permissions = $auth->getAllPerms();
 		// a $role_id-hez tartozó szerep adatai és engedélyei
-		$this->view->role =  $auth->getRoles($role_id);
+		$view->role =  $auth->getRoles($role_id);
 
-		$this->view->set_layout('tpl_layout');
-        $this->view->render('users/tpl_edit_roles');
+		$view->set_layout('tpl_layout');
+        $view->render('users/tpl_edit_roles');
     }
 	
 	/**
@@ -149,7 +155,7 @@ class Users extends Admin_controller {
 	        if(Auth::hasAccess('delete_user')){
 	        	// a POST-ban kapott user_id egy string ami egy szám vagy számok felsorolása pl.: "23" vagy "12,45,76" 
 	        	$id = $this->request->get_post('item_id');
-            	$respond = $this->users_model->delete_user_AJAX($id);
+            	$respond = $this->user_model->delete_user_AJAX($id);
         		echo json_encode($respond);
 	        } else {
 	            echo json_encode(array(
@@ -174,7 +180,7 @@ class Users extends Admin_controller {
 	public function user_img_upload()
 	{
 		if( $this->request->is_ajax() ){
-			echo $this->users_model->user_img_upload();
+			echo $this->user_model->user_img_upload();
 		}
 	}
 
@@ -192,7 +198,7 @@ class Users extends Admin_controller {
 				$action = $this->request->get_post('action');
 
 				if($action == 'make_active') {
-					$result = $this->users_model->change_status_query($id, 1);
+					$result = $this->user_model->change_status_query($id, 1);
 					if($result){
 						echo json_encode(array(
 							"status" => 'success',
@@ -207,7 +213,7 @@ class Users extends Admin_controller {
 				}
 				if($action == 'make_inactive') {
 					//ha a szuperadmint akarjuk blokkolni 
-					if($this->users_model->is_user_superadmin($id)) {
+					if($this->user_model->is_user_superadmin($id)) {
 						echo json_encode(array(
 							"status" => 'error',
 							"message" => 'Szuperadminisztrátor nem blokkolható!'
@@ -215,7 +221,7 @@ class Users extends Admin_controller {
 						return;					
 					}
 				
-					$result = $this->users_model->change_status_query($id, 0);
+					$result = $this->user_model->change_status_query($id, 0);
 					if($result){
 						echo json_encode(array(
 							"status" => 'success',
