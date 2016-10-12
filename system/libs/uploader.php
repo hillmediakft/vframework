@@ -178,28 +178,28 @@ class Uploader
 	private $ratio;
 
 	/**
-	 * Hibákat tartalmazó tömb
+	 * A hibát tartalmazza
 	 */
-	private $error = array();
+	private $error;
 
 	/**
 	 * Feltöltő objektum létrehozása
 	 */
-	function __construct($files_array)
+	function __construct($file)
 	{
-		$this->handle = new Upload($files_array);
+		$this->handle = new Upload($file);
 	}
 
 	/**
-	 * Hiba beállítása a hiba tömbbe
+	 * Hiba beállítása
 	 */
 	public function setError($error)
 	{
-		$this->error[] = $error;
+		$this->error = $error;
 	}
 
 	/**
-	 * Hiba visszaadása a hiba tömbből
+	 * Hiba visszaadása
 	 */
 	public function getError()
 	{

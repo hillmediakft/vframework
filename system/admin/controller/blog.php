@@ -450,9 +450,7 @@ class Blog extends Admin_controller {
 			$upload->make($upload_path, $args_thumb);
 		
 		} else {
-			foreach ($upload->getError() as $value) {
-				Message::set('error', $value);
-			}
+			Message::set('error', $upload->getError());
 			return false;
 		}
 		// kép neve
