@@ -54,7 +54,7 @@
                                 <div class="form-group">
                                     <label class="control-label">Slide kép</label>
                                     <div class="fileupload fileupload-new" data-provides="fileupload">
-                                        <div class="fileupload-new thumbnail" style="width: 585px"><img src="<?php echo Config::get('slider.upload_path') . $this->slider['picture']; ?>" alt=""/></div>
+                                        <div class="fileupload-new thumbnail" style="width: 585px"><img src="<?php echo $this->getConfig('slider.upload_path') . $this->slider['picture']; ?>" alt=""/></div>
                                         <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 585px; max-height: 210px; line-height: 20px;"></div>
                                         <div>
                                             <span class="btn default btn-file"><span class="fileupload-new">Kiválasztás</span><span class="fileupload-exists">Módosít</span><input id="uploadprofile" class="img" type="file" name="update_slide_picture"></span>

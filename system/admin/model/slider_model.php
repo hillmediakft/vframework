@@ -1,9 +1,12 @@
 <?php
 namespace System\Admin\Model;
 use System\Core\Admin_model;
+use System\Libs\Message;
 use System\Libs\Config;
 
 class Slider_model extends Admin_model {
+
+    protected $table = 'slider';
 
     private $slider_width; //slider kép szélessége
     private $slider_height; //slider kép magassága
@@ -24,10 +27,8 @@ class Slider_model extends Admin_model {
      * 	
      * @return Array (az összes slide minden adata a "slider_order" szerint rendezve)
      */
-    public function all_slides_query() {
-        $this->query->reset();
-        $this->query->set_table(array('slider'));
-        $this->query->set_columns();
+    public function allSlides()
+    {
         $this->query->set_orderby(array('slider_order'));
         return $this->query->select();
     }
@@ -38,9 +39,8 @@ class Slider_model extends Admin_model {
      * 	@param	$id  Int (egy id szám)
      * 	@return	Array
      */
-    public function one_slide_query($id) {
-        $this->query->reset();
-        $this->query->set_table(array('slider'));
+    public function oneSlide($id)
+    {
         $this->query->set_columns(array('id', 'active', 'picture', 'target_url', 'title', 'text'));
         $this->query->set_where('id', '=', $id);
         $result = $this->query->select();
@@ -48,295 +48,53 @@ class Slider_model extends Admin_model {
     }
 
     /**
-     * Slide adatainak módosítása
-     *
-     * @param 	$id	Int	
-     * @return 	bool
+     * INSERT
      */
-    public function update_slide($id) {
-        // új kép mutatója (a false a kezdőértéke)	
-        $new_picture = false;
-
-        //ha van új kép feltöltve
-        if (isset($_FILES['update_slide_picture'])) {
-            // ha a hibakód 4, akkor nem lett kijelölve feltöltendő file (vagyis nem akarunk képet módosítani)
-            // ha nem 4-es a hibakód, akkor sikeres, vagy valami gond van a feltöltéssel
-            if ($_FILES['update_slide_picture']['error'] != 4) {
-                $new_picture = true;
-
-                // kép feltöltése, upload_slider_picture() metódussal (visszatér a feltöltött kép nevével, vagy false-al)
-                $dest_image_name = $this->upload_slider_picture($_FILES['update_slide_picture']);
-
-                if ($dest_image_name === false) {
-                    return false;
-                }
-            }
-        } else {
-            throw new Exception('Hiba slide kep modositasakor: Nem letezik a \$_FILES[\'update_slide_picture\'] elem!');
-            return false;
-        }
-
-        // adatok beállítása
-        $data['active'] = $this->request->get_post('slider_status', 'integer');
-
-        if ($new_picture) {
-            $data['picture'] = $dest_image_name;
-            // régi kép adatai (ezt használjuk a régi kép törléséhez, ha új kép lett feltöltve)
-            $old_img_path = Config::get('slider.upload_path') . $this->request->get_post('old_img');
-            $old_thumb_path = Util::thumb_path($old_img_path);
-        }
-
-        $data['text'] = htmlentities($this->request->get_post('slider_text'), ENT_QUOTES, "UTF-8");
-        $data['title'] = htmlentities($this->request->get_post('slider_title'), ENT_QUOTES, "UTF-8");
-        $data['target_url'] = $this->request->get_post('slider_link');
-
-        // új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
-        $this->query->reset();
-        $this->query->set_table(array('slider'));
-        $this->query->set_where('id', '=', $id);
-        $result = $this->query->update($data);
-
-        // ha sikeres az adatbázisba írás
-        if ($result == 1) {
-            // megvizsgáljuk, hogy létezik-e új feltöltött kép
-            if ($new_picture) {
-                //régi képek törlése
-                if (!Util::del_file($old_img_path)) {
-                    Message::log('A ' . $old_img_path . ' kép nem törlődött!');
-                };
-                if (!Util::del_file($old_thumb_path)) {
-                    Message::log('A ' . $old_thumb_path . ' kép nem törlődött!');
-                };
-            }
-            // sikeres adatbázisba írás és kép feltöltés esetén!!!!
-            Message::set('success', 'slide_update_success');
-            return true;
-        } elseif ($result == 0) {
-            Message::set('success', 'Nem történt módosítás!');
-            return true;
-        } else {
-            Message::set('error', 'unknown_error');
-            return false;
-        }
+    public function insert($data)
+    {
+        return $this->query->insert($data);        
     }
 
+    /**
+     * UPDATE
+     */
+    public function update($id, $data)
+    {
+        $this->query->set_where('id', '=', $id);
+        return $this->query->update($data);
+    }
+
+    /**
+     * DELETE
+     */
+    public function delete($id)
+    {
+        return $this->query->delete('id', '=', $id);        
+    }
 
     /**
      * Sliderek sorrendjének módosítása
      *
-     * @param string $order     id=sorszám&id=sorszám....
+     * @param integer $id
+     * @param integer $new_order
      * @return array 
      */
-    public function slider_order($order)
+    public function orderUpdate($id, $new_order)
     {
-        // átalakítjuk a stringet tömbre
-        parse_str($order, $order_array);
-        foreach ($order_array as $id => $new_order) {
-            $this->query->reset();
-            $this->query->set_table(array('slider'));
-            $this->query->set_where('id', '=', $id);
-            $this->query->update(array('slider_order' => $new_order));
-        }
-        return array('status' => 'success');
+        $this->query->set_where('id', '=', $id);
+        return $this->query->update(array('slider_order' => $new_order));
     }
-
-
-
-
-
-
-
-
-
 
     /**
-     * 	Új slider hozzáadása	
-     *
-     * 	@return bool
+     * Egy rekordhoz tartozó Kép nevének lekérdezése
      */
-    public function insert_slide() {
-        if (isset($_FILES['upload_slide_picture'])) {
-            // kép feltöltése, upload_slider_picture() metódussal (visszatér a feltöltött kép elérési útjával, vagy false-al)
-            $dest_image_name = $this->upload_slider_picture($_FILES['upload_slide_picture']);
-
-            if ($dest_image_name === false) {
-                return false;
-            }
-        } else {
-            throw new Exception('Hiba slide kep feltoltesekor: Nem letezik a \$_FILES[\'upload_slide_picture\'] elem!');
-            return false;
-        }
-
-        //adatok bevitele az adatbázisba
-        $data['active'] = $this->request->get_post('slider_status', 'integer');
-        $data['slider_order'] = ($this->slide_highest_order_number()) + 1;
-        $data['picture'] = $dest_image_name;
-        //$data['target_url'] = "";
-        $data['text'] = htmlentities($this->request->get_post('slider_text'), ENT_QUOTES, "UTF-8");
-        $data['title'] = htmlentities($this->request->get_post('slider_title'), ENT_QUOTES, "UTF-8");
-        $data['target_url'] = $this->request->get_post('slider_link');
-
-        // adatbázis lekérdezés	
-        $this->query->reset();
-        $this->query->set_table(array('slider'));
-        $result = $this->query->insert($data);
-
-        // ha sikeres az insert visszatérési érték true
-        if ($result) {
-            Message::set('success', 'new_slide_success');
-            return true;
-        } else {
-            Message::set('error', 'unknown_error');
-            return false;
-        }
-    }
-
-                            /**
-                             * 	Slide törlése a slider táblából
-                             *
-                             * 	@param	$id String or Integer
-                             * 	@return	tru vagy false
-                             */
-                            public function delete_slide($id) {
-                                // kép nevének lekérdezése
-                                $this->query->reset();
-                                $this->query->set_table(array('slider'));
-                                $this->query->set_columns(array('picture'));
-                                $this->query->set_where('id', '=', $id);
-                                $result = $this->query->select();
-
-                                $image_name = $result[0]['picture'];
-                                $image_path = Config::get('slider.upload_path') . $image_name;
-                                $image_thumb_path = Util::thumb_path($image_path);
-
-                                // slider törlése
-                                $this->query->reset();
-                                $this->query->set_table(array('slider'));
-                                $this->query->set_where('id', '=', $id);
-                                $result = $this->query->delete();
-
-                                // ha sikeres a törlés 1 a vissaztérési érték
-                                if ($result == 1) {
-                                    //régi képek törlése
-                                    if (!Util::del_file($image_path)) {
-                                        Message::log($image_path . ' kép nem törlődött!');
-                                    };
-                                    if (!Util::del_file($image_thumb_path)) {
-                                        Message::log($image_thumb_path . ' kép nem törlődött!');
-                                    };
-
-                                    Message::set('success', 'slide_delete_success');
-                                    return true;
-                                } else {
-                                    throw new Exception('Hiba slide torlesekor: a DELETE lekerdezes nem sikerult!');
-                                    return false;
-                                }
-                            }
-
-
-
-
-
-
-    /**
-     * Slider törlése AJAX-al
-     *
-     * @param string $id     ez lehet egy szám, vagy felsorolás pl: 23 vagy 12,14,36
-     */
-    public function delete_slider_AJAX($id)
+    public function selectPicture($id)
     {
-        // a sikeres törlések számát tárolja
-        $success_counter = 0;
-        // a sikeresen törölt id-ket tartalmazó tömb
-        $success_id = array();      
-        // a sikertelen törlések számát tárolja
-        $fail_counter = 0; 
-
-        // a paraméterként kapott stringből tömböt csinálunk a , karakter mentén
-        $data_arr = explode(',', $id);
-        
-        // bejárjuk a $data_arr tömböt és minden elemen végrehajtjuk a törlést
-        foreach($data_arr as $value) {
-            //átalakítjuk a integer-ré a kapott adatot
-            $value = (int)$value;
-            
-            //lekérdezzük a törlendő blog képének a nevét, hogy törölhessük a szerverről
-            $this->query->reset();
-            $this->query->set_table('slider');
-            $this->query->set_columns(array('picture'));
-            $this->query->set_where('id', '=', $value);
-            $photo_name = $this->query->select();           
-
-            //blog törlése  
-            $this->query->reset();
-            $this->query->set_table(array('slider'));
-            //a delete() metódus integert (lehet 0 is) vagy false-ot ad vissza
-            $result = $this->query->delete('id', '=', $value);
-            
-            if($result !== false) {
-                // ha a törlési sql parancsban nincs hiba
-                if($result > 0){
-                    //ha van feltöltött képe a bloghoz (az adatbázisban szerepel a file-név)
-                    if(!empty($photo_name[0]['picture'])){
-                    
-                        $picture_path = Config::get('slider.upload_path') . $photo_name[0]['picture'];
-                        $thumb_picture_path = Util::thumb_path($picture_path);
-                    
-                        $del_result = Util::del_file($picture_path);
-                        $del_thumb_result = Util::del_file($thumb_picture_path);
-                    
-                        //kép file törlése a szerverről (ha az Util::del_file() falsot ad vissza nem tudtuk törölni a képet... hibaüzenet)
-                        if(!$del_result){
-                            Message::log('A kép nem törölhető! - ' . $picture_path);
-                        }
-                        //kép file törlése a szerverről (ha az Util::del_file() falsot ad vissza nem tudtuk törölni a képet... hibaüzenet)
-                        if(!$del_thumb_result){
-                            Message::log('A kép nem törölhető! - ' . $thumb_picture_path);
-                        }
-                    }               
-                    //sikeres törlés
-                    $success_counter += $result;
-                    $success_id[] = $value;
-                }
-                else {
-                    //sikertelen törlés
-                    $fail_counter += 1;
-                }
-            }
-            else {
-                // ha a törlési sql parancsban hiba van
-                return array(
-                    'status' => 'error',
-                    'message_error' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!',                  
-                );
-            }
-        }
-
-        // üzenetek visszaadása
-        $respond = array();
-        $respond['status'] = 'success';
-        
-        if ($success_counter > 0) {
-            $respond['message_success'] = 'A slide törölve.';
-        }
-        if ($fail_counter > 0) {
-            $respond['message_error'] = 'A slide-ot már töröltek!';
-        }
-
-        // respond tömb visszaadása
-        return $respond;    
+        $this->query->set_columns(array('picture'));
+        $this->query->set_where('id', '=', $id);
+        $result = $this->query->select();         
+        return $result[0]['picture'];
     }
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * Meghatározott slider_id-hez feltöltött képek közül kiválasztja azt a sort, amelyben a 
@@ -344,12 +102,10 @@ class Slider_model extends Admin_model {
      *
      * @return int az eddigi legnagyobb sorrend szám
      */
-    public function slide_highest_order_number() {
-        $this->query->reset();
-        $this->query->set_table(array('slider'));
+    public function slide_highest_order_number()
+    {
         $this->query->set_columns('MAX(slider_order)');
         $result = $this->query->select();
-
         return $result[0]['MAX(slider_order)'];
     }
 
@@ -360,12 +116,11 @@ class Slider_model extends Admin_model {
      * 	@param	$files_array	Array ($_FILES['valami'])
      * 	@return	String (kép elérési útja) or false
      */
-    private function upload_slider_picture($files_array) {
-        //include(LIBS . "/upload_class.php");
+    public function upload_slider_picture($files_array) {
         // feltöltés helye
         $imagePath = Config::get('slider.upload_path');
         //képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül)	
-        $handle = new Upload($files_array);
+        $handle = new \System\Libs\Upload($files_array);
         // fájlneve utáni random karakterlánc
         $suffix = md5(uniqid());
 

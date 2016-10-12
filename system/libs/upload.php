@@ -35,7 +35,7 @@ namespace System\Libs;
  * @license   http://opensource.org/licenses/gpl-license.php GNU Public License
  * @copyright Colin Verot
  */
-class upload {
+class Upload {
 
 
     /**
@@ -2010,7 +2010,7 @@ class upload {
      *    or   string $file Local filename
      * @param  string $lang Optional language code
      */
-    function upload($file, $lang = 'hu_HU') {
+    function __construct($file, $lang = 'hu_HU') {
 
         $this->version            = '0.32';
 
@@ -2099,7 +2099,8 @@ class upload {
 		$this->translation['reading_failed']              = 'Hiba a fájl olvasásakor.';
 
         // determines the language
-        $this->lang               = $lang;
+        $this->lang = $lang;
+/*
         if ($this->lang != 'hu_HU' && file_exists(dirname(__FILE__).'/lang') && file_exists(dirname(__FILE__).'/lang/class.upload.' . $lang . '.php')) {
             $translation = null;
             include(dirname(__FILE__).'/lang/class.upload.' . $lang . '.php');
@@ -2109,7 +2110,7 @@ class upload {
                 $this->lang = 'hu_HU';
             }
         }
-
+*/
 
         // determines the supported MIME types, and matching image format
         $this->image_supported = array();
@@ -4737,5 +4738,4 @@ class upload {
         return true;
     }
 }
-
 ?>

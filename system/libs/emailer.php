@@ -137,7 +137,8 @@ class Emailer {
             $mail->Port = Config::get('email.server.smtp_port');
         } 
         else {
-            $mail->isSendmail();
+            $mail->isMail(); // küldés a php mail metódusával
+            // $mail->isSendmail(); // küldés sendmail-al
         }
 
         $mail->CharSet = 'UTF-8'; //karakterkódolás beállítása

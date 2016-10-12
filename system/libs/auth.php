@@ -1,9 +1,7 @@
 <?php
 namespace System\Libs;
+
 use PDO;
-//use System\Libs\DB;
-
-
 
 /**
 * Class Auth
@@ -96,8 +94,7 @@ class Auth {
 
     public function __construct()
     {
-        //$this->request = Registry::getInstance()->request;
-        $this->connect = DB::get_connect();
+        $this->connect = DI::get('connect');
         //$this->query = new Query($this->connect);
         
         // a felhasználókat tartalmazó tábla neve
@@ -604,7 +601,8 @@ class Auth {
      */
     public static function hasAccess($permission, $target_url = null)
     {
-        $instance = self::instance();    
+        //$instance = self::instance();   
+        $instance = DI::get('auth');
 
         // ha még nincsenek lekérdezve a bejelentkezett felhasználó permission-jai
         if (is_null($instance->permissions)) {

@@ -14,17 +14,17 @@ class Pages extends Admin_controller {
 
 	public function index()
 	{
-		$this->view = new View();
+		$view = new View();
 
-		$this->view->title = 'Admin pages oldal';
-		$this->view->description = 'Admin pages oldal description';
+		$view->title = 'Admin pages oldal';
+		$view->description = 'Admin pages oldal description';
 		
-		$this->view->add_links(array('vframework', 'pages'));
+		$view->add_links(array('vframework', 'pages'));
 		
-		$this->view->all_pages = $this->pages_model->all_pages();
+		$view->all_pages = $this->pages_model->allPages();
 		
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('pages/tpl_pages');
+		$view->set_layout('tpl_layout');
+		$view->render('pages/tpl_pages');
 	}
 	
 	/**
@@ -36,28 +36,36 @@ class Pages extends Admin_controller {
 
 		if($this->request->has_post()) {
 			
-			$result = $this->pages_model->update_page($id);
+			$data['page_body'] = $this->request->get_post('page_body');
+			$data['page_metatitle'] = $this->request->get_post('page_metatitle');
+			$data['page_metadescription'] = $this->request->get_post('page_metadescription');
+			$data['page_metakeywords'] = $this->request->get_post('page_metakeywords');
+
+			// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
+			$result = $this->pages_model->update($id, $data);
 			
-			if($result) {
-				Util::redirect('pages');
+			if($result !== false) {
+	            Message::set('success', 'page_update_success');
+				$this->response->redirect('admin/pages');
+			} else {
+	            Message::set('error', 'unknown_error');
+				$this->response->redirect('admin/pages/update/' . $id);
 			}
-			else {
-				Util::redirect('pages/update/' . $id);
-			}
+
 		}	
 		
-		$this->view = new View();
+		$view = new View();
 		
-		$this->view->title = 'Oldal szerkesztése';
-		$this->view->description = 'Oldal szerkesztése description';
+		$view->title = 'Oldal szerkesztése';
+		$view->description = 'Oldal szerkesztése description';
 		
-		$this->view->add_links(array('bootbox', 'ckeditor', 'vframework', 'page_update'));
+		$view->add_links(array('bootbox', 'ckeditor', 'vframework', 'page_update'));
 				
 		// visszadja a szerkesztendő oldal adatait egy tömbben (page_id, page_title ... stb.)
-		$this->view->data_arr = $this->pages_model->page_data_query($id);
+		$view->data_arr = $this->pages_model->onePage($id);
 		
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('pages/tpl_page_update');
+		$view->set_layout('tpl_layout');
+		$view->render('pages/tpl_page_update');
 	}
 
 }

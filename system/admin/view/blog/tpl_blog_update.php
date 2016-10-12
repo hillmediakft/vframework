@@ -51,7 +51,7 @@
 							<div class="form-group">
 								<label class="control-label">Kép</label>
 								<div class="fileupload fileupload-new" data-provides="fileupload">
-									<div class="fileupload-new thumbnail" style="width: 200px; height: 150px;"><img src="<?php echo Config::get('blogphoto.upload_path') . $this->content[0]['blog_picture'];?>" alt=""/></div>
+									<div class="fileupload-new thumbnail" style="width: 200px; height: 150px;"><img src="<?php echo $this->getConfig('blogphoto.upload_path') . $this->content[0]['blog_picture'];?>" alt=""/></div>
 									<div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
 									<div>
 										<span class="btn default btn-file"><span class="fileupload-new">Kiválasztás</span><span class="fileupload-exists">Módosít</span><input id="uploadprofile" class="img" type="file" name="upload_blog_picture"></span>

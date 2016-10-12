@@ -134,14 +134,16 @@ var Newsletter = function () {
 	
 		es = new EventSource(query_string);
 		
-		console.log(es);
+//console.log(es);
 		
 		//a message is received
 		es.addEventListener('message', function(e) {
 			var result = JSON.parse( e.data );
 			  
 			addLog(result.message);      
-			  
+
+//console.log(e.lastEventId);
+
 			if(e.lastEventId == 'CLOSE') {
 				addLog('Hírlevelek küldése kész');
 				es.close();

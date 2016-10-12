@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a3f58245c2d31e2a37d755d789fc14e4",
-    "content-hash": "1f032bb20919b075a0f4cf1f977e8a36",
+    "hash": "30721555a7345c7c1ebb4c22fc99e571",
+    "content-hash": "61394e9aab0a7286350d78e6c51fde75",
     "packages": [
         {
             "name": "phpmailer/phpmailer",
@@ -112,6 +112,43 @@
                 "dependency injection"
             ],
             "time": "2015-09-11 15:10:35"
+        },
+        {
+            "name": "rev42/tfpdf",
+            "version": "v1.25",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rev42/tfpdf.git",
+                "reference": "08689ec41e757dde94db5e7527a98c5788555b61"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rev42/tfpdf/zipball/08689ec41e757dde94db5e7527a98c5788555b61",
+                "reference": "08689ec41e757dde94db5e7527a98c5788555b61",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "tFPDF": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Ian Back",
+                    "email": "ianb@bpm1.com"
+                }
+            ],
+            "description": "tFPDF",
+            "homepage": "http://fpdf.org/fr/script/script92.php",
+            "keywords": [
+                "pdf"
+            ],
+            "time": "2015-10-10 22:37:26"
         }
     ],
     "packages-dev": [],

@@ -2,7 +2,7 @@
 namespace System\Admin\Controller;
 use System\Core\Admin_controller;
 use System\Core\View;
-use System\Libs\Util;
+use System\Libs\Message;
 
 class Content extends Admin_controller {
 
@@ -15,17 +15,17 @@ class Content extends Admin_controller {
 
 	public function index()
 	{
-		$this->view = new View();
+		$view = new View();
 
-		$this->view->title = 'Egyéb tartalom oldal';
-		$this->view->description = 'Egyéb tartalom oldal description';
+		$view->title = 'Egyéb tartalom oldal';
+		$view->description = 'Egyéb tartalom oldal description';
 		
-		$this->view->add_links(array('content'));
+		$view->add_links(array('content'));
 		
-		$this->view->all_content = $this->content_model->all_content();
+		$view->all_content = $this->content_model->allContents();
 		
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('content/tpl_content');
+		$view->set_layout('tpl_layout');
+		$view->render('content/tpl_content');
 	}
 	
 	/**
@@ -37,22 +37,32 @@ class Content extends Admin_controller {
 
 		if($this->request->has_post('submit_update_content')) {
 		
-			$this->content_model->update_content($id);
-			Util::redirect('content');
+			$data['content_title'] = $this->request->get_post('content_title');
+			$data['content_body'] = $this->request->get_post('content_body', 'strip_danger_tags');
+
+			$result = $this->content_model->update($id, $data);
+					
+			if($result !== false)
+				Message::set('success', 'page_update_success');
+			} else {
+				Message::set('error', 'unknown_error');
+			}
+
+			$this->response->redirect('admin/content');	
 		}
 		
-		$this->view = new View();
+		$view = new View();
 
-		$this->view->title = 'Tartalom szerkesztése';
-		$this->view->description = 'Tartalom szerkesztése description';
+		$view->title = 'Tartalom szerkesztése';
+		$view->description = 'Tartalom szerkesztése description';
 		
-		$this->view->add_links(array('bootbox', 'ckeditor', 'edit_content'));
+		$view->add_links(array('bootbox', 'ckeditor', 'edit_content'));
 
 		// visszadja a szerkesztendő oldal adatait egy tömbben (page_id, page_title ... stb.)
-		$this->view->data_arr = $this->content_model->content_data_query($id);
+		$view->data_arr = $this->content_model->selectContent($id);
 		
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('content/tpl_edit_content');
+		$view->set_layout('tpl_layout');
+		$view->render('content/tpl_edit_content');
 	}
 
 }

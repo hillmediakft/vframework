@@ -60,7 +60,7 @@
 											<div class="photo_slider_label">
 												<?php echo ($value['photo_slider'] == 1) ? '<span class="label label-info">Kiemelt</span>' : '';?>
 											</div>
-											<img class="img-responsive" src="<?php echo Config::get('photogallery.upload_path') . Util::thumb_path( $value['photo_filename']);?>" alt="">
+											<img class="img-responsive" src="<?php echo $this->getConfig('photogallery.upload_path') . $this->url_helper->thumbPath( $value['photo_filename']);?>" alt="">
 											<div class="mix-details">
 												<h4><?php echo $value['photo_caption'];?></h4>
 												<a class="mix-delete" data-id="<?php echo $value['photo_id'];?>">

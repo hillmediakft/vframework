@@ -4,7 +4,6 @@ namespace System;
 use System\Libs\Config;
 use System\Core\Application;
 use System\libs\DI;
-use Pimple\Container;
 
 
 //MAPPA beállítások
@@ -72,11 +71,37 @@ else {
 
 //---!! DIC !!---------------------
 
-DI::setContainer(new Container());
+DI::setContainer(new \Pimple\Container());
 
-	DI::set('connect', function() {
+/*
+	DI::set('connect_old', function() {
 		return \System\Libs\DB::get_connect();
 	});
+*/
+
+	DI::set('connect', function() {
+		$settings = Config::get('db');
+		$db = new \System\Libs\DB($settings['host'], $settings['name'], $settings['user'], $settings['pass']);
+		return $db->create();
+	});
+/*
+		DI::set('connect2', function() {
+			$settings = Config::get('db');
+			try {
+				$connect = new \PDO('mysql:host=' . $settings['host'] . ';dbname=' . $settings['name'] . ';charset=utf8', $settings['user'], $settings['pass']);
+				if(ENV == 'development'){
+					$connect->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+				}
+			}
+			catch(\PDOException $e) {
+				die('Database error: ' . $e->getMessage());
+			}
+
+			return $connect;
+		});
+*/		
+
+
 
 	DI::set('uri', function() {
 		return new \System\Libs\Uri(Config::get('language_default'), Config::get('allowed_languages'));
@@ -93,17 +118,22 @@ DI::setContainer(new Container());
 	DI::set('response', function(){
 		return new \System\Libs\Response();
 	});
-/*
+
 	DI::set('auth', function(){
 		return new \System\Libs\Auth();
 	});
-*/
-/*
-	$config_name = 'auth';
-	DI::set('auth_init', function() use ($config_name) {
-		\System\Libs\Auth::init($config_name);
+
+// helpers ---------------
+	DI::set('file_helper', function(){
+		return new \System\Helper\File();
 	});
-*/
+	DI::set('str_helper', function(){
+		return new \System\Helper\Str();
+	});
+	DI::set('url_helper', function(){
+		return new \System\Helper\Url();
+	});
+
 /*
 	DI::factory('query', function($c){
 		return new \System\Libs\Query($c['connect']);

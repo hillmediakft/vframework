@@ -3,7 +3,8 @@
     "description": "varnagy framework",
     "require": {
 		"phpmailer/phpmailer": "~5.2",
-        "pimple/pimple": "~3.0"
+        "pimple/pimple": "~3.0",
+        "rev42/tfpdf": "^1.25"
 	},
 		"autoload": {
         "psr-4": {

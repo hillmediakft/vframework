@@ -1,4 +1,4 @@
-<?php use \System\Libs\Auth, \System\Libs\Config; ?>
+<?php use \System\Libs\Auth; ?>
 <div class="page-content">
     <!-- BEGIN PAGE HEADER-->
     <!-- BEGIN PAGE TITLE & BREADCRUMB-->
@@ -86,7 +86,7 @@
                                         <input type="checkbox" class="checkboxes" name="user_id_<?php echo $value['user_id']; ?>" value="<?php echo $value['user_id']; ?>"/>
                                     <?php } ?>	
                                     </td>
-                                    <td><img src="<?php echo Config::get('user.upload_path') . $value['user_photo']; ?>" width="60" height="60"/></td>
+                                    <td><img src="<?php echo $this->getConfig('user.upload_path') . $value['user_photo']; ?>" width="60" height="60"/></td>
                                     <td><?php echo $value['user_name']; ?></td>
                                     <td><?php echo $value['user_first_name'] . ' ' . $value['user_last_name']; ?></td>
                                     <td><a href="mailto:<?php echo $value['user_email']; ?>"><?php echo $value['user_email']; ?> </a></td>

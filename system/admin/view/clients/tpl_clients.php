@@ -52,7 +52,7 @@
                                     <td><?php echo $value['client_order']; ?></td>
                                     <td><?php echo $value['client_id']; ?></td>
                                     <td class="sortable_mover"><i class="fa fa-arrows"></i></td>
-                                    <td><img src="<?php echo (!empty($value['client_photo'])) ? Config::get('clientphoto.upload_path') . $value['client_photo'] : Config::get('clientphoto.default_photo'); ?>"/></td>
+                                    <td><img src="<?php echo (!empty($value['client_photo'])) ? $this->getConfig('clientphoto.upload_path') . $value['client_photo'] : $this->getConfig('clientphoto.default_photo'); ?>"/></td>
                                     <td><?php echo $value['client_name'];?></td>
                                     <td><?php echo $value['client_link']; ?></td>
                                     <td>

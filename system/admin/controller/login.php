@@ -1,7 +1,8 @@
 <?php
 namespace System\Admin\Controller;
+
 use System\Core\Admin_controller;
-use System\Libs\Auth;
+use System\Libs\DI;
 use System\Libs\Message;
 use System\Core\View;
 
@@ -31,15 +32,14 @@ class Login extends Admin_controller {
             $password = $this->request->get_post('user_password');
             $rememberme = $this->request->has_post('user_rememberme');
 
-            $auth = Auth::instance();
+            // $auth = Auth::instance();
+            $auth = DI::get('auth');
             $login_successful = $auth->login($username, $password, $rememberme);
 
 			// login status vizsgálata
 			if ($login_successful) {
                 // Sikeres bejelentkezés
                 $this->response->redirect('admin');
-                //header('location: ' . BASE_URL . 'admin');
-                //exit;
             }
             // Sikertelen bejelentkezés
             else {
@@ -49,13 +49,11 @@ class Login extends Admin_controller {
                 }
                 // visszairányítás
                 $this->response->redirect('admin/login');
-				//header('location: ' . BASE_URL . 'admin/login');
-				//exit;
 			}			
 		}
 
             // bejelentkezés cookie-val
-            $auth = Auth::instance();
+            $auth = DI::get('auth');
             $login_status = $auth->loginWithCookie();
             if ($login_status) {
                 $this->response->redirect('admin');
@@ -72,16 +70,13 @@ class Login extends Admin_controller {
     }
 	
     /**
-     * The logout action, login/logout
+     * Kijelentkezés
      */
     public function logout()
     {
-        //$this->login_model->logout();
-        Auth::instance()->logout();
-        // redirect
+        DI::get('auth')->logout();
+        // átirányítás a front-oldalra
         $this->response->redirect();
-        //header('location: ' . BASE_URL);
-        //exit;
     }
 
 }

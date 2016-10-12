@@ -51,7 +51,7 @@ class Model {
      *
      * @access private
      */
-    protected function load_password_compatibility()
+    public function load_password_compatibility()
     {
         if (version_compare(PHP_VERSION, '5.5.0', '<')) {
             // if you are using PHP 5.3 or PHP 5.4 you have to include the password_api_compatibility_library.php
@@ -83,7 +83,7 @@ class Model {
 	 * @param	mixed	$args		egy tömb, amiben megadjuk a lekérdezés paramétereit
 	 * @return 	array
 	 */
-	public function find($args = null)
+	final public function find($args = null)
 	{
 		if (func_num_args() == 0) {
 			return $this->query->select();
@@ -138,7 +138,7 @@ class Model {
 			return $this->query->select();
 		}
 
-		throw new Exception("Rossz parametert kapott a model find metodusa");
+		throw new \Exception("Rossz parametert kapott a model find metodusa");
 	}
 
 
@@ -154,11 +154,13 @@ class Model {
 	/**
 	 * Rekord módosítása
 	 */
-	// public function update($id, $data)
-	// {
-	// 	$this->query->set_where($this->id, '=', $id);
-	// 	return $this->query->update($data);
-	// }
+	/*
+	final public function update($id, $data)
+	{
+		$this->query->set_where($this->id, '=', $id);
+		return $this->query->update($data);
+	}
+	*/
 
 	/**
 	 * Rekord módosítása

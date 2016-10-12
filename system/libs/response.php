@@ -314,18 +314,20 @@ class Response {
 	}
 
 	/**
-	 * JSON visszaadása
+	 * JSON válasz
+	 * @param array $array
+	 * @param bool $flag 	ha false, akkor nem lesz exit parancs
 	 */
-	public function json(array $array)
+	public function json(array $array, $flag = true)
 	{
 		$json = json_encode($array);
 		$this->setHeader('Content-Type', 'application/json', true);
 		$this->sendHeaders();
 		echo $json;
+		if ($flag) {
+			exit;
+		}
 	}
-
-
-
 
 	/**
 	 * Redirects to another uri/url.  Sets the redirect header,
@@ -373,7 +375,7 @@ class Response {
 	 *
 	 * @throws  \RuntimeException  If it would redirect back to itself
 	 */
-	public static function redirectBack($url = '', $method = 'location', $code = 302)
+	public function redirectBack($url = '', $method = 'location', $code = 302)
 	{
 		// ha van referrer
 		if ($referrer = $_SERVER['HTTP_REFERER']) {

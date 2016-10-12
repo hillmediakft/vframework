@@ -24,29 +24,45 @@ class Controller {
             }
             */
 
-    /*
-     *  A model file betöltése és példányosítása a paramétertől függően.
+    /**
+     * A model file betöltése és példányosítása a paramétertől függően.
      *
-     *  @param  string  (a model file neve kiterjesztés nélkül)
+     * @param  string  $model (a model file neve kiterjesztés nélkül)
+     * @param bool $return_var
+     * @return void|object
      */
-    public function loadModel($model)
+    public function loadModel($model, $return_var = false)
     {
-        if(!isset($this->$model)) {
-            $model_path = ucfirst(APP_DIR) . '\\' . ucfirst(AREA) . '\\Model\\' . ucfirst($model);
-            $this->$model = new $model_path();
+        $model_path = ucfirst(APP_DIR) . '\\' . ucfirst(AREA) . '\\Model\\' . ucfirst($model);
+
+        if (!$return_var) {
+            if(!isset($this->$model)) {
+                $this->$model = new $model_path();
+            }
+        } else {
+            return new $model_path();
         }
+        
     }
 
-    /*
-     * 	A helper file betöltése és példányosítása a paramétertől függően.
+    /**
+     * A helper file betöltése és példányosítása a paramétertől függően.
      *
-     * 	@param	string	(a helper file neve kiterjesztés nélkül)
+     * @param string $helper
+     * @param bool $return_var
+     * @return void|object     
      */
-    public function loadHelper($helper)
+    public function loadHelper($helper, $return_var = false)
     {
-        if(!isset($this->$helper)) {
-            $helper_path = ucfirst(APP_DIR) . '\\Helper\\' . ucfirst($helper);
-            $this->$helper = new $helper_path();
+        $helper_class = ucfirst(APP_DIR) . '\\Helper\\' . ucfirst($helper);
+    
+        if (!$return_var) {
+            //$helper = $helper . '_helper';
+            if(!isset($this->$helper)) {
+                $this->$helper = new $helper_class();
+            }
+        } else {
+            return new $helper_class();
         }
     }
 

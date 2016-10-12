@@ -1,5 +1,8 @@
 <?php
 namespace System\Helper;
+
+use System\Libs\Message;
+
 /**
 * File-műveleteket végző metódusok
 */
@@ -8,44 +11,24 @@ class File {
 	public function __construct() { }
 
 	/**
-     * 	File törlése
+     * 	File, vagy file-ok törlése
      *
-     * 	@param	$filename	a törlendő file elérési útja mappa/filename.ext
-     * 	@return	true|false
+     * 	@param	string|array $filenames 	a törlendő file elérési útja mappa/filename.ext
+     * 	@return	bool
      */
-    public function delete($filename)
+    public function delete($filenames)
     {
-        if (is_file($filename)) {
-            //ha a file megnyitható és írható
-            if (is_writable($filename)) {
-                unlink($filename);
-                return true;
+        $filenames = (array) $filenames;
+        foreach ($filenames as $file) {
+            if (is_file($file) && is_writable($file)) {
+                //ha a file megnyitható és írható
+                unlink($file);
+            } else {
+                Message::log('A ' . $file . ' kép nem törlődött!');
             }
-        } else {
-            return false;
         }
+        return true;
     }
-
-    /**
-     * A fájl nevéhez hozzáilleszt egy query stringet (pl: style.css?v=2314564321
-     * A szám a fájl utolsó módosításának timestamp-je
-     *  
-     * @param   string  $uri  a file elérési útvonala pl.: valami.hu/public/site_assets/css/style.css
-     * @return  string  a fájl verzióval ellátott elérési útvonala
-     */
-    public function auto_version($uri)
-    {
-        if (substr($uri, 0, 1) == "/") {
-            // relatív URI
-            $fname = $_SERVER["DOCUMENT_ROOT"] . $uri;
-        } else {
-            // abszolút URI
-            $fname = $uri;
-        }
-        $ftime = filemtime($fname);
-        return $uri . '?v=' . $ftime;
-    }    
-
 
 
 }

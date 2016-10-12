@@ -3,7 +3,6 @@ namespace System\Admin\Controller;
 
 use System\Core\Admin_controller;
 use System\Core\View;
-use System\Libs\Util;
 use System\Libs\Session;
 use System\Libs\Message;
 use System\Libs\Validate;
@@ -25,7 +24,7 @@ class Testimonials extends Admin_controller {
 		
 		$view->add_links(array('bootbox', 'testimonials'));
 		
-		$view->all_testimonials = $this->testimonials_model->findAll();	
+		$view->all_testimonials = $this->testimonials_model->selectAll();	
 		
 		$view->set_layout('tpl_layout');
 		$view->render('testimonials/tpl_testimonials');
@@ -83,12 +82,11 @@ class Testimonials extends Admin_controller {
 	        	// adatbázisba írás
 				$result = $this->testimonials_model->insert($data);
 
-				if($result) {
+				if($result !== false) {
 		            Message::set('success', 'new_testimonial_success');
 					Session::delete('testimonial_input');
 					$this->response->redirect('admin/testimonials/insert');
-				}
-				else {
+				} else {
 		            Message::set('error', 'unknown_error');
 					$this->response->redirect('admin/testimonials/insert');
 				}
@@ -122,15 +120,13 @@ class Testimonials extends Admin_controller {
 
 			$result = $this->testimonials_model->update($id, $data);
 
-			if($result >= 0) {
+			if($result !== false) {
 	            Message::set('success', 'testimonial_update_success');
 				$this->response->redirect('admin/testimonials');
-			}
-			else {
+			} else {
 	            Message::set('error', 'unknown_error');
 				$this->response->redirect('admin/testimonials/update');
 			}
-			
 		}
 		
 		$view = new View();
@@ -141,11 +137,10 @@ class Testimonials extends Admin_controller {
 		$view->add_links(array('bootbox', 'vframework', 'testimonial_update'));
 		
 		// visszadja a szerkesztendő oldal adatait egy tömbben (page_id, page_title ... stb.)
-		$view->data_arr = $this->testimonials_model->find($id);
+		$view->data_arr = $this->testimonials_model->selectOne($id);
 		
 		$view->set_layout('tpl_layout');
 		$view->render('testimonials/tpl_testimonial_update');
-	
 	}
 	
 	/**
@@ -153,14 +148,12 @@ class Testimonials extends Admin_controller {
 	 */
 	public function delete()
 	{
-		$id = (int)$this->request->get_params('id');
-		$result = $this->testimonials_model->delete($id);
+		$result = $this->testimonials_model->delete( (int)$this->request->get_params('id') );
 		
 		// ha sikeres a törlés 1 a vissaztérési érték
 		if($result === 1) {
             Message::set('success', 'testimonial_delete_success');
-		}
-		else {
+		} else {
             Message::set('error', 'unknown_error');
 		}
 

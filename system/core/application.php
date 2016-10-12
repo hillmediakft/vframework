@@ -22,7 +22,6 @@ class Application {
         
         // Megadjuk az Auth osztály alapbeállításait ('auth.php' config file betöltése)
 		Auth::init('auth');
-		//DI::get('auth_init');
 
 
 				// nyelvi fájl betöltése

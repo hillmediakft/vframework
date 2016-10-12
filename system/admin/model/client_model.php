@@ -1,8 +1,12 @@
 <?php
 namespace System\Admin\Model;
 use System\Core\Admin_model;
+use System\Libs\Config;
 
-class Client_model extends Model {
+class Client_model extends Admin_model {
+
+    protected $table = 'clients';
+    protected $id = 'client_id';
 
     /**
      * Constructor, létrehozza az adatbáziskapcsolatot
@@ -15,11 +19,8 @@ class Client_model extends Model {
      * 	Egy kolléga minden "nyers" adatát lekérdezi
      * 	A kolléga módosításához kell (itt az id-kre van szükség, és nem a hozzájuk tartozó névre)	
      */
-    public function one_client_query($id) {
+    public function oneClient($id) {
         $id = (int) $id;
-        $this->query->reset();
-        $this->query->set_table(array('clients'));
-        $this->query->set_columns('*');
         $this->query->set_where('client_id', '=', $id);
         $result = $this->query->select();
         return $result[0];
@@ -29,200 +30,68 @@ class Client_model extends Model {
      * 	Egy partner minden "nyers" adatát lekérdezi
      * 	A partner módosításához kell (itt az id-kre van szükség, és nem a hozzájuk tartozó névre)	
      */
-    public function all_client_query()
+    public function allClient()
     {
-        $this->query->reset();
-        $this->query->set_table(array('clients'));
-        $this->query->set_columns('*');
         $this->query->set_orderby(array('client_order'));
         return $this->query->select();
     }
 
     /**
-     * 	Partner hozzáadása
+     * INSERT partner
      */
-    public function insert_client() {
-        $data = $this->request->get_post();
-    
-        if(isset($data['submit_new_client'])){
-            unset($data['submit_new_client']);
-        }
-
-        $error_counter = 0;
-        //megnevezés ellenőrzése	
-        if (empty($data['client_name'])) {
-            $error_counter++;
-            Message::set('error', 'A partner neve nem lehet üres!');
-        }
-        if (empty($data['img_url'])) {
-            $error_counter++;
-            Message::set('error', 'töltsön fel logót!');
-        }
-
-        if (isset($data['img_url']) && $data['img_url'] != '') {
-            $data['client_photo'] = str_replace(Config::get('clientphoto.upload_path'), '', $data['img_url']);
-        }
-        unset($data['img_url']);
-
-        $data['client_order'] = ($this->highest_order_number()) + 1;
-
-
-        if ($error_counter == 0) {
-
-            // új adatok az adatbázisba
-            $this->query->reset();
-//            $this->query->debug(true);
-            $this->query->set_table(array('clients'));
-            $this->query->insert($data);
-
-            Message::set('success', 'Partner sikeresen hozzáadva.');
-            return true;
-        } else {
-            // nem volt minden kötelező mező kitöltve
-            return false;
-        }
-    }
-
-    /**
-     * 	Partner módosítása
-     *
-     * 	@param integer	$id
-     */
-    public function update_client($id) {
-        $data = $this->request->get_post();
-        unset($data['submit_update_client']);
-        $id = (int) $id;
-
-        $error_counter = 0;
-        //megnevezés ellenőrzése	
-        if (empty($data['client_name'])) {
-            $error_counter++;
-            Message::set('error', 'A partner neve nem lehet üres!');
-        }
-        if (empty($data['client_link'])) {
-            $error_counter++;
-            Message::set('error', 'Adjon meg linket!');
-        }
-
-
-        if ($error_counter == 0) {
-            if (isset($data['img_url']) && $data['img_url'] != '') {
-                // új képet töltöttünk fel
-                $data['client_photo'] = str_replace(Config::get('clientphoto.upload_path'), '', $data['img_url']);
-                $old_img = $data['old_img'];
-                $img_to_delete = true;
-            } else {
-                // nincs úf feltöltött kép
-                $data['client_photo'] = str_replace(Config::get('clientphoto.upload_path'), '', $data['old_img']);
-                $img_to_delete = false;
-            }
-            unset($data['img_url']);
-            unset($data['old_img']);
-
-            // új adatok az adatbázisba
-            $this->query->reset();
-            $this->query->set_table(array('clients'));
-            $this->query->set_where('client_id', '=', $id);
-            $result = $this->query->update($data);
-
-            if ($result >= 0) {
-                // megvizsgáljuk, hogy létezik-e új feltöltött kép és a régi kép, nem a default
-                if ($img_to_delete) {
-                    //régi képek törlése
-                    if (!Util::del_file($old_img)) {
-                        Message::set('error', 'unknown_error');
-                    }
-                }
-                Message::set('success', 'Partner adatai módosítva!');
-                return true;
-            }
-        } else {
-            // ha valamilyen hiba volt a form adataiban
-            return false;
-        }
-    }
-
-
-    /**
-     * Partner törlése AJAX-al
-     *
-     * @param string $id     ez lehet egy szám, vagy felsorolás pl: 23 vagy 12,14,36
-     */
-    public function delete_client_AJAX($id)
+    public function insert($data)
     {
-        // a sikeres törlések számát tárolja
-        $success_counter = 0;
-        // a sikeresen törölt id-ket tartalmazó tömb
-        $success_id = array();      
-        // a sikertelen törlések számát tárolja
-        $fail_counter = 0; 
+        return $this->query->insert($data);
+    }
 
-        // a paraméterként kapott stringből tömböt csinálunk a , karakter mentén
-        $data_arr = explode(',', $id);
-        
-        // bejárjuk a $data_arr tömböt és minden elemen végrehajtjuk a törlést
-        foreach($data_arr as $value) {
-            //átalakítjuk a integer-ré a kapott adatot
-            $value = (int)$value;
+    /**
+     * UPDATE partner
+     */
+    public function update($id, $value)
+    {
+        $this->query->set_where('client_id', '=', $id);
+        $result = $this->query->update($value);
+    }
 
-            //lekérdezzük a törlendő kép nevét, hogy törölhessük a szerverről
-            $this->query->reset();
-            $this->query->set_table('clients');
-            $this->query->set_columns(array('client_photo'));
-            $this->query->set_where('client_id', '=', $value);
-            $photo_name = $this->query->select();           
+    /**
+     * DELETE partner
+     */
+    public function delete($id)
+    {
+        return $this->query->delete('client_id', '=', $id);        
+    }
 
-            //rekord törlése  
-            $this->query->reset();
-            $this->query->set_table(array('clients'));
-            //a delete() metódus integert (lehet 0 is) vagy false-ot ad vissza
-            $result = $this->query->delete('client_id', '=', $value);
-            
-            if($result !== false) {
-                // ha a törlési sql parancsban nincs hiba
-                if($result > 0){
-                    //ha van feltöltött képe (az adatbázisban szerepel a file-név)
-                    if(!empty($photo_name[0]['client_photo'])){
-                    
-                        $picture_path = Config::get('clientphoto.upload_path') . $photo_name[0]['client_photo'];
-                        $del_result = Util::del_file($picture_path);
-                    
-                        //kép file törlése a szerverről (ha az Util::del_file() falsot ad vissza nem tudtuk törölni a képet... hibaüzenet)
-                        if(!$del_result){
-                            Message::log('Kép nem törölhető! - ' . $picture_path);
-                        }
-                    }               
-                    //sikeres törlés
-                    $success_counter += $result;
-                    $success_id[] = $value;
-                }
-                else {
-                    //sikertelen törlés
-                    $fail_counter++;
-                }
-            }
-            else {
-                // ha a törlési sql parancsban hiba van
-                return array(
-                    'status' => 'error',
-                    'message_error' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!',                  
-                );
-            }
-        }
+    /**
+     * Lekérdezzük a törlendő kép nevét, hogy törölhessük a szerverről
+     */
+    public function selectPicture($id)
+    {
+        $this->query->set_columns(array('client_photo'));
+        $this->query->set_where('client_id', '=', $id);
+        $result = $this->query->select();
+        return $result[0]['client_photo'];
+    }
 
-        // üzenetek visszaadása
-        $respond = array();
-        $respond['status'] = 'success';
-        
-        if ($success_counter > 0) {
-            $respond['message_success'] = 'Partner törölve.';
-        }
-        if ($fail_counter > 0) {
-            $respond['message_error'] = 'A partnert már töröltek!';
-        }
+    /**
+     * Meghatározott slider_id-hez feltöltött képek közül kiválasztja azt a sort, amelyben a 
+     * legmagasabb a sorrend értéke. 
+     *
+     * @return int az eddigi legnagyobb sorrend szám
+     */
+    public function highest_order_number()
+    {
+        $this->query->set_columns('MAX(client_order)');
+        $result = $this->query->select();
+        return $result[0]['MAX(client_order)'];
+    }
 
-        // respond tömb visszaadása
-        return $respond;    
+    /**
+     * Sorrend módosítása
+     */
+    public function order($id, $new_order)
+    {
+        $this->query->set_where('client_id', '=', $id);
+        $this->query->update(array('client_order' => $new_order));        
     }
 
     /**
@@ -244,7 +113,7 @@ class Client_model extends Model {
                 $imagePath = Config::get('clientphoto.upload_path');
 
                 //képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül)	
-                $handle = new Upload($_FILES['img']);
+                $handle = new \System\Libs\Upload($_FILES['img']);
 
                 if ($handle->uploaded) {
                     // kép paramétereinek módosítása
@@ -318,7 +187,7 @@ class Client_model extends Model {
                 $imagePath = Config::get('clientphoto.upload_path');
 
                 //képkezelő objektum létrehozása (a feltöltött kép elérése a paraméter)	
-                $handle = new Upload($imgUrl);
+                $handle = new \System\Libs\Upload($imgUrl);
 
                 // fájlneve utáni random karakterlánc
                 $suffix = md5(uniqid());
@@ -365,39 +234,6 @@ class Client_model extends Model {
                 }
             }
         }
-    }
-
-    /**
-     * Meghatározott slider_id-hez feltöltött képek közül kiválasztja azt a sort, amelyben a 
-     * legmagasabb a sorrend értéke. 
-     *
-     * @return int az eddigi legnagyobb sorrend szám
-     */
-    public function highest_order_number() {
-        $this->query->reset();
-        $this->query->set_table(array('clients'));
-        $this->query->set_columns('MAX(client_order)');
-        $result = $this->query->select();
-        return $result[0]['MAX(client_order)'];
-    }
-
-    /**
-     * Partnerek sorrendjének módosítása
-     *
-     * @param string $order     id=sorszám&id=sorszám....
-     * @return array 
-     */
-    public function order($order)
-    {
-        // átalakítjuk a stringet tömbre
-        parse_str($order, $order_array);
-        foreach ($order_array as $id => $new_order) {
-            $this->query->reset();
-            $this->query->set_table(array('clients'));
-            $this->query->set_where('client_id', '=', $id);
-            $this->query->update(array('client_order' => $new_order));
-        }
-        return array('status' => 'success');
     }
 
 }

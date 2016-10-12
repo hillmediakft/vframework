@@ -1,18 +1,24 @@
 <?php
 namespace System\Libs;
+
 use PDO, PDOException;
 
-class DB{
+class DB {
 
-	/*** Declare connect ***/
-	public static $connect = null;
+	private $host;
+	private $db_name;
+	private $user;
+	private $password;
 
 	/**
-	 * the constructor is set to private so
-	 * so nobody can create a new connect using new
+	 * Kapcsolat adatainak megadása
 	 */
-	private function __construct() {
-	  /*** maybe set the db name here later ***/
+	public function __construct($host, $db_name, $user, $password)
+	{
+		$this->host = $host;
+		$this->db_name = $db_name;
+		$this->user = $user;
+		$this->password = $password;
 	}
 
 	/**
@@ -22,39 +28,20 @@ class DB{
 	 * @return object (PDO)
 	 * @access public
 	 */
-	public static function get_connect()
+	public function create()
 	{
-		if (!self::$connect) {
-			try {
-				self::$connect = new PDO('mysql:host=' . Config::get('db.host') . ';dbname=' . Config::get('db.name') . ';charset=utf8', Config::get('db.user'), Config::get('db.pass'));
-				// hiba visszaadás beállítása a PDO objektumban a fejlesztői környezet alapján
-				if(ENV == 'development'){
-					self::$connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-				}
-			}
-			catch(PDOException $e) {
-				die('Database error: ' . $e->getMessage());
+		try {
+			$connect = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->db_name . ';charset=utf8', $this->user, $this->password);
+			// hiba visszaadás beállítása a PDO objektumban a fejlesztői környezet alapján
+			if(ENV == 'development'){
+				$connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			}
 		}
-	return self::$connect;
-	}
-
-	/**
-	 *	Lezárja az adatbázis kapcsolatot (A PDO objektum-hoz a null értéket rendeli hozzá)
-	 */
-	public static function close_connect()
-	{
-		if(self::$connect != null){
-			self::$connect = null;
+		catch(PDOException $e) {
+			die('Database error: ' . $e->getMessage());
 		}
-		return self::$connect;
+
+		return $connect;
 	}
-
-    /**
-     * Like the constructor, we make __clone private
-     * so nobody can clone the connect
-     */
-    private function __clone(){ }
-
-} /*** end of class ***/
+}
 ?>

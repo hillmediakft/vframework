@@ -144,6 +144,15 @@ class Request {
 	}
 
 	/**
+	 * Adat visszaadása a $_FILES tömbből
+	 */
+	public function getFiles($key = null)
+	{
+		//return (is_null($key)) ? $_FILES : $_FILES[$key];
+		return $this->_fetch_from_array($_FILES, $key);
+	}
+
+	/**
 	 * HTTP Referer visszaadása a $_SERVER szuperglobális tömbből
 	 */
 	public function get_httpreferer()
@@ -181,7 +190,6 @@ class Request {
 		if(is_null($index)){
 			return !empty($_POST);
 		}
-
 		return isset($_POST[$index]);
 	}
 
@@ -197,8 +205,62 @@ class Request {
 		if(is_null($index)){
 			return !empty($_GET);
 		}
-
 		return isset($_GET[$index]);
+	}
+
+	/**
+	 * Ellenőrzi, hogy létezik-e a paraméterként kapott index a $_FILES szuperglobális tömbben
+	 * Ha nem adunk paramétert a metódusnak, akkor azt vizsgálja, hogy üres-e a $_FILES tömb
+	 * (ha a $_FILES tömb üres, akkor false-t ad vissza, ha nem üres, akkor true)
+	 */
+	public function hasFiles($index = null)
+	{
+		if(is_null($index)){
+			return !empty($_FILES);
+		}
+		return isset($_FILES[$index]);
+	}
+
+	/**
+	 * Megvizsgálja, hogy nem üres-e a $_Files tömb, és nincs-e valamilyen hiba
+	 *
+	 * @param string $index
+	 * @return bool
+	 */
+	public function checkFiles($index)
+	{
+		if ($this->hasFiles($index)) {
+			return ($_FILES[$index]['error']) === 0 ? true : false;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * A $_FILES tömb 'error' értékéhez rendelt üzenetet adja vissza
+	 *
+	 * @param string $index
+	 * @return string
+	 */
+	public function getFilesError($index)
+	{
+		$status = array(
+			0 => 'There is no error, the file uploaded with success.',
+			1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
+			2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',
+			3 => 'The uploaded file was only partially uploaded.',
+			4 => 'No file was uploaded.',
+			6 => 'Missing a temporary folder.',
+			7 => 'Failed to write file to disk.',
+			8 => 'A PHP extension stopped the file upload.'
+		);
+
+		if (isset($_FILES[$index]['error'])) {
+			$code = $_FILES[$index]['error'];
+			return $status[$code];
+		} else {
+			return 'unknown_error';
+		}
 	}
 
 	/**
@@ -236,7 +298,7 @@ class Request {
 	 * Adatok visszaadása a szuperglobális tömbökből
 	 *
 	 * @param	array	$array		$_GET, $_POST stb.
-	 * @param	mixed	$index		Kulcs, aminek az értékét vissza kell adni az $array tömbből
+	 * @param	string	$index		Kulcs, aminek az értékét vissza kell adni az $array tömbből
 	 * @return	mixed
 	 */
 	private function _fetch_from_array($array, $index = NULL)
@@ -270,7 +332,7 @@ class Request {
 				if (isset($value[$key])) {
 					$value = $value[$key];
 				} else {
-					throw new \Exception('Nincs ' . $index . ' indexu elem a $_POST, vagy $_GET es $_REQUEST tombben');
+					throw new \Exception('Nincs ' . $index . ' indexu elem a tombben');
 					exit();
 					//return NULL;
 				}
@@ -278,7 +340,7 @@ class Request {
 
 		}
 		else {
-			throw new \Exception('Nincs ' . $index . ' indexu elem a $_POST, vagy $_GET es $_REQUEST tombben');
+			throw new \Exception('Nincs ' . $index . ' indexu elem a tombben');
 			exit();
 			//return NULL;
 		}

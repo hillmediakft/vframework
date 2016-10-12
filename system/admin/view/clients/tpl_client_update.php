@@ -50,7 +50,7 @@
                                 <div id="client_image"></div>	
 
                                 <input type="hidden" name="img_url" id="OutputId" >
-                                <input type="hidden" id="old_img" value="<?php echo Config::get('clientphoto.upload_path') . $this->actual_client['client_photo']; ?>" name="old_img">
+                                <input type="hidden" id="old_img" value="<?php echo $this->getConfig('clientphoto.upload_path') . $this->actual_client['client_photo']; ?>" name="old_img">
 
                                 <div class="margin-bottom-10"></div>
                                 <div class="clearfix"></div>

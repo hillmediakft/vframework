@@ -46,23 +46,12 @@ class Session
 	 */
     public static function set($key, $value)
     {
-        $_SESSION[$key] = $value;
+    	if (strpos($key, '.') === false) {
+        	$_SESSION[$key] = $value;
+    	} else {
+    		self::_setArrayValue($_SESSION, $key, $value);
+    	}        	
     }
-
-
-			/**
-		 	 * gets/returns the value of a specific key of the session
-			 * @param mixed $key Usually a string, right ?
-			 * @return mixed
-			 */
-			/*
-		    public static function get($key)
-		    {
-		        if (isset($_SESSION[$key])) {
-		            return $_SESSION[$key];
-		        }
-		    }
-		    */
 
     /**
      * Visszaadja a $_SESSION tömb megadott kulcsának értékét
@@ -94,6 +83,14 @@ class Session
     }
 
 	/**
+	 * deletes the session (= logs the user out)
+	 */
+    public static function destroy()
+    {
+        session_destroy();
+    }    
+
+	/**
 	 *	Visszadja egy tömb megadott kulcsának értékét
 	 *
 	 *	Példa a kulcsok megadására: (a többdimenziós tömb elemeit a . karakterrel elválasztva kell megadni, mintha egy útvonal lenne)
@@ -118,12 +115,33 @@ class Session
 	}
 
 	/**
-	 * deletes the session (= logs the user out)
+	 * Tömb kulcsának és értékének megadása "." karakterrel megadva
+	 *
+	 *	_setArrayValue($array, 'user_data.user_id', $value);
+     *
+	 * @param   array   $array  tömb amibe az adatot rakjuk
+	 * @param   mixed   $key    kulcsok "." karakterrel elválasztva
+	 * @param   mixed   $value  érték
+	 * @return  void
 	 */
-    public static function destroy()
-    {
-        session_destroy();
-    }
+	private static function _setArrayValue(&$array, $key, $value = null)
+	{
+		$keys = explode('.', $key);
+
+		while (count($keys) > 1)
+		{
+			$key = array_shift($keys);
+
+			if (!array_key_exists($key, $array))
+			{
+				$array[$key] = array();
+			}
+
+			$array =& $array[$key];
+		}
+
+		$array[array_shift($keys)] = $value;
+	}
 	
 } //osztály vége
 ?>

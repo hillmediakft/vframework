@@ -20,13 +20,13 @@ class Testimonials_model extends Admin_model {
 	 *	@param	$id String or Integer
 	 *	@return	az adatok tömbben
 	 */
-	public function find($id)
+	public function selectOne($id)
 	{
 		$this->query->set_where('id', '=', $id);
 		return $this->query->select();
 	}
 
-	public function findAll()
+	public function selectAll()
 	{
 		return $this->query->select(); 
 	}
@@ -56,7 +56,7 @@ class Testimonials_model extends Admin_model {
 	 */
 	public function delete($id)
 	{
-		$result = $this->query->delete('id', '=', $id);
+		return $this->query->delete('id', '=', $id);
 	}
 	
 }

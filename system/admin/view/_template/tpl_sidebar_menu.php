@@ -165,14 +165,12 @@
         </li>
 
         <!-- NELVEK -->
-        <!--
-        <li class="nav-item <?php //$this->menu_active('languages'); ?> ">
+        <li class="nav-item <?php $this->menu_active('languages'); ?> ">
             <a href="admin/languages" class="nav-link ">
                 <i class="fa fa-globe"></i>
                 <span class="title">Nyelvek</span>
             </a>
         </li>
-        -->
 
         <!-- HÍRLEVÉL -->
         <li class="nav-item <?php $this->menu_active('newsletter'); ?> ">

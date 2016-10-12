@@ -12,15 +12,15 @@ class User_manual extends Admin_controller {
 
 	public function index()
 	{
-		$this->view = new View();
+		$view = new View();
 		
-		$this->view->title = 'Admin dokumentáció oldal';
-		$this->view->description = 'Admin dookumentáció description';
+		$view->title = 'Admin dokumentáció oldal';
+		$view->description = 'Admin dokumentáció description';
 		
-		$this->view->add_link('js', ADMIN_JS . 'pages/common.js');
+		$view->add_link('js', ADMIN_JS . 'pages/common.js');
 		
-		$this->view->set_layout('tpl_layout');
-		$this->view->render('user_manual/tpl_user_manual');
+		$view->set_layout('tpl_layout');
+		$view->render('user_manual/tpl_user_manual');
 	}
 }
 ?>
