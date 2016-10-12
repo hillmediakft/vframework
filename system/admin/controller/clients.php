@@ -285,8 +285,95 @@ class Clients extends Admin_controller {
     public function client_img_upload()
     {
         if ($this->request->is_ajax()) {
-            echo $this->client_model->client_img_upload();
-        }
+        
+            // feltöltés helye
+            $imagePath = Config::get('clientphoto.upload_path');
+
+            if ($this->request->get_params('id') == 'upload') {
+                //képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül) 
+                $upload = new \System\Libs\Uploader($this->request->getFiles('img'));
+
+                $args = array(
+                    //'file_new_name_body' => 'client_' . md5(uniqid()),
+                    'allowed' => array('image/*'),
+                    'image_resize' => true,
+                    'image_x' => Config::get('clientphoto.width', 150),
+                    'image_ratio_y' => true
+                );
+
+                $dest_file = $upload->make($imagePath, $args);
+
+                if ($dest_file !== false) {
+
+                    $this->response->json(array(
+                        "status" => 'success',
+                        "url" => $imagePath . $upload->get('file_dst_name'),
+                        "width" => $upload->get('image_dst_x'),
+                        "height" => $upload->get('image_dst_y')
+                    ));
+                } else {
+                    $this->response->json(array(
+                        "status" => 'error',
+                        "message" => $upload->getError()
+                    ));
+                }
+            }
+
+            // Kiválasztott kép vágása és vágott kép feltöltése
+            if ($this->request->get_params('id') == 'crop') {
+
+                // a croppic js küldi ezeket a POST adatokat    
+                $imgUrl = $this->request->get_post('imgUrl');
+                // original sizes
+                $imgInitW = $this->request->get_post('imgInitW');
+                $imgInitH = $this->request->get_post('imgInitH');
+                // resized sizes
+                //kerekítjük az értéket, mert lebegőpotos számot is kaphatunk és ez hibát okozna a kép generálásakor
+                $imgW = round($this->request->get_post('imgW'));
+                $imgH = round($this->request->get_post('imgH'));
+                // offsets
+                // megadja, hogy mennyit kell vágni a kép felső oldalából
+                $imgY1 = $this->request->get_post('imgY1');
+                // megadja, hogy mennyit kell vágni a kép bal oldalából
+                $imgX1 = $this->request->get_post('imgX1');
+                // crop box
+                $cropW = $this->request->get_post('cropW');
+                $cropH = $this->request->get_post('cropH');
+                // rotation angle
+                //$angle = $this->request->get_post('rotation'];
+                //a $right_crop megadja, hogy mennyit kell vágni a kép jobb oldalából
+                $right_crop = ($imgW - $imgX1) - $cropW;
+                //a $bottom_crop megadja, hogy mennyit kell vágni a kép aljából
+                $bottom_crop = ($imgH - $imgY1) - $cropH;
+
+                //képkezelő objektum létrehozása (a feltöltött kép elérése a paraméter) 
+                $upload = new \System\Libs\Uploader($imgUrl);
+
+                $args = array(
+                    'file_new_name_body' => 'client_' . md5(uniqid()),
+                    //'file_overwrite' => true,
+                    'image_resize' => true,
+                    'image_x' => $imgW,
+                    'image_ratio_y' => true,
+                    'image_crop' => array($imgY1, $right_crop, $bottom_crop, $imgX1)
+                );
+
+                $dest_file = $upload->make($imagePath, $args);
+
+                if ($dest_file !== false) {
+                    $this->response->json(array(
+                        "status" => 'success',
+                        "url" => $imagePath . $upload->get('file_dst_name')
+                    ));
+                } else {
+                    $this->response->json(array(
+                        "status" => 'error',
+                        "message" => $upload->getError()
+                    ));                    
+                }
+
+            }        
+        } //is_ajax
     }
 
 }
