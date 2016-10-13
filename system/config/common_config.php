@@ -6,6 +6,12 @@ $config['log'] = array(
     'notice' => 'logs_notice.log'
 );
 
+//default html layout beállítása
+$config['layout'] = array(
+    'default_site' => 'tpl_layout',
+    'default_admin' => 'tpl_layout'
+);
+
 $config['email'] = array(
     'password_reset' => array(
         'admin_url' => BASE_URL . 'admin/login/verifypasswordreset',
