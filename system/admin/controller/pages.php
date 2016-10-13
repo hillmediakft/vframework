@@ -2,7 +2,6 @@
 namespace System\Admin\Controller;
 use System\Core\Admin_controller;
 use System\Core\View;
-use System\Libs\Util;
 
 class Pages extends Admin_controller {
 
@@ -16,15 +15,12 @@ class Pages extends Admin_controller {
 	{
 		$view = new View();
 
-		$view->title = 'Admin pages oldal';
-		$view->description = 'Admin pages oldal description';
+		$data['title'] = 'Admin pages oldal';
+		$data['description'] = 'Admin pages oldal description';
+		$data['all_pages'] = $this->pages_model->allPages();
 		
 		$view->add_links(array('vframework', 'pages'));
-		
-		$view->all_pages = $this->pages_model->allPages();
-		
-		$view->set_layout('tpl_layout');
-		$view->render('pages/tpl_pages');
+		$view->render('pages/tpl_pages', $data);
 	}
 	
 	/**
@@ -56,16 +52,12 @@ class Pages extends Admin_controller {
 		
 		$view = new View();
 		
-		$view->title = 'Oldal szerkesztése';
-		$view->description = 'Oldal szerkesztése description';
+		$data['title'] = 'Oldal szerkesztése';
+		$data['description'] = 'Oldal szerkesztése description';
+		$data['page'] = $this->pages_model->onePage($id);
 		
 		$view->add_links(array('bootbox', 'ckeditor', 'vframework', 'page_update'));
-				
-		// visszadja a szerkesztendő oldal adatait egy tömbben (page_id, page_title ... stb.)
-		$view->data_arr = $this->pages_model->onePage($id);
-		
-		$view->set_layout('tpl_layout');
-		$view->render('pages/tpl_page_update');
+		$view->render('pages/tpl_page_update', $data);
 	}
 
 }

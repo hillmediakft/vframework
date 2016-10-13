@@ -19,15 +19,12 @@ class Testimonials extends Admin_controller {
 	{
 		$view = new View();
 		
-		$view->title = 'testimonials oldal';
-		$view->description = 'testimonials oldal description';
+		$data['title'] = 'testimonials oldal';
+		$data['description'] = 'testimonials oldal description';
+		$data['all_testimonials'] = $this->testimonials_model->selectAll();	
 		
 		$view->add_links(array('bootbox', 'testimonials'));
-		
-		$view->all_testimonials = $this->testimonials_model->selectAll();	
-		
-		$view->set_layout('tpl_layout');
-		$view->render('testimonials/tpl_testimonials');
+		$view->render('testimonials/tpl_testimonials', $data);
 	}
 	
 	
@@ -95,13 +92,11 @@ class Testimonials extends Admin_controller {
 		
 		$view = new View();
 			
-		$view->title = 'Új testimonials oldal';
-		$view->description = 'Új testimonials oldal description';
+		$data['title'] = 'Új testimonials oldal';
+		$data['description'] = 'Új testimonials oldal description';
 		
 		$view->add_links(array('testimonial_insert','vframework'));
-	
-		$view->set_layout('tpl_layout');
-		$view->render('testimonials/tpl_testimonial_insert');
+		$view->render('testimonials/tpl_testimonial_insert', $data);
 		Session::delete('testimonial_input');
 	}
 	
@@ -131,16 +126,13 @@ class Testimonials extends Admin_controller {
 		
 		$view = new View();
 		
-		$view->title = 'Rólunk mondták szerkesztése';
-		$view->description = 'Rólunk mondták szerkesztése description';
+		$data['title'] = 'Rólunk mondták szerkesztése';
+		$data['description'] = 'Rólunk mondták szerkesztése description';
+		// visszadja a szerkesztendő oldal adatait egy tömbben (page_id, page_title ... stb.)
+		$data['data_arr'] = $this->testimonials_model->selectOne($id);
 		
 		$view->add_links(array('bootbox', 'vframework', 'testimonial_update'));
-		
-		// visszadja a szerkesztendő oldal adatait egy tömbben (page_id, page_title ... stb.)
-		$view->data_arr = $this->testimonials_model->selectOne($id);
-		
-		$view->set_layout('tpl_layout');
-		$view->render('testimonials/tpl_testimonial_update');
+		$view->render('testimonials/tpl_testimonial_update', $data);
 	}
 	
 	/**

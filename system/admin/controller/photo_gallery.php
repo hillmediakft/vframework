@@ -27,20 +27,17 @@ class Photo_gallery extends Admin_controller {
 	{
 		$view = new View();
 
-		$view->title = 'Fotó galériák oldal';
-		$view->description = 'Fotó galériák oldal description';
-		
+		$data['title'] = 'Fotó galériák oldal';
+		$data['description'] = 'Fotó galériák oldal description';
+		// kategóriák
+		$data['categorys'] = $this->photocategory_model->selectAll();
+		// összes rekord a photo_gallery-ból	
+		$data['all_photos'] = $this->photo_gallery_model->selectAll();
+// $view->debug(true);
 		$view->add_link('css', ADMIN_CSS . 'pages/portfolio.css');
 		$view->add_links(array('bootbox', 'mixitup', 'vframework', 'photo_gallery'));
-		
 		$view->setHelper(array('url_helper'));
-		// kategóriák
-		$view->categorys = $this->photocategory_model->selectAll();
-		// összes rekord a photo_gallery-ból	
-		$view->all_photos = $this->photo_gallery_model->selectAll();
-// $view->debug(true);
-		$view->set_layout('tpl_layout');
-		$view->render('photo_gallery/tpl_photo_gallery');
+		$view->render('photo_gallery/tpl_photo_gallery', $data);
 	}
 	
 	/**
@@ -115,15 +112,12 @@ class Photo_gallery extends Admin_controller {
 		
 		$view = new View();
 
-		$view->title = 'Új fotó oldal';
-		$view->description = 'Új fotó oldal description';
-		
-		$view->add_links(array('bootstrap-fileupload', 'vframework', 'photo_gallery_insert_update'));
+		$data['title'] = 'Új fotó oldal';
+		$data['description'] = 'Új fotó oldal description';
+		$data['categorys'] = $this->photocategory_model->selectAll();
 
-		$view->categorys = $this->photocategory_model->selectAll();
-// $view->debug(true);			
-		$view->set_layout('tpl_layout');	
-		$view->render('photo_gallery/tpl_photo_insert');	
+		$view->add_links(array('bootstrap-fileupload', 'vframework', 'photo_gallery_insert_update'));
+		$view->render('photo_gallery/tpl_photo_insert', $data);	
 	}
 	
 	/**
@@ -217,16 +211,13 @@ class Photo_gallery extends Admin_controller {
 		
 		$view = new View();
 
-		$view->title = 'Fotó szerkesztése oldal';
-		$view->description = 'Fotó szerkesztése description';
+		$data['title'] = 'Fotó szerkesztése oldal';
+		$data['description'] = 'Fotó szerkesztése description';
+		$data['categorys'] = $this->photocategory_model->selectAll();
+		$data['photo'] = $this->photo_gallery_model->selectOne($id);
 
 		$view->add_links(array('bootstrap-fileupload', 'vframework', 'photo_gallery_insert_update'));
-		
-		$view->categorys = $this->photocategory_model->selectAll();
-		$view->photo = $this->photo_gallery_model->selectOne($id);
-// $view->debug(true);		
-		$view->set_layout('tpl_layout');	
-		$view->render('photo_gallery/tpl_photo_update');	
+		$view->render('photo_gallery/tpl_photo_update', $data);	
 	}
 	
 	/**
@@ -318,17 +309,13 @@ class Photo_gallery extends Admin_controller {
 	{
 		$view = new View();
 
-		$view->title = 'Admin fotó kategóriák oldal';
-		$view->description = 'Admin fotó kategóriák oldal description';	
+		$data['title'] = 'Admin fotó kategóriák oldal';
+		$data['description'] = 'Admin fotó kategóriák oldal description';	
+		$data['all_category'] = $this->photocategory_model->selectAll();
+		$data['category_counter'] = $this->photo_gallery_model->categoryCounter();
 
 		$view->add_links(array('bootbox', 'datatable', 'bootstrap-editable', 'vframework', 'photo_category'));
-
-		$view->all_category = $this->photocategory_model->selectAll();
-		$view->category_counter = $this->photo_gallery_model->categoryCounter();
-//$view->debug(true);			
-		$view->set_layout('tpl_layout');	
-		$view->render('photo_gallery/tpl_photo_category');	
-
+		$view->render('photo_gallery/tpl_photo_category', $data);	
 	}
 
 	/**

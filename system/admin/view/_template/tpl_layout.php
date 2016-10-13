@@ -1,4 +1,4 @@
-<?php use System\Libs\Auth, System\Libs\Config; ?>
+<?php use System\Libs\Auth; ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
@@ -9,10 +9,10 @@
 <!-- BEGIN HEAD -->
 <head>
     <meta charset="utf-8" />
-    <title>V-Framework | <?php echo $this->title; ?></title>
+    <title>V-Framework | <?php echo $title; ?></title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <meta content="<?php echo $this->description; ?>" name="description" />
+    <meta content="<?php echo $description; ?>" name="description" />
     <meta content="" name="author" />
     <base href="<?php echo BASE_URL; ?>">
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
@@ -64,7 +64,7 @@
                     <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte; -->
                     <li class="dropdown dropdown-user">
                         <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-                            <img alt="" class="img-circle" src="<?php echo Config::get('user.upload_path') . Auth::getUser('user_photo'); ?>" />
+                            <img alt="" class="img-circle" src="<?php echo $this->getConfig('user.upload_path') . Auth::getUser('user_photo'); ?>" />
                             <span class="username username-hide-on-mobile"><?php echo Auth::getUser('user_name'); ?></span>
                             <i class="fa fa-angle-down"></i>
                         </a>

@@ -29,7 +29,7 @@
         </li>
 
         <!-- SZERKESZTHETŐ OLDALAK -->
-        <li class="nav-item <?php $this->menu_active('pages|content'); ?> ">
+        <li class="nav-item <?php $this->menu_active('pages'); ?> ">
             <a href="javascript:;" class="nav-link nav-toggle">
                 <i class="fa fa-files-o"></i>
                 <span class="title">Oldalak</span>
@@ -39,6 +39,22 @@
                 <li class="nav-item <?php $this->menu_active('pages'); ?> ">
                     <a href="admin/pages" class="nav-link ">
                         <span class="title">Oldalak listája</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- SZERKESZTHETŐ TARTALMI ELEMEK -->
+        <li class="nav-item <?php $this->menu_active('content'); ?> ">
+            <a href="javascript:;" class="nav-link nav-toggle">
+                <i class="fa fa-files-o"></i>
+                <span class="title">Tartalmi elemek</span>
+                <span class="arrow"></span>
+            </a>
+            <ul class="sub-menu">
+                <li class="nav-item <?php $this->menu_active('content'); ?> ">
+                    <a href="admin/content" class="nav-link ">
+                        <span class="title">Tartalmi elemek listája</span>
                     </a>
                 </li>
             </ul>

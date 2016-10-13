@@ -79,7 +79,7 @@
 								</thead>
 								<tbody>
 
-							<?php foreach($this->newsletters as $value) { ?>
+							<?php foreach($newsletters as $value) { ?>
 
 								<tr class="odd gradeX">
 

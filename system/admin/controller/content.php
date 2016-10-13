@@ -17,15 +17,12 @@ class Content extends Admin_controller {
 	{
 		$view = new View();
 
-		$view->title = 'Egyéb tartalom oldal';
-		$view->description = 'Egyéb tartalom oldal description';
+		$data['title'] = 'Egyéb tartalom oldal';
+		$data['description'] = 'Egyéb tartalom oldal description';
+		$data['all_content'] = $this->content_model->allContents();
 		
 		$view->add_links(array('content'));
-		
-		$view->all_content = $this->content_model->allContents();
-		
-		$view->set_layout('tpl_layout');
-		$view->render('content/tpl_content');
+		$view->render('content/tpl_content', $data);
 	}
 	
 	/**
@@ -42,7 +39,7 @@ class Content extends Admin_controller {
 
 			$result = $this->content_model->update($id, $data);
 					
-			if($result !== false)
+			if($result !== false) {
 				Message::set('success', 'page_update_success');
 			} else {
 				Message::set('error', 'unknown_error');
@@ -53,16 +50,13 @@ class Content extends Admin_controller {
 		
 		$view = new View();
 
-		$view->title = 'Tartalom szerkesztése';
-		$view->description = 'Tartalom szerkesztése description';
+		$data['title'] = 'Tartalom szerkesztése';
+		$data['description'] = 'Tartalom szerkesztése description';
+		// visszadja a szerkesztendő oldal adatait egy tömbben (page_id, page_title ... stb.)
+		$data['content'] = $this->content_model->selectContent($id);
 		
 		$view->add_links(array('bootbox', 'ckeditor', 'edit_content'));
-
-		// visszadja a szerkesztendő oldal adatait egy tömbben (page_id, page_title ... stb.)
-		$view->data_arr = $this->content_model->selectContent($id);
-		
-		$view->set_layout('tpl_layout');
-		$view->render('content/tpl_edit_content');
+		$view->render('content/tpl_edit_content', $data);
 	}
 
 }

@@ -51,7 +51,7 @@
 							</thead>
 							<tbody>
 
-					<?php foreach($this->all_content as $value) { ?>
+					<?php foreach($all_content as $value) { ?>
 								<tr class="odd gradeX">
 									<td><?php echo $value['content_id'];?></td>
 									<td><?php echo $value['content_name'];?></td>

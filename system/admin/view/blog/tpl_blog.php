@@ -66,7 +66,7 @@
 							</thead>
 							<tbody>
 
-							<?php foreach($this->all_blog as $value) { ?>
+							<?php foreach($all_blog as $value) { ?>
 								<tr class="odd gradeX">
 									<td>
 										<?php if (1) { ?>

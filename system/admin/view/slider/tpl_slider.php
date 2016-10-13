@@ -1,4 +1,3 @@
-<?php use System\Libs\Config, System\Libs\Util;?>
 <div class="page-content">
     <!-- BEGIN PAGE HEADER-->
     <!-- BEGIN PAGE TITLE & BREADCRUMB-->
@@ -56,21 +55,21 @@
                         </thead>
                         <tbody id="slider_list">						
 
-                            <?php foreach ($this->slider as $value) { ?>
-                                <tr id="slider_<?php echo $value['id']; ?>" class="odd gradeX">
+                            <?php foreach ($sliders as $slider) { ?>
+                                <tr id="slider_<?php echo $slider['id']; ?>" class="odd gradeX">
 
-                                    <td><?php echo $value['slider_order']; ?></td>
-                                    <td><?php echo $value['id']; ?></td>
+                                    <td><?php echo $slider['slider_order']; ?></td>
+                                    <td><?php echo $slider['id']; ?></td>
                                     <td class="sortable_mover"><i class="fa fa-arrows"></i></td>
 
-                                    <td><img src="<?php echo Config::get('slider.upload_path') . Util::thumb_path($value['picture']); ?>"></td>
-                                    <td><?php echo $value['title']; ?></td>
-                                    <td><?php echo $value['text']; ?></td>
+                                    <td><img src="<?php echo $this->getConfig('slider.upload_path') . $this->url_helper->thumbPath($slider['picture']); ?>"></td>
+                                    <td><?php echo $slider['title']; ?></td>
+                                    <td><?php echo $slider['text']; ?></td>
 
-                                    <?php if ($value['active'] == 1) { ?>
+                                    <?php if ($slider['active'] == 1) { ?>
                                         <td><span class="label label-sm label-success"><?php echo 'Aktív'; ?></span></td>
                                     <?php } ?>
-                                    <?php if ($value['active'] == 0) { ?>
+                                    <?php if ($slider['active'] == 0) { ?>
                                         <td><span class="label label-sm label-danger"><?php echo 'Inaktív'; ?></span></td>
                                     <?php } ?>
                                     <td>									
@@ -81,10 +80,10 @@
                                                 </a>
                                                 <ul class="dropdown-menu pull-right">
                                                     <?php if (1) { ?>
-                                                    <li><a href="admin/slider/update/<?php echo $value['id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
+                                                    <li><a href="admin/slider/update/<?php echo $slider['id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
                                                     <?php } ?>
                                                     <?php if (1) { ?>
-                                                        <li><a class="delete_item" data-id="<?php echo $value['id']; ?>"><i class="fa fa-trash"></i> Töröl</a></li>
+                                                        <li><a class="delete_item" data-id="<?php echo $slider['id']; ?>"><i class="fa fa-trash"></i> Töröl</a></li>
                                                     <?php } ?>
 
                                                 </ul>

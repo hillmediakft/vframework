@@ -76,7 +76,7 @@
 											<label for="photo_category" class="control-label">Fotó kategória</label>
 											<select class="form-control input-xlarge" name="photo_category" aria-controls="category">
 												<option value="0">Válasszon kategóriát</option>
-												<?php foreach ($this->categorys as $value) {
+												<?php foreach ($categorys as $value) {
 													echo '<option value="' . $value['category_id'] . '">' . $value['category_name'] . '</option>' . "\r\n";
 												} ?>	
 											</select>

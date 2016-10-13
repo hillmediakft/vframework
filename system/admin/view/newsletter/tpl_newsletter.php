@@ -93,11 +93,11 @@
 							</thead>
 							<tbody>
 
-						<?php foreach($this->newsletters as $value) { ?>
+						<?php foreach($newsletters as $value) { ?>
 
 							<tr class="odd gradeX">
 								<td>
-									<?php if (Session::get('user_role_id') > 0 && empty($value['newsletter_lastsent_date'])) { ?>
+									<?php if (Session::get('user_data.user_role_id') > 0 && empty($value['newsletter_lastsent_date'])) { ?>
 									<input type="checkbox" class="checkboxes" name="newsletter_id_<?php echo $value['newsletter_id'];?>" value="<?php echo $value['newsletter_id'];?>"/>
 									<?php } ?>	
 								</td>

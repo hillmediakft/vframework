@@ -24,16 +24,12 @@ class Users extends Admin_controller {
 	{
 		$view = new View();
 
-		$view->title = 'Users oldal';
-		$view->description = 'Users oldal description';
-		
-		$view->add_links(array('datatable', 'bootbox','vframework','users'));
+		$data['title'] = 'Users oldal';
+		$data['description'] = 'Users oldal description';
+        $data['all_user'] = $this->user_model->selectUser();
 
-        // userek adatainak lekérdezése
-        $view->all_user = $this->user_model->selectUser();	
-//$this->view->debug(true);	
-        $view->set_layout('tpl_layout');
-		$view->render('users/tpl_users');
+		$view->add_links(array('datatable', 'bootbox','vframework','users'));
+		$view->render('users/tpl_users', $data);
 	}
 
 	
@@ -179,13 +175,11 @@ class Users extends Admin_controller {
 
 		$view = new View();
 
-		$view->title = 'Új felhasználó oldal';
-		$view->description = 'Új felhasználó description';
+		$data['title'] = 'Új felhasználó oldal';
+		$data['description'] = 'Új felhasználó description';
 
 		$view->add_links(array('bootstrap-fileupload','croppic','validation','user_insert'));
-		
-		$view->set_layout('tpl_layout');
-		$view->render('users/tpl_user_insert');
+		$view->render('users/tpl_user_insert', $data);
 	}
 	
 	
@@ -333,15 +327,12 @@ class Users extends Admin_controller {
 		
 		$view = new View();
 
-		$view->title = 'Profilom oldal';
-		$view->description = 'Profilom description';
-		
-		$view->add_links(array('bootstrap-fileupload', 'croppic', 'validation', 'user_profile'));
-        
-		$view->data_arr = $this->user_model->selectUser($user_id);
+		$data['title'] = 'Profilom oldal';
+		$data['description'] = 'Profilom description';
+		$data['user'] = $this->user_model->selectUser($user_id);
 
-		$view->set_layout('tpl_layout');
-		$view->render('users/tpl_profile');
+		$view->add_links(array('bootstrap-fileupload', 'croppic', 'validation', 'user_profile'));
+		$view->render('users/tpl_profile', $data);
 	}
 	
 	
@@ -349,16 +340,13 @@ class Users extends Admin_controller {
     {
     	$view = new View();
 
-        $view->title = 'Felhasználói csoportok oldal';
-        $view->description = 'Felhasználói csoportok description';
-        
+        $data['title'] = 'Felhasználói csoportok oldal';
+        $data['description'] = 'Felhasználói csoportok description';
+        $data['roles'] = DI::get('auth')->getRoles();
+        $data['roles_counter'] = $this->user_model->rolesCounter();
+
         $view->add_link('js', ADMIN_JS . 'pages/common.js');
-
-        $view->roles = DI::get('auth')->getRoles();
-        $view->roles_counter = $this->user_model->rolesCounter();
-
-		$view->set_layout('tpl_layout');
-        $view->render('users/tpl_user_roles');
+        $view->render('users/tpl_user_roles', $data);
     }
 	
 	
@@ -378,19 +366,17 @@ class Users extends Admin_controller {
 
 		$view = new View();
 
-        $view->title = 'Felhasználói jogosultságok szerkesztése oldal';
-        $view->description = 'Felhasználói jogosultságok szerkesztése description';
-        
-		$view->add_link('js', ADMIN_JS . 'pages/common.js');
-
+        $data['title'] = 'Felhasználói jogosultságok szerkesztése oldal';
+        $data['description'] = 'Felhasználói jogosultságok szerkesztése description';
+		
 		$auth = DI::get('auth');
-		// összes permission adata	
-		$view->role_permissions = $auth->getAllPerms();
+		// összes permission	
+		$data['role_permissions'] = $auth->getAllPerms();
 		// a $role_id-hez tartozó szerep adatai és engedélyei
-		$view->role =  $auth->getRoles($role_id);
+		$data['role'] = $auth->getRoles($role_id);
 
-		$view->set_layout('tpl_layout');
-        $view->render('users/tpl_edit_roles');
+		$view->add_link('js', ADMIN_JS . 'pages/common.js');
+        $view->render('users/tpl_edit_roles', $data);
     }
 	
 	/**
@@ -487,7 +473,98 @@ class Users extends Admin_controller {
 	public function user_img_upload()
 	{
 		if( $this->request->is_ajax() ){
-			echo $this->user_model->user_img_upload();
+			//echo $this->user_model->user_img_upload();
+		
+            // feltöltés helye
+            $imagePath = Config::get('user.upload_path');
+
+            // Kiválasztott kép feltöltése
+            if ($this->request->get_params('id') == 'upload') {
+
+                //képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül)	
+                $upload = new \System\Libs\Uploader($this->request->getFiles('img'));
+
+                $args = array(
+                    'file_new_name_body' => 'temp_' . uniqid(),
+                    'allowed' => array('image/*'),
+                    'image_resize' => true,
+                    'image_x' => Config::get('user.width', 600),
+                    'image_ratio_y' => true
+                );
+
+                $dest_file = $upload->make($imagePath, $args);
+
+                if ($dest_file !== false) {
+                    $this->response->json(array(
+                        "status" => 'success',
+                        "url" => $imagePath . $upload->get('file_dst_name'),
+                        "width" => $upload->get('image_dst_x'),
+                        "height" => $upload->get('image_dst_y')
+                    ));
+                } else {
+                    $this->response->json(array(
+                        "status" => 'error',
+                        "message" => $upload->getError()
+                    ));
+                }
+            }
+
+            // Kiválasztott kép vágása és vágott kép feltöltése
+            else if ($this->request->get_params('id') == 'crop') {
+
+                // a croppic js küldi ezeket a POST adatokat 	
+                $imgUrl = $this->request->get_post('imgUrl');
+                // original sizes
+                $imgInitW = $this->request->get_post('imgInitW');
+                $imgInitH = $this->request->get_post('imgInitH');
+                // resized sizes
+                //kerekítjük az értéket, mert lebegőpotos számot is kaphatunk és ez hibát okozna a kép generálásakor
+                $imgW = round($this->request->get_post('imgW'));
+                $imgH = round($this->request->get_post('imgH'));
+                // offsets
+                // megadja, hogy mennyit kell vágni a kép felső oldalából
+                $imgY1 = $this->request->get_post('imgY1');
+                // megadja, hogy mennyit kell vágni a kép bal oldalából
+                $imgX1 = $this->request->get_post('imgX1');
+                // crop box
+                $cropW = $this->request->get_post('cropW');
+                $cropH = $this->request->get_post('cropH');
+                // rotation angle
+                //$angle = $this->request->get_post('rotation');
+                //a $right_crop megadja, hogy mennyit kell vágni a kép jobb oldalából
+                $right_crop = ($imgW - $imgX1) - $cropW;
+                //a $bottom_crop megadja, hogy mennyit kell vágni a kép aljából
+                $bottom_crop = ($imgH - $imgY1) - $cropH;
+
+                //képkezelő objektum létrehozása (a feltöltött kép elérése a paraméter)	
+                $upload = new \System\Libs\Uploader($imgUrl);
+
+                $args = array(
+                    'file_new_name_body' => 'user_' . md5(uniqid()),
+                    'image_resize' => true,
+                    'image_x' => $imgW,
+                    'image_ratio_y' => true,
+                    'image_crop' => array($imgY1, $right_crop, $bottom_crop, $imgX1),
+                );
+
+                $dest_file = $upload->make($imagePath, $args);
+
+                if ($dest_file !== false) {
+                	// temp kép törlése
+                	DI::get('file_helper')->delete($imgUrl);
+
+                    $this->response->json(array(
+                        "status" => 'success',
+                        "url" => $imagePath . $upload->get('file_dst_name'),
+                    ));
+                } else {
+                    $this->response->json(array(
+                        "status" => 'error',
+                        "message" => $upload->getError()
+                    ));                    
+                }
+
+            }
 		}
 	}
 
@@ -545,7 +622,7 @@ class Users extends Admin_controller {
 			} else {
 				$this->response->json(array(
 					"status" => 'error',
-					"message" => 'Adatbázis lekérdezési hiba!'
+					"message" => 'unknown_error'
 				));
 			}
 		} else {

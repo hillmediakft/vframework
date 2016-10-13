@@ -79,7 +79,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($this->all_user as $value) { ?>
+                                <?php foreach ($all_user as $value) { ?>
                                 <tr class="odd gradeX">
                                     <td>
                                     <?php if (Auth::hasAccess('delete_user') && $value['user_id'] != $loggedin_user_id) { ?>

@@ -22,15 +22,12 @@ class Clients extends Admin_controller {
     {
         $view = new View();
         
-        $view->title = 'Partnereink oldal';
-        $view->description = 'Partnereink description';
-
-        $view->add_links(array('select2', 'datatable', 'bootbox', 'vframework', 'clients'));
-
-        $view->all_client = $this->client_model->allClient();
+        $data['title'] = 'Partnereink oldal';
+        $data['description'] = 'Partnereink description';
+        $data['all_client'] = $this->client_model->allClient();
 //$view->debug(true);
-        $view->set_layout('tpl_layout');        
-        $view->render('clients/tpl_clients');
+        $view->add_links(array('select2', 'datatable', 'bootbox', 'vframework', 'clients'));
+        $view->render('clients/tpl_clients', $data);
     }
 
     /**
@@ -84,13 +81,11 @@ class Clients extends Admin_controller {
 
         $view = new View();
 
-        $view->title = 'Új partner oldal';
-        $view->description = 'Új partner description';
-
-        $view->add_links(array('select2', 'bootstrap-fileupload', 'croppic', 'vframework', 'client_insert'));
+        $data['title'] = 'Új partner oldal';
+        $data['description'] = 'Új partner description';
 //$view->debug(true);
-        $view->set_layout('tpl_layout');
-        $view->render('clients/tpl_client_insert');
+        $view->add_links(array('select2', 'bootstrap-fileupload', 'croppic', 'vframework', 'client_insert'));
+        $view->render('clients/tpl_client_insert', $data);
     }
 
     /**
@@ -240,16 +235,12 @@ class Clients extends Admin_controller {
 
         $view = new View();
 
-        $view->title = 'Partner módosítása oldal';
-        $view->description = 'Partner módosítása description';
+        $data['title'] = 'Partner módosítása oldal';
+        $data['description'] = 'Partner módosítása description';
+        $data['actual_client'] = $this->client_model->oneClient($this->request->get_params('id'));
 
         $view->add_links(array('bootstrap-fileupload', 'croppic', 'vframework', 'client_update'));
-
-        // a módosítandó kliens adatai
-        $view->actual_client = $this->client_model->oneClient($this->request->get_params('id'));
-
-        $view->set_layout('tpl_layout');
-        $view->render('clients/tpl_client_update');
+        $view->render('clients/tpl_client_update', $data);
     }
 
     /**
@@ -294,7 +285,8 @@ class Clients extends Admin_controller {
                 $upload = new \System\Libs\Uploader($this->request->getFiles('img'));
 
                 $args = array(
-                    //'file_new_name_body' => 'client_' . md5(uniqid()),
+                    'file_new_name_body' => 'temp_' . uniqid(),
+                    'file_overwrite' => true,
                     'allowed' => array('image/*'),
                     'image_resize' => true,
                     'image_x' => Config::get('clientphoto.width', 150),
@@ -320,7 +312,7 @@ class Clients extends Admin_controller {
             }
 
             // Kiválasztott kép vágása és vágott kép feltöltése
-            if ($this->request->get_params('id') == 'crop') {
+            else if ($this->request->get_params('id') == 'crop') {
 
                 // a croppic js küldi ezeket a POST adatokat    
                 $imgUrl = $this->request->get_post('imgUrl');
@@ -351,7 +343,6 @@ class Clients extends Admin_controller {
 
                 $args = array(
                     'file_new_name_body' => 'client_' . md5(uniqid()),
-                    //'file_overwrite' => true,
                     'image_resize' => true,
                     'image_x' => $imgW,
                     'image_ratio_y' => true,
@@ -361,6 +352,9 @@ class Clients extends Admin_controller {
                 $dest_file = $upload->make($imagePath, $args);
 
                 if ($dest_file !== false) {
+                    // temp kép törlése
+                    DI::get('file_helper')->delete($imgUrl);
+                                        
                     $this->response->json(array(
                         "status" => 'success',
                         "url" => $imagePath . $upload->get('file_dst_name')

@@ -44,7 +44,7 @@
 
 										<label class="control-label">Kép feltöltése</label>					
 										<div class="fileupload fileupload-new" data-provides="fileupload">
-											<div class="fileupload-new thumbnail" style="width: 400px; height: 300px;"><img src="<?php echo Config::get('photogallery.upload_path') . $this->photo[0]['photo_filename'];?>" /></div>
+											<div class="fileupload-new thumbnail" style="width: 400px; height: 300px;"><img src="<?php echo $this->getConfig('photogallery.upload_path') . $photo['photo_filename'];?>" /></div>
 											<div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 400px; max-height: 300px; line-height: 20px;"></div>
 											<div>
 												<span class="btn btn-file green"><span class="fileupload-new">Kiválasztás</span><span class="fileupload-exists">Módosít</span><input id="uploadprofile" class="img" type="file" name="upload_gallery_photo"></span>
@@ -62,14 +62,14 @@
 					
 										<div class="form-group">
 											<label for="photo_caption" class="control-label">Fotó felirat</label>
-											<input type="text" name="photo_caption" id="photo_caption" class="form-control input-xlarge" value="<?php echo $this->photo[0]['photo_caption'];?>"/>
+											<input type="text" name="photo_caption" id="photo_caption" class="form-control input-xlarge" value="<?php echo $photo['photo_caption'];?>"/>
 										</div>
 										<div class="form-group">
 											<label for="photo_category" class="control-label">Fotó kategória</label>
 											<select class="form-control input-xlarge" name="photo_category" aria-controls="category">
 												<option value="">Válasszon kategóriát</option>
-												<?php foreach ($this->categorys as $value) { ?>
-													<option value="<?php echo $value['category_id']; ?>" <?php echo ($this->photo[0]['photo_category'] == $value['category_id']) ? 'selected' : '';?>><?php echo $value['category_name']; ?></option>
+												<?php foreach ($categorys as $value) { ?>
+													<option value="<?php echo $value['category_id']; ?>" <?php echo ($photo['photo_category'] == $value['category_id']) ? 'selected' : '';?>><?php echo $value['category_name']; ?></option>
 												<?php } ?>	
 											</select>
 										</div>											
@@ -77,12 +77,12 @@
 											<label>Megjelenés galéria sliderben</label>
 											<div class="checkbox">
 												<label>
-													<span><input type="checkbox" value="1" name="photo_slider" <?php echo ($this->photo[0]['photo_slider'] == 1) ? 'checked' : '';?>></span>
+													<span><input type="checkbox" value="1" name="photo_slider" <?php echo ($photo['photo_slider'] == 1) ? 'checked' : '';?>></span>
 													Megjelenik
 												</label>
 											</div>
 										</div>
-										<input type="hidden" value="<?php echo $this->photo[0]['photo_filename'];?>" name="old_photo">												
+										<input type="hidden" value="<?php echo $photo['photo_filename'];?>" name="old_photo">												
 									
 									</div>
 													

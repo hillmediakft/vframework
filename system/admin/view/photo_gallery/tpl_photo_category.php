@@ -89,7 +89,7 @@
 								</tr>
 							</thead>
 							<tbody>
-							<?php foreach($this->all_category as $value) { ?>
+							<?php foreach($all_category as $value) { ?>
 								<tr class="odd gradeX" data-id="<?php echo $value['category_id'];?>">
 									<td>
 										<?php echo $value['category_name'];?>
@@ -97,7 +97,7 @@
 										<?php
 										// megszámoljuk, hogy az éppen aktuális kategóriának mennyi eleme van a photo_gallery tábla photo_category oszlopában
 										$counter = 0;
-										foreach($this->category_counter as $v) {
+										foreach($category_counter as $v) {
 											if($value['category_id'] == $v['photo_category']) {
 												$counter++;
 											}

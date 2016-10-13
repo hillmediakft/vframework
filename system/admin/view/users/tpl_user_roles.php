@@ -50,7 +50,7 @@
                         </thead>
                         <tbody>
 
-                            <?php foreach ($this->roles as $value) { ?>
+                            <?php foreach ($roles as $value) { ?>
                                 <tr class="odd gradeX">
                                     <td><?php echo $value['role_id']; ?></td>
                                     <td><?php echo $value['role_name']; ?></td>
@@ -58,7 +58,7 @@
                                     <?php
                                         // megszámoljuk, hogy az éppen aktuális kategóriának mennyi eleme van a jobs tábla job_category_id oszlopában
                                         $counter = 0;
-                                        foreach ($this->roles_counter as $v) {
+                                        foreach ($roles_counter as $v) {
                                             if ($value['role_id'] == $v['user_role_id']) {
                                                 $counter++;
                                             }

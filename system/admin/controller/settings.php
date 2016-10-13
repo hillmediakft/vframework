@@ -35,15 +35,12 @@ class Settings extends Admin_controller {
 
 		$view = new View();
 		
-		$view->title = 'Beállítások oldal';
-		$view->description = 'Beállítások oldal description';
-		
-		$view->add_link('js', ADMIN_JS . 'pages/settings.js');
-		
-		$view->settings = $this->settings_model->get_settings();
+		$data['title'] = 'Beállítások oldal';
+		$data['description'] = 'Beállítások oldal description';
+		$data['settings'] = $this->settings_model->get_settings();
 
-		$view->set_layout('tpl_layout');
-		$view->render('settings/tpl_settings');
+		$view->add_link('js', ADMIN_JS . 'pages/settings.js');
+		$view->render('settings/tpl_settings', $data);
 	}
 }
 ?>

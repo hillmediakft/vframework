@@ -39,7 +39,8 @@ class Content_model extends Admin_model {
 	public function selectContent($id)
 	{
 		$this->query->set_where('content_id', '=', $id);
-		return $this->query->select();
+		$result = $this->query->select();
+		return $result[0];
 	}
 	
 }

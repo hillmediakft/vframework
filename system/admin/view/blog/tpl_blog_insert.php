@@ -61,7 +61,6 @@
 									</div>
 								</div>
 								<!-- bootstrap file upload END -->
-
 								<div class="clearfix"></div>
 
 								<div class="note note-info">
@@ -80,7 +79,7 @@
 								<div class="form-group">
 									<label for="blog_category">Kategória</label>
 									<select name="blog_category" class="form-control input-xlarge">
-									<?php foreach($this->category_list as $value) { ?>
+									<?php foreach($category_list as $value) { ?>
 										<option value="<?php echo $value['category_id']?>"><?php echo $value['category_name']?></option>
 									<?php } ?>
 									</select>

@@ -52,9 +52,11 @@ class User_model extends Admin_model {
         
         if(!is_null($user_id)){
             $this->query->set_where('user_id', '=', $user_id);
+            $result = $this->query->select();
+            return $result[0];
+        } else {
+            return $this->query->select();
         }
-
-        return $this->query->select();
     }
 
     /**
@@ -228,146 +230,6 @@ class User_model extends Admin_model {
                     }
                 }
 
-
-    /**
-     * 	Felhasználó képének vágása és feltöltése
-     * 	Az $this->registry->params['id'] paraméter értékétől függően feltölti a kiválasztott képet
-     * 		upload paraméter esetén: feltölti a kiválasztott képet
-     * 		crop paraméter esetén: megvágja a kiválasztott képet és feltölti	
-     */
-    public function user_img_upload()
-    {
-        if ($this->request->has_params('id')) {
-            //include(LIBS . "/upload_class.php");
-            // Kiválasztott kép feltöltése
-            if ($this->request->get_params('id') == 'upload') {
-
-                // feltöltés helye
-                $imagePath = Config::get('user.upload_path');
-
-                //képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül)	
-                $handle = new \System\Libs\Upload($_FILES['img']);
-
-                if ($handle->uploaded) {
-                    // kép paramétereinek módosítása
-                    $handle->file_auto_rename = true;
-                    $handle->file_safe_name = true;
-                    //$handle->file_new_name_body   	 = 'lorem ipsum';
-                    $handle->allowed = array('image/*');
-                    $handle->image_resize = true;
-                    $handle->image_x = Config::get('user.width', 600);
-                    $handle->image_ratio_y = true;
-
-                    //végrehajtás: kép átmozgatása végleges helyére
-                    $handle->Process($imagePath);
-
-                    if ($handle->processed) {
-                        //temp file törlése a szerverről
-                        $handle->clean();
-
-                        $response = array(
-                            "status" => 'success',
-                            "url" => $imagePath . $handle->file_dst_name,
-                            "width" => $handle->image_dst_x,
-                            "height" => $handle->image_dst_y
-                        );
-                        return json_encode($response);
-                    } else {
-                        $response = array(
-                            "status" => 'error',
-                            "message" => $handle->error . ': Can`t upload File; no write Access'
-                        );
-                        return json_encode($response);
-                    }
-                } else {
-                    $response = array(
-                        "status" => 'error',
-                        "message" => $handle->error . ': Can`t upload File; no write Access'
-                    );
-                    return json_encode($response);
-                }
-            }
-
-
-            // Kiválasztott kép vágása és vágott kép feltöltése
-            if ($this->request->get_params('id') == 'crop') {
-
-                // a croppic js küldi ezeket a POST adatokat 	
-                $imgUrl = $this->request->get_post('imgUrl');
-                // original sizes
-                $imgInitW = $this->request->get_post('imgInitW');
-                $imgInitH = $this->request->get_post('imgInitH');
-                // resized sizes
-                //kerekítjük az értéket, mert lebegőpotos számot is kaphatunk és ez hibát okozna a kép generálásakor
-                $imgW = round($this->request->get_post('imgW'));
-                $imgH = round($this->request->get_post('imgH'));
-                // offsets
-                // megadja, hogy mennyit kell vágni a kép felső oldalából
-                $imgY1 = $this->request->get_post('imgY1');
-                // megadja, hogy mennyit kell vágni a kép bal oldalából
-                $imgX1 = $this->request->get_post('imgX1');
-                // crop box
-                $cropW = $this->request->get_post('cropW');
-                $cropH = $this->request->get_post('cropH');
-                // rotation angle
-                //$angle = $this->request->get_post('rotation');
-                //a $right_crop megadja, hogy mennyit kell vágni a kép jobb oldalából
-                $right_crop = ($imgW - $imgX1) - $cropW;
-                //a $bottom_crop megadja, hogy mennyit kell vágni a kép aljából
-                $bottom_crop = ($imgH - $imgY1) - $cropH;
-
-                // feltöltés helye
-                $imagePath = Config::get('user.upload_path');
-
-                //képkezelő objektum létrehozása (a feltöltött kép elérése a paraméter)	
-                $handle = new \System\Libs\Upload($imgUrl);
-
-                // fájlneve utáni random karakterlánc
-                $suffix = md5(uniqid());
-
-                if ($handle->uploaded) {
-
-                    // kép paramétereinek módosítása
-                    //$handle->file_auto_rename 		 = true;
-                    //$handle->file_safe_name 		 = true;
-                    //$handle->file_name_body_add   	 = '_thumb';
-                    $handle->file_new_name_body = "user_" . $suffix;
-                    //kép átméretezése
-                    $handle->image_resize = true;
-                    $handle->image_x = $imgW;
-                    $handle->image_ratio_y = true;
-                    //utána kép vágása
-                    $handle->image_crop = array($imgY1, $right_crop, $bottom_crop, $imgX1);
-
-                    //végrehajtás: kép átmozgatása végleges helyére
-                    $handle->Process($imagePath);
-
-                    if ($handle->processed) {
-                        // vágatlan forrás kép törlése az upload/user_photo mappából
-                        $handle->clean();
-
-                        $response = array(
-                            "status" => 'success',
-                            "url" => $imagePath . $handle->file_dst_name
-                        );
-                        return json_encode($response);
-                    } else {
-                        $response = array(
-                            "status" => 'error',
-                            "message" => $handle->error . ': Can`t upload File; no write Access'
-                        );
-                        return json_encode($response);
-                    }
-                } else {
-                    $response = array(
-                        "status" => 'error',
-                        "message" => $handle->error . ': Can`t upload File; no write Access'
-                    );
-                    return json_encode($response);
-                }
-            }
-        }
-    }
 
     /**
      * 	(AJAX) A users tábla user_active mezőjének ad értéket

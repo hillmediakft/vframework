@@ -14,13 +14,11 @@ class Home extends Admin_controller {
     {
         $view = new View();
 
-        $view->title = 'Admin kezdő oldal';
-        $view->description = 'Admin kezdő oldal description';
+        $data['title'] = 'Admin kezdő oldal';
+        $data['description'] = 'Admin kezdő oldal description';
 
         $view->add_link('js', ADMIN_JS . 'pages/common.js');
-
-        $view->set_layout('tpl_layout');
-        $view->render('home/tpl_home');
+        $view->render('home/tpl_home', $data);
     }
 
 }

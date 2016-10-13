@@ -24,7 +24,8 @@ class Photo_gallery_model extends Admin_model {
 	public function selectOne($id)
 	{
 		$this->query->set_where('photo_id', '=', $id);
-		return $this->query->select();
+		$result = $this->query->select();
+		return $result[0];
 	}
 
 	/**

@@ -46,7 +46,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($this->all_client as $value) { ?>
+                            <?php foreach ($all_client as $value) { ?>
                                 <tr class="odd gradeX">
 
                                     <td><?php echo $value['client_order']; ?></td>

@@ -50,7 +50,7 @@
                                 <div id="client_image"></div>	
 
                                 <input type="hidden" name="img_url" id="OutputId" >
-                                <input type="hidden" id="old_img" value="<?php echo $this->getConfig('clientphoto.upload_path') . $this->actual_client['client_photo']; ?>" name="old_img">
+                                <input type="hidden" id="old_img" value="<?php echo $this->getConfig('clientphoto.upload_path') . $actual_client['client_photo']; ?>" name="old_img">
 
                                 <div class="margin-bottom-10"></div>
                                 <div class="clearfix"></div>
@@ -66,12 +66,12 @@
                                         <!-- PARTNER NÉV -->	
                                         <div class="form-group">
                                             <label for="client_name" class="control-label">Partner neve <span class="required">*</span></label>
-                                            <input type="text" name="client_name" id="client_name" value="<?php echo $this->actual_client['client_name']; ?>" class="form-control input-xlarge" />
+                                            <input type="text" name="client_name" id="client_name" value="<?php echo $actual_client['client_name']; ?>" class="form-control input-xlarge" />
                                         </div>
                                         <!-- PARTNER WEBOLDAL -->	
                                         <div class="form-group">
                                             <label for="client_link" class="control-label">Partner weboldala <span class="required">*</span></label>
-                                            <input type="text" name="client_link" id="client_link" value="<?php echo $this->actual_client['client_link']; ?>" class="form-control input-xlarge" />
+                                            <input type="text" name="client_link" id="client_link" value="<?php echo $actual_client['client_link']; ?>" class="form-control input-xlarge" />
                                         </div>
                                     </div> 
                                 </div>

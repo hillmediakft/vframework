@@ -45,7 +45,7 @@
 									<li class="filter" data-filter="all">
 										 Összes
 									</li>
-									<?php foreach ($this->categorys as $value) { ?>
+									<?php foreach ($categorys as $value) { ?>
 									<li class="filter" data-filter="category_<?php echo $value['category_id']; ?>">
 										 <?php echo $value['category_name']; ?>
 									</li>									
@@ -53,7 +53,7 @@
 								</ul>
 								<div class="row mix-grid">
 								
-								<?php foreach($this->all_photos as $value) { ?>						
+								<?php foreach($all_photos as $value) { ?>						
 											
 									<div id="photo_<?php echo $value['photo_id'];?>" class="col-md-3 col-sm-4 mix category_<?php echo $value['photo_category'];?>">
 										<div class="mix-inner">

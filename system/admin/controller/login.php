@@ -66,6 +66,7 @@ class Login extends Admin_controller {
             }
 
         $view = new View();
+        $view->set_layout(null);
 		$view->render('login/tpl_login');
     }
 	

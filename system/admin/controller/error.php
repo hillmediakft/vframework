@@ -14,11 +14,10 @@ class Error extends Admin_controller {
 	{
 		header('HTTP/1.0 404 Not Found');
 		$view = new View();
-		$view->title = '404 hiba oldal';
-		$view->description = '404 hiba oldal description';
+		$data['title'] = '404 hiba oldal';
+		$data['description'] = '404 hiba oldal description';
 		$view->add_link('js', ADMIN_JS . 'pages/common.js');
-		$view->set_layout('tpl_layout');
-		$view->render('error/tpl_404');
+		$view->render('error/tpl_404', $data);
 	}
 	
 }

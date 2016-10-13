@@ -41,7 +41,7 @@
 								<th>Angol</th>
 								<th>Német</th>
 							<tbody>
-								<?php foreach($this->languages as $value) { ?>			
+								<?php foreach($languages as $value) { ?>			
 								<tr>
 									<td style="width:15%">
 										 <?php echo $value['text_code'];?>

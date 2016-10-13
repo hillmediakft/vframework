@@ -21,15 +21,13 @@ class Slider extends Admin_controller {
     {
         $view = new View();
 
-        $view->title = 'Slider oldal';
-        $view->description = 'Slider oldal description';
+        $data['title'] = 'Slider oldal';
+        $data['description'] = 'Slider oldal description';
+        $data['sliders'] = $this->slider_model->allSlides();
 
+        $view->setHelper(array('url_helper'));
         $view->add_links(array('datatable', 'bootbox', 'vframework', 'slider'));     
-
-        $view->slider = $this->slider_model->allSlides();
-
-        $view->set_layout('tpl_layout');    
-        $view->render('slider/tpl_slider');
+        $view->render('slider/tpl_slider', $data);
     }
 
     /**
@@ -75,13 +73,11 @@ class Slider extends Admin_controller {
 
         $view = new View();
         
-        $view->title = 'Új slide oldal';
-        $view->description = 'Új slide oldal description';
+        $data['title'] = 'Új slide oldal';
+        $data['description'] = 'Új slide oldal description';
 
         $view->add_links(array('ckeditor','bootstrap-fileupload', 'slider_insert'));
-
-        $view->set_layout('tpl_layout');
-        $view->render('slider/tpl_slider_insert');
+        $view->render('slider/tpl_slider_insert', $data);
     }
 
     /**
@@ -93,34 +89,22 @@ class Slider extends Admin_controller {
         $id = (int) $this->request->get_params('id');
 
         if ($this->request->has_post()) {
-           
-            // új kép mutatója (a false a kezdőértéke)  
-            $new_picture = false;
 
             //ha van új kép feltöltve
-            if (isset($_FILES['update_slide_picture'])) {
-                // ha a hibakód 4, akkor nem lett kijelölve feltöltendő file (vagyis nem akarunk képet módosítani)
-                // ha nem 4-es a hibakód, akkor sikeres, vagy valami gond van a feltöltéssel
-                if ($_FILES['update_slide_picture']['error'] != 4) {
-                    $new_picture = true;
+            if ($this->request->checkFiles('update_slide_picture')) {
+                // kép feltöltése (visszatér a feltöltött kép nevével, vagy false-al)
+                $dest_image = $this->_uploadPicture($this->request->getFiles('update_slide_picture'));
 
-                    // kép feltöltése, upload_slider_picture() metódussal (visszatér a feltöltött kép nevével, vagy false-al)
-                    $dest_image_name = $this->slider_model->upload_slider_picture($_FILES['update_slide_picture']);
-
-                    if ($dest_image_name === false) {
-                        $this->response->redirect('admin/slider/update');
-                    }
+                if ($dest_image === false) {
+                    $this->response->redirect('admin/slider/update');
                 }
-            } else {
-                throw new Exception('Hiba slide kep modositasakor: Nem letezik a \$_FILES[\'update_slide_picture\'] elem!');
-                return false;
             }
 
             // adatok beállítása
             $data['active'] = $this->request->get_post('slider_status', 'integer');
 
-            if ($new_picture) {
-                $data['picture'] = $dest_image_name;
+            if ($dest_image) {
+                $data['picture'] = $dest_image;
                 // régi kép adatai (ezt használjuk a régi kép törléséhez, ha új kép lett feltöltve)
                 $old_img_path = Config::get('slider.upload_path') . $this->request->get_post('old_img');
                 $old_thumb_path = DI::get('url_helper')->thumbPath($old_img_path);
@@ -135,7 +119,7 @@ class Slider extends Admin_controller {
             // ha sikeres az adatbázisba írás
             if ($result !== false) {
                 // megvizsgáljuk, hogy létezik-e új feltöltött kép
-                if ($new_picture) {
+                if ($dest_image) {
                     //régi képek törlése
                     DI::get('file_helper')->delete(array($old_img_path, $old_thumb_path));
                 }
@@ -150,15 +134,12 @@ class Slider extends Admin_controller {
 
         $view = new View();
         
-        $view->title = 'Slider szerkesztése oldal';
-        $view->description = 'Slider szerkesztése description';
+        $data['title'] = 'Slider szerkesztése oldal';
+        $data['description'] = 'Slider szerkesztése description';
+        $data['slider'] = $this->slider_model->oneSlide($id);
 
         $view->add_links(array('bootbox', 'ckeditor', 'bootstrap-fileupload', 'slider_update'));
-
-        $view->slider = $this->slider_model->oneSlide($id);
-
-        $view->set_layout('tpl_layout');
-        $view->render('slider/tpl_slider_update');
+        $view->render('slider/tpl_slider_update', $data);
     }
 
     /**
@@ -195,21 +176,7 @@ class Slider extends Admin_controller {
                             if(!empty($photo_name)){
                                 $picture_path = Config::get('slider.upload_path') . $photo_name;
                                 $thumb_picture_path = DI::get('url_helper')->thumbPath($picture_path);
-                            
                                 DI::get('file_helper')->delete(array($picture_path, $thumb_picture_path));
-        /*
-                                $del_result = Util::del_file($picture_path);
-                                $del_thumb_result = Util::del_file($thumb_picture_path);
-                            
-                                //kép file törlése a szerverről (ha az Util::del_file() falsot ad vissza nem tudtuk törölni a képet... hibaüzenet)
-                                if(!$del_result){
-                                    Message::log('A kép nem törölhető! - ' . $picture_path);
-                                }
-                                //kép file törlése a szerverről (ha az Util::del_file() falsot ad vissza nem tudtuk törölni a képet... hibaüzenet)
-                                if(!$del_thumb_result){
-                                    Message::log('A kép nem törölhető! - ' . $thumb_picture_path);
-                                }
-        */
                             }               
                             //sikeres törlés
                             $success_counter += $result;
@@ -270,6 +237,53 @@ class Slider extends Admin_controller {
             $this->response->json(array('status' => 'success'));
         }
     } 
+
+
+    /**
+     *  Slide képet méretezi és tölti fel a szerverre (thumb képet is)
+     *  (ez a metódus az update_slide() és add_slide() metódusokban hívódik meg!)
+     *
+     *  @param  array $files_array - $_FILES['valami']
+     *  @return string (kép elérési útja) vagy false
+     */
+    private function _uploadPicture($files_array)
+    {
+        // feltöltés helye
+        $imagePath = Config::get('slider.upload_path');
+        $width = Config::get('slider.width', 1170);
+        $height = Config::get('slider.height', 420);
+        $thumb_width = Config::get('slider.thumb_width', 200);
+
+        //képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül) 
+        $upload = new \System\Libs\Uploader($files_array);
+
+        $args = array(
+            'allowed' => array('image/*'),
+            'file_new_name_body' => "slide_" . md5(uniqid()),
+            'image_resize' => true,
+            'image_x' => $width,
+            'image_y' => $height
+        );
+        $dest_image = $upload->make($imagePath, $args);
+
+        if ($dest_image !== false) {
+            // thumbnail kép készítése
+            $thumb_args = array(
+                'file_new_name_body' => $upload->get('file_dst_name_body'),
+                'file_name_body_add' => '_thumb',
+                'image_resize' => true,
+                'image_x' => $thumb_width,
+                'image_y' => $upload->calcHeight($thumb_width)            
+            );
+            $upload->make($imagePath, $thumb_args);
+           
+        } else {
+            Message::set('error', $upload->getError());
+            return false;
+        }
+        // ha nincs hiba visszadja a feltöltött kép nevét
+        return $dest_image;
+    }
 
 }
 ?>

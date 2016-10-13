@@ -46,21 +46,21 @@
 							<div class="col-md-12">		
                                 <div class="form-group">
                                     <label for="newsletter_name" class="control-label">Név</label>
-                                    <input type="text" name="newsletter_name" id="newsletter_name" value="<?php echo $this->newsletter[0]['newsletter_name'];?>" placeholder="" class="form-control input-xlarge" />
+                                    <input type="text" name="newsletter_name" id="newsletter_name" value="<?php echo $newsletter[0]['newsletter_name'];?>" placeholder="" class="form-control input-xlarge" />
                                 </div>
                                 <div class="form-group">
                                     <label for="newsletter_subject" class="control-label">Tárgy</label>
-                                    <input type="text" name="newsletter_subject" id="newsletter_subject" value="<?php echo $this->newsletter[0]['newsletter_subject'];?>" placeholder="" class="form-control input-xlarge" />
+                                    <input type="text" name="newsletter_subject" id="newsletter_subject" value="<?php echo $newsletter[0]['newsletter_subject'];?>" placeholder="" class="form-control input-xlarge" />
                                 </div>
                                 <div class="form-group">
                                     <label for="newsletter_body" class="control-label">Tartalom</label>
-                                    <textarea name="newsletter_body" id="newsletter_body" placeholder="" class="form-control input-xlarge"><?php echo $this->newsletter[0]['newsletter_body'];?></textarea>
+                                    <textarea name="newsletter_body" id="newsletter_body" placeholder="" class="form-control input-xlarge"><?php echo $newsletter[0]['newsletter_body'];?></textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="newsletter_status">Státusz</label>
                                     <select name='newsletter_status' class="form-control input-xlarge">
-                                        <option value="1" <?php echo ($this->newsletter[0]['newsletter_status'] == 1) ? "selected='selected'" : '';?> >Aktív</option>
-                                        <option value="0" <?php echo ($this->newsletter[0]['newsletter_status'] == 0) ? "selected='selected'" : '';?> >Inaktív</option>
+                                        <option value="1" <?php echo ($newsletter[0]['newsletter_status'] == 1) ? "selected='selected'" : '';?> >Aktív</option>
+                                        <option value="0" <?php echo ($newsletter[0]['newsletter_status'] == 0) ? "selected='selected'" : '';?> >Inaktív</option>
                                     </select>
                                 </div>
 							</div>

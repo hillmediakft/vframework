@@ -29,7 +29,8 @@ class Pages_model extends Admin_model {
 	public function onePage($id)
 	{
 		$this->query->set_where('page_id', '=', $id);
-		return $this->query->select();
+		$result = $this->query->select();
+		return $result[0];
 	}
 
 	/**

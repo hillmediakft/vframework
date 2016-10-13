@@ -47,20 +47,20 @@
                         </thead>
                         <tbody>
 
-                            <?php foreach ($this->all_testimonials as $value) { ?>
+                            <?php foreach ($all_testimonials as $testimonial) { ?>
                                 <tr class="odd gradeX">
-                                    <td><?php echo $value['id']; ?></td>
-                                    <td><?php echo $value['text']; ?></td>
-                                    <td><?php echo $value['name']; ?></td>
-                                    <td><?php echo $value['title']; ?></td>
+                                    <td><?php echo $testimonial['id']; ?></td>
+                                    <td><?php echo $testimonial['text']; ?></td>
+                                    <td><?php echo $testimonial['name']; ?></td>
+                                    <td><?php echo $testimonial['title']; ?></td>
 
                                     <td>
                                         <div class="actions">
                                             <div class="btn-group">
                                                 <a class="btn btn-sm grey-steel" title="Műveletek" href="#" data-toggle="dropdown"><i class="fa fa-cogs"></i></a>
                                                 <ul class="dropdown-menu pull-right">
-                                                    <li><a href="admin/testimonials/update/<?php echo $value['id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
-                                                    <li><a href="admin/testimonials/delete/<?php echo $value['id']; ?>" id="delete_<?php echo $value['id']; ?>"><i class="fa fa-trash"></i> Töröl</a></li>
+                                                    <li><a href="admin/testimonials/update/<?php echo $testimonial['id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
+                                                    <li><a href="admin/testimonials/delete/<?php echo $testimonial['id']; ?>" id="delete_<?php echo $testimonial['id']; ?>"><i class="fa fa-trash"></i> Töröl</a></li>
                                                 </ul>
                                             </div>
                                         </div>

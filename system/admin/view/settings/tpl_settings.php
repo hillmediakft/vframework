@@ -36,43 +36,43 @@
 
                         <div class="form-group">
                             <label for="settings_ceg">Cég</label>	
-                            <input type='text' name='setting_ceg' class='form-control input-large' value="<?php echo (empty($this->settings['ceg'])) ? "" : $this->settings['ceg']; ?>"/>
+                            <input type='text' name='setting_ceg' class='form-control input-large' value="<?php echo (empty($settings['ceg'])) ? "" : $settings['ceg']; ?>"/>
                         </div>
 
                         <div class="form-group">
                             <label for="settings_cim">Cím</label>	
-                            <input type='text' name='setting_cim' class='form-control input-large' value="<?php echo (empty($this->settings['cim'])) ? "" : $this->settings['cim']; ?>"/>
+                            <input type='text' name='setting_cim' class='form-control input-large' value="<?php echo (empty($settings['cim'])) ? "" : $settings['cim']; ?>"/>
                         </div>
 
                         <div class="form-group">
                             <label for="settings_tel">Telefonszám</label>	
-                            <input type='text' name='setting_tel' class='form-control input-large' value="<?php echo (empty($this->settings['tel'])) ? "" : $this->settings['tel']; ?>"/>
+                            <input type='text' name='setting_tel' class='form-control input-large' value="<?php echo (empty($settings['tel'])) ? "" : $settings['tel']; ?>"/>
                         </div>
 
                         <div class="form-group">
                             <label for="settings_email">E-mail (lábléc e-mail űrlap)</label>	
-                            <input type='text' name='setting_email' class='form-control input-large' value="<?php echo (empty($this->settings['email'])) ? "" : $this->settings['email']; ?>"/>
+                            <input type='text' name='setting_email' class='form-control input-large' value="<?php echo (empty($settings['email'])) ? "" : $settings['email']; ?>"/>
                         </div>
                         
                     <!--
                         <div class="form-group">
                             <label for="setting_email_ceges">E-mail céges (céges kapcsolat)</label>	
-                            <input type='text' name='setting_email_ceges' class='form-control input-large' value="<?php //echo (empty($this->settings['email_ceges'])) ? "" : $this->settings['email_ceges']; ?>"/>
+                            <input type='text' name='setting_email_ceges' class='form-control input-large' value="<?php //echo (empty($settings['email_ceges'])) ? "" : $settings['email_ceges']; ?>"/>
                         </div>
                            
                         <div class="form-group">
                             <label for="setting_email_diak">E-mail diák</label>	
-                            <input type='text' name='setting_email_diak' class='form-control input-large' value="<?php //echo (empty($this->settings['email_diak'])) ? "" : $this->settings['email_diak']; ?>"/>
+                            <input type='text' name='setting_email_diak' class='form-control input-large' value="<?php //echo (empty($settings['email_diak'])) ? "" : $settings['email_diak']; ?>"/>
                         </div>
                                                     
                         <div class="form-group">
                             <label for="setting_email_kilepes">E-mail kilépés</label>	
-                            <input type='text' name='setting_email_kilepes' class='form-control input-large' value="<?php //echo (empty($this->settings['email_kilepes'])) ? "" : $this->settings['email_kilepes']; ?>"/>
+                            <input type='text' name='setting_email_kilepes' class='form-control input-large' value="<?php //echo (empty($settings['email_kilepes'])) ? "" : $settings['email_kilepes']; ?>"/>
                         </div>                                                            
 
                         <div class="form-group">
                             <label for="setting_email_diak">Facebook link</label>	
-                            <input type='text' name='setting_facebook_link' class='form-control input-large' value="<?php //echo (empty($this->settings['facebook_link'])) ? "" : $this->settings['facebook_link']; ?>"/>
+                            <input type='text' name='setting_facebook_link' class='form-control input-large' value="<?php //echo (empty($settings['facebook_link'])) ? "" : $settings['facebook_link']; ?>"/>
                         </div>
                     -->
 						

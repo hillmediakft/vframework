@@ -15,16 +15,13 @@ class Languages extends Admin_controller {
 	{
 		$view = new View();
 		
-		$view->title = 'Nyelvek oldal';
-		$view->description = 'Nyelvek oldal description';
+		$data['title'] = 'Nyelvek oldal';
+		$data['description'] = 'Nyelvek oldal description';
+		$data['languages'] = $this->languages_model->get_language_data();
 		
 		$view->add_links(array('bootstrap-editable'));
 		$view->add_link('js', ADMIN_JS . 'pages/languages.js');
-		
-		$view->languages = $this->languages_model->get_language_data();
-		
-		$view->set_layout('tpl_layout');
-		$view->render('languages/tpl_languages');
+		$view->render('languages/tpl_languages', $data);
 	}
 	
 	/**

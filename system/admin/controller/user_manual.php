@@ -14,13 +14,11 @@ class User_manual extends Admin_controller {
 	{
 		$view = new View();
 		
-		$view->title = 'Admin dokumentáció oldal';
-		$view->description = 'Admin dokumentáció description';
+		$data['title'] = 'Admin dokumentáció oldal';
+		$data['description'] = 'Admin dokumentáció description';
 		
 		$view->add_link('js', ADMIN_JS . 'pages/common.js');
-		
-		$view->set_layout('tpl_layout');
-		$view->render('user_manual/tpl_user_manual');
+		$view->render('user_manual/tpl_user_manual', $data);
 	}
 }
 ?>

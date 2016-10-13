@@ -14,17 +14,16 @@ class Home extends Site_controller {
     public function index()
     {
         $view = new View();
-        $view->add_link('js', SITE_ASSETS . 'pages/home.js');
-        // lekérdezések
-        // $this->view->settings = $this->home_model->get_settings();
 
-        $view->title = 'page_metatitle';
-        $view->description = 'page_metadescription';
-        $view->keywords = 'page_metakeywords';
+        $data['title'] = 'page_metatitle';
+        $data['description'] = 'page_metadescription';
+        $data['keywords'] = 'page_metakeywords';
 
-//$this->view->debug(true); 
         //$view->setLazyRender();
-        $view->render('home/tpl_home');
+//$this->view->debug(true); 
+        $view->add_link('js', SITE_ASSETS . 'pages/home.js');
+       $view->set_layout(null);
+        $view->render('home/tpl_home', $data);
     }
 
 }
