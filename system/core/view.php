@@ -83,6 +83,13 @@ class View {
 		$this->area = $this->request->get_uri('area');
 		// linkek tömb behívása
 		$this->modul_link = include_once(CONFIG . '/links_' . $this->area . '.php');
+		// default layout
+		if ($this->area == 'site') {
+			$layout = Config::get('layout.default_site', null);
+		} elseif ($this->area == 'admin') {
+			$layout = Config::get('layout.default_admin', null);
+		}
+		$this->set_layout($layout);
 	}
 	
 	/**
@@ -278,7 +285,7 @@ HTML;
 					include('system/' . $this->area . '/view/_template/' . $this->layout . '.php');
 				}
 				else {
-					throw new \Exception('A ' . $template . '.php template file nem toltheto be!');
+					throw new \Exception('A ' . $this->layout . '.php template file nem toltheto be!');
 				} 
 	        } catch (\Exception $e) {
 	        	die($e->getMessage());
