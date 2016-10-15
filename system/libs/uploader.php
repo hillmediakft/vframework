@@ -255,6 +255,16 @@ class Uploader
 	}
 
 	/**
+	 * A feltöltött kép képarányát állítja be a ratio változóba
+	 */
+	public function setRatio()
+	{
+		if ($this->isImage()) {
+			$this->ratio = $this->handle->image_x / $this->handle->image_y;
+		}
+	}
+
+	/**
 	 * Képarány változó reset
 	 */
 	public function cleanRatio()
@@ -314,6 +324,8 @@ class Uploader
 			{
 				$this->handle->$key = $value;
 			}
+
+			$this->setRatio();
 
 			$this->handle->Process($path);
 			
@@ -400,7 +412,7 @@ class Uploader
 					}
 
 					$this->handle_thumb->Process($path);
-					
+
 					// if ($this->handle_thumb->processed) {	}
 					$this->handle_thumb = null;
 				}
@@ -416,16 +428,6 @@ class Uploader
 		} else {
             $this->setError($this->handle->error);
 			return false;			
-		}
-	}
-
-	/**
-	 * A feltöltött kép képarányát állítja be a ratio változóba
-	 */
-	public function setRatio()
-	{
-		if ($this->isImage()) {
-			$this->ratio = $this->handle->image_x / $this->handle->image_y;
 		}
 	}
 
