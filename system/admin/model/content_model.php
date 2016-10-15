@@ -5,7 +5,6 @@ use System\Core\Admin_model;
 class Content_model extends Admin_model {
 
 	protected $table = 'content';
-	protected $id = 'content_id';
 
 	/**
      * Constructor, létrehozza az adatbáziskapcsolatot
@@ -17,7 +16,7 @@ class Content_model extends Admin_model {
 	
 	public function allContents()
 	{
-		$this->query->set_columns(array('content_id', 'content_name', 'content_title')); 
+		$this->query->set_columns(array('id', 'name', 'title')); 
 		return $this->query->select(); 
 	}
 	
@@ -26,7 +25,7 @@ class Content_model extends Admin_model {
 	 */
 	public function update($id, $data)
 	{
-		$this->query->set_where('content_id', '=', $id);
+		$this->query->set_where('id', '=', $id);
 		return $this->query->update($data);
 	}
 
@@ -38,7 +37,7 @@ class Content_model extends Admin_model {
 	 */
 	public function selectContent($id)
 	{
-		$this->query->set_where('content_id', '=', $id);
+		$this->query->set_where('id', '=', $id);
 		$result = $this->query->select();
 		return $result[0];
 	}

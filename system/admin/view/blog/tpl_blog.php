@@ -66,27 +66,27 @@
 							</thead>
 							<tbody>
 
-							<?php foreach($all_blog as $value) { ?>
+							<?php foreach($all_blog as $blog) { ?>
 								<tr class="odd gradeX">
 									<td>
 										<?php if (1) { ?>
-										<input type="checkbox" class="checkboxes" name="blog_id_<?php echo $value['blog_id'];?>" value="<?php echo $value['blog_id'];?>"/>
+										<input type="checkbox" class="checkboxes" name="blog_id_<?php echo $blog['id'];?>" value="<?php echo $blog['id'];?>"/>
 										<?php } ?>	
 									</td>
-									<!-- <td><img src="<?php //echo Util::thumb_path($value['blog_picture']);?>" width="60" /></td>-->
-									<td><?php echo $value['blog_title'];?></td>
-									<td><?php echo $value['blog_add_date'];?></td>
-									<td><?php echo $value['category_name'];?></td>
+									<!-- <td><img src="<?php //echo Util::thumb_path($blog['picture']);?>" width="60" /></td>-->
+									<td><?php echo $blog['title'];?></td>
+									<td><?php echo $blog['add_date'];?></td>
+									<td><?php echo $blog['category_name'];?></td>
 									<td>									
 										<div class="actions">
 											<div class="btn-group">
 												<a class="btn btn-sm grey-steel" href="#" data-toggle="dropdown"><i class="fa fa-cogs"></i></a>
 												<ul class="dropdown-menu pull-right">
 													<?php if (1) { ?>	
-														<li><a href="admin/blog/update/<?php echo $value['blog_id'];?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
+														<li><a href="admin/blog/update/<?php echo $blog['id'];?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
 													<?php } ?>
 													<?php if (1) { ?>
-														<li><a class="delete_item" data-id="<?php echo $value['blog_id']; ?>"><i class="fa fa-trash"></i> Töröl</a></li>
+														<li><a class="delete_item" data-id="<?php echo $blog['id']; ?>"><i class="fa fa-trash"></i> Töröl</a></li>
 													<?php } ?>
 												</ul>
 											</div>

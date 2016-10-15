@@ -48,56 +48,41 @@ class Photo_gallery extends Admin_controller {
 	public function insert()
 	{
 		if($this->request->has_post()) {
-
+			
 			//képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül)	
-			$handle = new \System\Libs\Upload($_FILES['upload_gallery_photo']);
+			$upload = new \System\Libs\Uploader($this->request->getFiles('upload_gallery_photo'));
 
-			if ($handle->uploaded) {
+			$args = array(
+				'allowed' => array('image/*'),
+				'image_resize' => true,
+				'image_x' => $this->photo_width,
+				'image_ratio_y' => true,
+				'file_new_name_body' => md5(uniqid())
+			);
+			$filename = $upload->make($this->image_path, $args);
 
-				$handle->allowed = array('image/*');
-				$random_number = md5(date('Y-m-d H:i:s:u'));
-			    
-				$handle->image_resize            = true;
-				$handle->image_ratio_y           = true;
-				$handle->image_x                 = $this->photo_width; //kép szélessége;
-				$handle->file_new_name_body 	 = $random_number;
-							
-				//végrehajtás: kép átmozgatása végleges helyére
-				$handle->Process($this->image_path);
-				
-				$filename = $handle->file_dst_name;
+			if ($filename !== false) {
+				// thumbnail kép készítés
+				$args_thumb = array(
+					'image_resize'            => true,
+					'image_x'                 => $this->thumb_width,
+					'image_ratio_y'           => true,
+					'file_new_name_body' 	 =>  $upload->get('file_dst_name_body'),
+					'file_name_body_add' 	 =>  '_thumb'
+				);
+				$upload->make($this->image_path, $args_thumb);
 
-				if ($handle->processed) {
-											
-					$handle->image_resize            = true;
-					$handle->image_ratio_y           = true;
-					$handle->image_x                 = $this->thumb_width; // nézőkép szélessége
-					$handle->file_new_name_body 	 =  $random_number . '_thumb';
-							
-					//végrehajtás: kép átmozgatása végleges helyére
-					$handle->Process($this->image_path);
-					$handle->clean();
-					
-				} else {
-                    Message::set('error', $handle->error);
-					$this->response->redirect('admin/photo_gallery/insert');
-				}
-	
 			} else {
-                Message::set('error', $handle->error);
+				Message::set('error', $upload->getError());
 				$this->response->redirect('admin/photo_gallery/insert');
 			}
-			
+
+
 			$data['photo_filename'] =  $filename;
 			$data['photo_caption'] = $this->request->get_post('photo_caption');
 			$data['photo_category'] = $this->request->get_post('photo_category', 'integer');
-			
-			if( $this->request->has_post('photo_slider') ) {
-				$data['photo_slider'] = $this->request->get_post('photo_slider', 'integer');
-			} else {
-				$data['photo_slider'] = 0;
-			}	
-					
+			$data['photo_slider'] = ($this->request->has_post('photo_slider')) ? $this->request->get_post('photo_slider', 'integer') : 0;
+				
 			// adatbázis lekérdezés
 			$result = $this->photo_gallery_model->insert($data);
 		
@@ -131,82 +116,62 @@ class Photo_gallery extends Admin_controller {
 
 		if($this->request->has_post()) {
 			
-			$flag = false;
-		
-			if(isset($_FILES['upload_gallery_photo'])  && $_FILES['upload_gallery_photo']['tmp_name'] != '') {
+			if($this->request->checkFiles('upload_gallery_photo')) {
 			
-				$flag = true;
+				//képkezelő objektum létrehozása
+				$upload = new \System\Libs\Uploader($this->request->getFiles('upload_gallery_photo'));
 
-				//képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül)	
-				$handle = new \System\Libs\Upload($_FILES['upload_gallery_photo']);
+				$args = array(
+					'allowed' => array('image/*'),
+					'image_resize' => true,
+					'image_x' => $this->photo_width,
+					'image_ratio_y' => true,
+					'file_new_name_body' => md5(uniqid())
+				);
+				$filename = $upload->make($this->image_path, $args);
 
-				if ($handle->uploaded) {
-				
-					$handle->allowed = array('image/*');
-					
-					$random_number = md5(date('Y-m-d H:i:s:u'));
-				    $handle->jpeg_quality 			 = 80;
-					$handle->image_resize            = true;
-					$handle->image_ratio_y           = true;
-					$handle->image_x                 = $this->photo_width; //kép szélessége;
-					$handle->file_new_name_body = $random_number;
-								
-					//végrehajtás: kép átmozgatása végleges helyére
-					$handle->Process($this->image_path);
-					
-					$filename = $handle->file_dst_name;
+				if ($filename !== false) {
+					// thumbnail kép készítés
+					$args_thumb = array(
+						'image_resize'            => true,
+						'image_x'                 => $this->thumb_width,
+						'image_ratio_y'           => true,
+						'file_new_name_body' 	 =>  $upload->get('file_dst_name_body'),
+						'file_name_body_add' 	 =>  '_thumb'
+					);
+					$upload->make($this->image_path, $args_thumb);
 
-					if ($handle->processed) {
-						
-						$handle->jpeg_quality 			 = 80;						
-						$handle->image_resize            = true;
-						$handle->image_ratio_y           = true;
-						$handle->image_x                 = $this->thumb_width; // nézőkép szélessége
-						$handle->file_new_name_body =  $random_number . '_thumb';
-								
-						//végrehajtás: kép átmozgatása végleges helyére
-						$handle->Process($this->image_path);
-						$handle->clean();
-						
-					} else {
-	                    Message::set('error', 'Nem sikerült a feltöltés! Hiba: ' . $handle->error);
-						$this->response->redirect('admin/photo_gallery/update');
-					}
-		
 				} else {
-	                Message::set('error', 'Nem sikerült a feltöltés! Hiba: ' . $handle->error);
-					$this->response->redirect('admin/photo_gallery/update');
-				}		
-			}
-			
-			if ($flag) {
-				$data['photo_filename'] = $filename;
-			}	
-			$data['photo_caption'] = $this->request->get_post('photo_caption');
-			$data['photo_category'] = $this->request->get_post('photo_category', 'integer');
-			
-			if( $this->request->has_post('photo_slider') ) {
-				$data['photo_slider'] = $this->request->get_post('photo_slider', 'integer');
-			} else {
-				$data['photo_slider'] = 0;
-			} 
-
-			$old_img = $this->image_path . $this->request->get_post('old_photo');
-
-			// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
-			$result = $this->photo_gallery_model->update($id, $data);
-					
-			if($result !== false) {
-				if($flag){
-					$old_img_thumb = DI::get('url_helper')->thumbPath($old_img);
-					DI::get('file_helper')->delete(array($old_img, $old_img_thumb));
+                    Message::set('error', $upload->getError());
+					$this->response->redirect('admin/photo_gallery/update');					
 				}
-	            Message::set('success', 'photo_update_success');
-			} else {
-	            Message::set('error', 'unknown_error');
-			}
 
-			$this->response->redirect('admin/photo-gallery');
+
+				if (isset($filename)) {
+					$data['photo_filename'] = $filename;
+				}	
+				$data['photo_caption'] = $this->request->get_post('photo_caption');
+				$data['photo_category'] = $this->request->get_post('photo_category', 'integer');
+				$data['photo_slider'] = ($this->request->has_post('photo_slider')) ? $this->request->get_post('photo_slider', 'integer') : 0;
+
+				// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
+				$result = $this->photo_gallery_model->update($id, $data);
+						
+				if($result !== false) {
+					
+					if(isset($filename)){
+						$old_img = $this->image_path . $this->request->get_post('old_photo');
+						$old_img_thumb = DI::get('url_helper')->thumbPath($old_img);
+						DI::get('file_helper')->delete(array($old_img, $old_img_thumb));
+					}
+		            
+		            Message::set('success', 'photo_update_success');
+				} else {
+		            Message::set('error', 'unknown_error');
+				}
+
+				$this->response->redirect('admin/photo-gallery');
+			}
 		}
 		
 		$view = new View();

@@ -36,23 +36,17 @@ class Blog extends Admin_controller {
 		if( $this->request->has_post() ){
 
 			// kép feltöltése
-			if($this->request->checkFiles('upload_blog_picture')) {
-				$dest_image = $this->_uploadPicture($this->request->getFiles('upload_blog_picture'));
-				if ($dest_image === false) {
-					$this->response->redirect('admin/blog/insert');
-				}
-			} else {
-				$error = $this->request->getFilesError('upload_blog_picture');
-				Message::set('error', $error);
+			$dest_image = $this->_uploadPicture($this->request->getFiles('upload_blog_picture'));
+			if ($dest_image === false) {
 				$this->response->redirect('admin/blog/insert');
 			}
 
 			// az adatbázisba kerülő adatok
-			$data['blog_title'] = $this->request->get_post('blog_title');
-			$data['blog_body'] = $this->request->get_post('blog_body', 'strip_danger_tags');
-			$data['blog_picture'] = $dest_image;
-			$data['blog_category'] = $this->request->get_post('blog_category');
-			$data['blog_add_date'] = date('Y-m-d-G:i');
+			$data['title'] = $this->request->get_post('blog_title');
+			$data['body'] = $this->request->get_post('blog_body', 'strip_danger_tags');
+			$data['picture'] = $dest_image;
+			$data['category_id'] = $this->request->get_post('blog_category');
+			$data['add_date'] = date('Y-m-d-G:i');
 
 			// DB lekérdezés
 			$result = $this->blog_model->insert($data);
@@ -92,20 +86,20 @@ class Blog extends Admin_controller {
 			}
 
 		// az adatbázisba kerülő adatok
-			$data['blog_title'] = $this->request->get_post('blog_title');
-			$data['blog_body'] = $this->request->get_post('blog_body', 'strip_danger_tags');
+			$data['title'] = $this->request->get_post('blog_title');
+			$data['body'] = $this->request->get_post('blog_body', 'strip_danger_tags');
 			
 			// ha van új feltöltött kép
 			if(isset($dest_image)) {
 				$url_helper = DI::get('url_helper');
-				$data['blog_picture'] = $dest_image;
+				$data['picture'] = $dest_image;
 	            // régi kép adatai (ezt használjuk a régi kép törléséhez, ha új kép lett feltöltve)
 	            $old_img_path = Config::get('blogphoto.upload_path') . $this->request->get_post('old_img');
 	            $old_thumb_path = $url_helper->thumbPath($old_img_path);
 			}
 			
-			$data['blog_category'] = $this->request->get_post('blog_category');
-			$data['blog_add_date'] = date('Y-m-d-G:i');
+			$data['category_id'] = $this->request->get_post('blog_category');
+			$data['add_date'] = date('Y-m-d-G:i');
 
 		// adatbázis lekérdezés	
 			$result = $this->blog_model->update((int)$this->request->get_params('id'), $data);
@@ -132,8 +126,8 @@ class Blog extends Admin_controller {
 		$data['title'] = 'Admin blog oldal';
 		$data['description'] = 'Admin blog oldal description';	
 		$data['category_list'] = $this->blogcategory_model->selectCategory();
-		$data['content'] = $this->blog_model->selectBlog($this->request->get_params('id'));
-//$view->debug(true);		
+		$data['blog'] = $this->blog_model->selectBlog($this->request->get_params('id'));
+// $view->debug(true);		
 		$view->add_links(array('bootstrap-fileupload', 'ckeditor', 'vframework', 'blog_update'));
 		$view->render('blog/tpl_blog_update', $data);
 	}  
@@ -322,7 +316,7 @@ class Blog extends Admin_controller {
 
 				$photo_names = array();
 				foreach ($photo_names_temp as $key => $value) {
-					$photo_names[] = $value['blog_picture'];
+					$photo_names[] = $value['picture'];
 				}
 				unset($photo_names_temp);
 
@@ -397,7 +391,7 @@ class Blog extends Admin_controller {
 	 *	@param	array $files_array	$_FILES['valami']
 	 *	@return	string|false - képneve vagy false
 	 */
-	private function _uploadPicture($files_array)
+	private function _uploadPicture__OLD($files_array)
 	{
 		// uploader objektum létrehozása
 		$upload = new \System\Libs\Uploader($files_array);
@@ -443,5 +437,50 @@ class Blog extends Admin_controller {
 		// kép neve
 		return $dest_image;		
 	}	
+
+
+
+
+
+
+
+
+
+
+	/**
+	 *	Blog képet méretezi és tölti fel a szerverre (thumb képet is)
+	 *	(ez a metódus az update() és insert() metódusokban hívódik meg!)
+	 *
+	 *	@param	array $files_array	$_FILES['valami']
+	 *	@return	string|false - képneve vagy false
+	 */
+	private function _uploadPicture($files_array)
+	{
+		// uploader objektum létrehozása
+		$upload = new \System\Libs\Uploader($files_array);
+		// feltöltés helye
+		$upload_path = Config::get('blogphoto.upload_path');
+		// normál kép készítése
+		$args = array(
+			'file_new_name_body' => "blog_" . md5(uniqid()),
+			'image_resize' => true,
+			'image_x' => Config::get('blogphoto.width', 600),
+			'image_y' => Config::get('blogphoto.height', 400),
+			'thumb' => true,
+			'thumb_width' => Config::get('blogphoto.thumb_width', 150)
+		);
+		// feltöltött kép nevével tér vissza ez kerül be az adatbázisba (feltoltottkep.jpg)
+		$dest_image = $upload->makeImage($upload_path, $args);
+	
+		if ($dest_image === false) {
+			Message::set('error', $upload->getError());
+			return false;
+		}
+		// kép neve
+		return $dest_image;		
+	}	
+
+
+
 }
 ?>

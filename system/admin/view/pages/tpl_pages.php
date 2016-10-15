@@ -44,12 +44,12 @@
 						<tbody>
 							<?php foreach($all_pages as $page) { ?>
 							<tr class="odd gradeX">
-								<td><?php echo $page['page_id'];?></td>
-								<td><?php echo $page['page_title'];?></td>
-								<td><?php echo $page['page_metatitle'];?></td>
-								<td><?php echo $page['page_metadescription'];?></td>
+								<td><?php echo $page['id'];?></td>
+								<td><?php echo $page['title'];?></td>
+								<td><?php echo $page['metatitle'];?></td>
+								<td><?php echo $page['metadescription'];?></td>
 								<td>									
-									<a class="btn btn-sm grey-steel" href="admin/pages/update/<?php echo $page['page_id'];?>"><i class="fa fa-pencil"></i></a>
+									<a class="btn btn-sm grey-steel" href="admin/pages/update/<?php echo $page['id'];?>"><i class="fa fa-pencil"></i></a>
 								</td>
 							</tr>
 							<?php } ?>										

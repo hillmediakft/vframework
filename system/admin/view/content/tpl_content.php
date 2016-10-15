@@ -51,14 +51,14 @@
 							</thead>
 							<tbody>
 
-					<?php foreach($all_content as $value) { ?>
+					<?php foreach($all_content as $content) { ?>
 								<tr class="odd gradeX">
-									<td><?php echo $value['content_id'];?></td>
-									<td><?php echo $value['content_name'];?></td>
-									<td><?php echo $value['content_title'];?></td>
+									<td><?php echo $content['id'];?></td>
+									<td><?php echo $content['name'];?></td>
+									<td><?php echo $content['title'];?></td>
 										
 									<td>
-										<a class="btn btn-sm green" href="admin/content/edit/<?php echo $value['content_id'];?>" ><i class="fa fa-pencil"></i>
+										<a class="btn btn-sm green" href="admin/content/edit/<?php echo $content['id'];?>" ><i class="fa fa-pencil"></i>
 										Szerkeszt</a>
 									</td>
 								</tr>

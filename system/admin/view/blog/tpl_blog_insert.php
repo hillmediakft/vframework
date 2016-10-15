@@ -79,8 +79,8 @@
 								<div class="form-group">
 									<label for="blog_category">Kategória</label>
 									<select name="blog_category" class="form-control input-xlarge">
-									<?php foreach($category_list as $value) { ?>
-										<option value="<?php echo $value['category_id']?>"><?php echo $value['category_name']?></option>
+									<?php foreach($category_list as $category) { ?>
+										<option value="<?php echo $category['id']?>"><?php echo $category['category_name']?></option>
 									<?php } ?>
 									</select>
 								</div>

@@ -59,7 +59,7 @@ $config['slider'] = array(
 $config['photogallery'] = array(
     'width' => 800,
     'thumb_width' => 320,
-    'upload_path' => UPLOADS . 'photo_gallery/'
+    'upload_path' => UPLOADS . 'photo_gallery'
 );
 
 $config['hash_cost_factor'] = 10;

@@ -51,7 +51,7 @@
 							<div class="form-group">
 								<label class="control-label">Kép</label>
 								<div class="fileupload fileupload-new" data-provides="fileupload">
-									<div class="fileupload-new thumbnail" style="width: 200px; height: 150px;"><img src="<?php echo $this->getConfig('blogphoto.upload_path') . $content[0]['blog_picture'];?>" alt=""/></div>
+									<div class="fileupload-new thumbnail" style="width: 200px; height: 150px;"><img src="<?php echo $this->getConfig('blogphoto.upload_path') . $blog['picture'];?>" alt=""/></div>
 									<div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
 									<div>
 										<span class="btn default btn-file"><span class="fileupload-new">Kiválasztás</span><span class="fileupload-exists">Módosít</span><input id="uploadprofile" class="img" type="file" name="upload_blog_picture"></span>
@@ -67,26 +67,25 @@
 								Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!
 							</div>
 
-							<?php foreach($content as $value) { ?>
 								<div class="form-group">
 									<label for="blog_title" class="control-label">Cím</label>
-									<input type="text" name="blog_title" id="blog_title" value="<?php echo $value['blog_title'];?>" class="form-control input-xlarge" />
+									<input type="text" name="blog_title" id="blog_title" value="<?php echo $blog['title'];?>" class="form-control input-xlarge" />
 								</div>
 								<div class="form-group">
 									<label for="blog_text" class="control-label">Szöveg</label>
-									<textarea name="blog_body" id="blog_body" class="form-control input-xlarge"><?php echo $value['blog_body'];?></textarea>
+									<textarea name="blog_body" id="blog_body" class="form-control input-xlarge"><?php echo $blog['body'];?></textarea>
 								</div>
 								<div class="form-group">
 									<label for="blog_category">Kategória</label>
 									<select name="blog_category" class="form-control input-xlarge">
-								<?php foreach($category_list as $v) { ?>
-										<option value="<?php echo $v['category_id']?>" <?php echo ($value['category_name'] == $v['category_name']) ? "selected" : "";?>><?php echo $v['category_name']?></option>
-								<?php } ?>
+									<?php foreach($category_list as $category) { ?>
+										<option value="<?php echo $category['id']?>" <?php echo ($blog['category_name'] == $category['category_name']) ? "selected" : "";?>><?php echo $category['category_name']?></option>
+									<?php } ?>
 									</select>
 								</div>
-							<?php } ?>
+
 								<!-- régi kép elérési útja-->
-                            	<input type="hidden" name="old_img" id="old_img" value="<?php echo $content[0]['blog_picture']; ?>">
+                            	<input type="hidden" name="old_img" id="old_img" value="<?php echo $blog['picture']; ?>">
 							</div>
 							
 						</div>	

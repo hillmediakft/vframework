@@ -6,7 +6,6 @@ use System\Core\Admin_model;
 class BlogCategory_model extends Admin_model {
 
 	protected $table = 'blog_category';	
-	protected $id = 'category_id';	
 
 	function __construct()
 	{
@@ -23,7 +22,7 @@ class BlogCategory_model extends Admin_model {
 	{
 		if(!is_null($id)){
 			$id = (int)$id;
-			$this->query->set_where('category_id', '=', $id); 
+			$this->query->set_where('id', '=', $id); 
 		}
 		return $this->query->select(); 
 	}
@@ -33,7 +32,7 @@ class BlogCategory_model extends Admin_model {
 	 */
  	public function deleteCategory($id)
 	{
-		return $this->query->delete('category_id', '=', $id);
+		return $this->query->delete('id', '=', $id);
 	}
 
 	/**
@@ -41,7 +40,7 @@ class BlogCategory_model extends Admin_model {
 	 */
  	public function updateCategory($id, $name)
  	{
-		$this->query->set_where('category_id', '=', $id);
+		$this->query->set_where('id', '=', $id);
 		return $this->query->update(array('category_name' => $name));
  	}
 

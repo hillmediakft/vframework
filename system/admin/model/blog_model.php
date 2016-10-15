@@ -6,7 +6,6 @@ use System\Core\Admin_model;
 class Blog_model extends Admin_model {
 
 	protected $table = 'blog';	
-	protected $id = 'blog_id';	
 
 	function __construct()
 	{
@@ -21,14 +20,18 @@ class Blog_model extends Admin_model {
 	 */
 	public function selectBlog($id = null)
 	{
-		$this->query->set_columns(array('blog.blog_id','blog.blog_title','blog.blog_body','blog.blog_picture','blog.blog_add_date', 'blog_category.category_name')); 
-		$this->query->set_join('left', 'blog_category', 'blog.blog_category', '=', 'blog_category.category_id'); 
+		$this->query->set_columns(array('blog.id','blog.title','blog.body','blog.picture','blog.add_date', 'blog_category.category_name')); 
+		$this->query->set_join('left', 'blog_category', 'blog.category_id', '=', 'blog_category.id'); 
+		
 		if(!is_null($id)){
 			$id = (int)$id;
-			$this->query->set_where('blog.blog_id', '=', $id); 
-		}
+			$this->query->set_where('blog.id', '=', $id); 
+			$result = $this->query->select(); 
+			return $result[0];
 
-		return $this->query->select(); 
+		} else {
+			return $this->query->select(); 
+		}
 	}
 
 	/**
@@ -36,7 +39,7 @@ class Blog_model extends Admin_model {
 	 */
 	public function categoryCounter()
 	{
-		$this->query->set_columns('blog_category');
+		$this->query->set_columns('category_id');
 		return $this->query->select(); 
 	}
    
@@ -53,7 +56,7 @@ class Blog_model extends Admin_model {
 	 */
 	public function update($id, $data)
 	{
-		$this->query->set_where('blog_id','=', $id);
+		$this->query->set_where('id','=', $id);
 		return $this->query->update($data);
 	}
 	
@@ -62,7 +65,7 @@ class Blog_model extends Admin_model {
 	 */
 	public function delete($value)
 	{
-		return $this->query->delete('blog_id', '=', $value);
+		return $this->query->delete('id', '=', $value);
 	}
 
  	/**
@@ -70,7 +73,7 @@ class Blog_model extends Admin_model {
  	 */
 	public function deleteWhereCategory($id)
  	{
-		return $this->query->delete('blog_category', '=', $id);
+		return $this->query->delete('category_id', '=', $id);
  	}
 
 	/**
@@ -78,10 +81,10 @@ class Blog_model extends Admin_model {
 	 */
 	public function selectPicture($id)
 	{
-		$this->query->set_columns(array('blog_picture'));
-		$this->query->set_where('blog_id', '=', $id);
+		$this->query->set_columns(array('picture'));
+		$this->query->set_where('id', '=', $id);
 		$result = $this->query->select();
-		return $result[0]['blog_picture'];
+		return $result[0]['picture'];
 	}
 
 	/**
@@ -89,8 +92,8 @@ class Blog_model extends Admin_model {
 	 */
 	public function selectPictureWhereCategory($category)
 	{
-		$this->query->set_columns(array('blog_picture'));
-		$this->query->set_where('blog_category', '=', $category);
+		$this->query->set_columns(array('picture'));
+		$this->query->set_where('category_id', '=', $category);
 		return $this->query->select();
 	}
 

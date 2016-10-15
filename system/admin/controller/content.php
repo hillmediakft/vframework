@@ -34,8 +34,8 @@ class Content extends Admin_controller {
 
 		if($this->request->has_post('submit_update_content')) {
 		
-			$data['content_title'] = $this->request->get_post('content_title');
-			$data['content_body'] = $this->request->get_post('content_body', 'strip_danger_tags');
+			$data['title'] = $this->request->get_post('content_title');
+			$data['body'] = $this->request->get_post('content_body', 'strip_danger_tags');
 
 			$result = $this->content_model->update($id, $data);
 					

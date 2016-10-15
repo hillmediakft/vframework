@@ -5,7 +5,6 @@ use System\Core\Admin_model;
 class Languages_model extends Admin_model {
 
 	protected $table = 'languages';
-	protected $id = 'text_id';
 
 	/**
      * Constructor, létrehozza az adatbáziskapcsolatot
@@ -23,7 +22,7 @@ class Languages_model extends Admin_model {
 
 	public function updateLang($id, $column, $text)
 	{
-		$this->query->set_where('text_id', '=', $id);
+		$this->query->set_where('id', '=', $id);
 		return $this->query->update(array($column => $text));
 	}
 

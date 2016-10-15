@@ -34,25 +34,25 @@
 							<div class="portlet-body">
 
 								
-								<h2 class='cim1'><?php echo $content['content_title'];?> szerkesztése</h2>
+								<h2 class='cim1'><?php echo $content['title'];?> szerkesztése</h2>
 								<br />
 								<form action='' name='update_content_form' id='update_content_form' method='POST'>
 									
-									<input type="hidden" name="content_id" id="content_id" value="<?php echo $content['content_id'] ?>">
+									<input type="hidden" name="content_id" id="content_id" value="<?php echo $content['id'] ?>">
 									
 									<div class="form-group">
-										<label for="content_name">A tartalmi elem neve</label>	
-										<input type="text" name="content_name" class="form-control input-large" disabled value="<?php echo $content['content_name'];?>"/>
+										<label for="name">A tartalmi elem neve</label>	
+										<input type="text" name="name" class="form-control input-large" disabled value="<?php echo $content['name'];?>"/>
 									</div>
 									
 									<div class="form-group">
-										<label for="content_title">A tartalmi elem megnevezése</label>	
-										<input type='text' name='content_title' class='form-control input-large' value="<?php echo $content['content_title'];?>"/>
+										<label for="title">A tartalmi elem megnevezése</label>	
+										<input type='text' name='title' class='form-control input-large' value="<?php echo $content['title'];?>"/>
 									</div>
 									
 									<div class="form-group">
-										<label for="content_body">Tartalom</label>
-										<textarea type='text' name='content_body' class='form-control'><?php echo $content['content_body'] ?></textarea>
+										<label for="body">Tartalom</label>
+										<textarea type='text' name='body' class='form-control'><?php echo $content['body'] ?></textarea>
 									</div>
 									
 

@@ -37,47 +37,38 @@ class Clients extends Admin_controller {
     {
         if ( $this->request->has_post() ) {
            
-            $data = $this->request->get_post();
-        
-            if(isset($data['submit_new_client'])){
-                unset($data['submit_new_client']);
-            }
+            $img_url = $this->request->get_post('img_url');
+            $data['name'] = $this->request->get_post('client_name');
+            $data['link'] = $this->request->get_post('client_link');
+            $data['photo'] = str_replace(Config::get('clientphoto.upload_path'), '', $img_url);
+            $data['client_order'] = ($this->client_model->highest_order_number()) + 1;
 
             $error_counter = 0;
             //megnevezés ellenőrzése    
-            if (empty($data['client_name'])) {
+            if ($data['name'] === '') {
                 $error_counter++;
                 Message::set('error', 'A partner neve nem lehet üres!');
             }
-            if (empty($data['img_url'])) {
+            if ($img_url === '') {
                 $error_counter++;
                 Message::set('error', 'töltsön fel logót!');
             }
-
-            if (isset($data['img_url']) && $data['img_url'] != '') {
-                $data['client_photo'] = str_replace(Config::get('clientphoto.upload_path'), '', $data['img_url']);
-            }
-            unset($data['img_url']);
-
-            $data['client_order'] = ($this->client_model->highest_order_number()) + 1;
-
-            if ($error_counter == 0) {
-                // új adatok az adatbázisba
-                $result = $this->client_model->insert($data);
-
-                if ($result !== false) {
-                    Message::set('success', 'Partner sikeresen hozzáadva.');
-                    $this->response->redirect('admin/clients');
-                } else {
-                    Message::set('error', 'unknown_error');
-                    $this->response->redirect('admin/clients/insert');
-                }
-                
-            } else {
-                // nem volt minden kötelező mező kitöltve
+            if ($error_counter > 0) {
                 $this->response->redirect('admin/clients/insert');
             }
+
+            // új adatok az adatbázisba
+            $result = $this->client_model->insert($data);
+
+            if ($result !== false) {
+                Message::set('success', 'Partner sikeresen hozzáadva.');
+            } else {
+                Message::set('error', 'unknown_error');
+            }
+
+            $this->response->redirect('admin/clients');
         }
+
 
         $view = new View();
 
@@ -182,62 +173,47 @@ class Clients extends Admin_controller {
         
         if ($this->request->has_post()) {
 
-            $data = $this->request->get_post();
-            unset($data['submit_update_client']);
+            $img_url = $this->request->get_post('img_url');
+            $old_img = $this->request->get_post('old_img');
+            $data['name'] = $this->request->get_post('client_name');
+            $data['link'] = $this->request->get_post('client_link');
 
-            $error_counter = 0;
             //megnevezés ellenőrzése    
-            if (empty($data['client_name'])) {
-                $error_counter++;
+            if ($data['name'] === '') {
                 Message::set('error', 'A partner neve nem lehet üres!');
-            }
-            if (empty($data['client_link'])) {
-                $error_counter++;
-                Message::set('error', 'Adjon meg linket!');
-            }
-
-            if ($error_counter == 0) {
-                if (isset($data['img_url']) && $data['img_url'] != '') {
-                    // új képet töltöttünk fel
-                    $data['client_photo'] = str_replace(Config::get('clientphoto.upload_path'), '', $data['img_url']);
-                    $old_img = $data['old_img'];
-                    $img_to_delete = true;
-                } else {
-                    // nincs úf feltöltött kép
-                    $data['client_photo'] = str_replace(Config::get('clientphoto.upload_path'), '', $data['old_img']);
-                    $img_to_delete = false;
-                }
-                unset($data['img_url']);
-                unset($data['old_img']);
-
-                // új adatok az adatbázisba
-                $result = $this->client_model->update($id, $data);
-
-                if ($result !== false) {
-                    // megvizsgáljuk, hogy létezik-e új feltöltött kép és a régi kép, nem a default
-                    if ($img_to_delete) {
-                        // régi kép törlése
-                        DI::get('file_helper')->delete($old_img);
-                    }
-                    Message::set('success', 'Partner adatai módosítva!');
-                } else {
-                    Message::set('error', 'unknown_error');
-                }
-            
-                $this->response->redirect('admin/clients');
-            
-            } else {
-                // ha valamilyen hiba volt a form adataiban
                 $this->response->redirect('admin/clients/update/' . $id);
-                //$this->response->redirectBack();
             }
+
+            if ($img_url !== '') {
+                // új képet töltöttünk fel
+                $data['photo'] = str_replace(Config::get('clientphoto.upload_path'), '', $img_url);
+            } else {
+                // nincs úf feltöltött kép
+                $img_url = false;
+            }
+
+            // új adatok az adatbázisba
+            $result = $this->client_model->update($id, $data);
+
+            if ($result !== false) {
+                // ha létezik-e új feltöltött kép, akkor törüljük a régi képet
+                if ($img_url !== false) {
+                    DI::get('file_helper')->delete($old_img);
+                }
+                Message::set('success', 'Partner adatai módosítva!');
+            } else {
+                Message::set('error', 'unknown_error');
+            }
+        
+            $this->response->redirect('admin/clients');
         }
+
 
         $view = new View();
 
         $data['title'] = 'Partner módosítása oldal';
         $data['description'] = 'Partner módosítása description';
-        $data['actual_client'] = $this->client_model->oneClient($this->request->get_params('id'));
+        $data['client'] = $this->client_model->oneClient($this->request->get_params('id'));
 
         $view->add_links(array('bootstrap-fileupload', 'croppic', 'vframework', 'client_update'));
         $view->render('clients/tpl_client_update', $data);

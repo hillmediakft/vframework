@@ -16,9 +16,10 @@ define('CONFIG', APP_DIR . '/config'); //config mappa
 define('MESSAGE', APP_DIR . '/message'); //message mappa
 define('ADMIN', APP_DIR . '/admin'); //admin mappa
 define('SITE', APP_DIR . '/site'); //site mappa
+//define('UPLOADS', 'uploads' . DS); //uploads mappa
 define('UPLOADS', 'uploads/'); //uploads mappa
 
-define('SITE_ASSETS', 'public/site_assets/');
+define('SITE_ASSETS', 'public/site_assets/' );
 define('SITE_CSS', 'public/site_assets/css/');
 define('SITE_JS', 'public/site_assets/js/');
 define('SITE_IMAGE', 'public/site_assets/image/');

@@ -113,7 +113,7 @@ class View {
 	/**
 	 * Debug lefuttatása
 	 */
-	private function _runDebug($data)
+	private function _runDebug($data, $par1 = true)
 	{
 		echo <<<HTML
 			<!DOCTYPE html>
@@ -124,23 +124,14 @@ class View {
 			</head>
 			<body>
 HTML;
-		echo "<h2>A template-be helyezhető változók: </h2><pre style='background:#DDDDDD; border:1px solid #AAAAAA; padding:10px'>";
-			if($par1 == true) {
-				print_r($this->vars);
-				echo "<hr>";
-				print_r($data);
-
-			} else {
-				print_r(array_keys($this->vars));
-				echo "<hr>";
-				print_r($data);
-			}
+		echo "<h2>A template változói: </h2><pre style='background:#DDDDDD; border:1px solid #AAAAAA; padding:10px'>";
+		print_r($data);
 		echo "</pre>";
 		echo "<h2>CSS linkek: </h2><div style='background:#DDDDDD; border:1px solid #AAAAAA; padding:10px'>";
-				var_dump($this->css_link);
+			var_dump($this->css_link);
 		echo "</div>";
 		echo "<h2>JS linkek: </h2><div style='background:#DDDDDD; border:1px solid #AAAAAA; padding:10px'>";
-				var_dump($this->js_link);
+			var_dump($this->js_link);
 		echo "</div></body></html>";
 		die();			
 	}
@@ -266,7 +257,7 @@ HTML;
 
 			// DEBUG elindítása
 			if ($this->debug_flag) {
-				$this->_runDebug();
+				$this->_runDebug($data);
 			}
 
 		if ($this->lazy_render) {

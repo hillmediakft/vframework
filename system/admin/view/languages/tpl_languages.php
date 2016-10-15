@@ -41,19 +41,19 @@
 								<th>Angol</th>
 								<th>Német</th>
 							<tbody>
-								<?php foreach($languages as $value) { ?>			
+								<?php foreach($languages as $language) { ?>			
 								<tr>
 									<td style="width:15%">
-										 <?php echo $value['text_code'];?>
+										 <?php echo $language['code'];?>
 									</td>
 									<td style="width:28%">
-										<a href="admin/languages#" class="xedit" id="<?php echo $value['text_code'];?>_hu" data-type="text" data-pk="<?php echo $value['text_id'];?>" data-title="Írja be a szöveget"><?php echo $value['text_hu'];?></a>
+										<a href="admin/languages#" class="xedit" id="<?php echo $language['code'];?>_hu" data-type="text" data-pk="<?php echo $language['id'];?>" data-title="Írja be a szöveget"><?php echo $language['text_hu'];?></a>
 									</td>
 									<td style="width:27%">
-										<a href="admin/languages#" class="xedit" id="<?php echo $value['text_code'];?>_en" data-type="text" data-pk="<?php echo $value['text_id'];?>" data-title="Írja be a szöveget"><?php echo $value['text_en'];?></a>
+										<a href="admin/languages#" class="xedit" id="<?php echo $language['code'];?>_en" data-type="text" data-pk="<?php echo $language['id'];?>" data-title="Írja be a szöveget"><?php echo $language['text_en'];?></a>
 									</td>
 									<td style="width:27%">
-										<a href="admin/languages#" class="xedit" id="<?php echo $value['text_code'];?>_de" data-type="text" data-pk="<?php echo $value['text_id'];?>" data-title="Írja be a szöveget"><?php echo $value['text_de'];?></a>
+										<a href="admin/languages#" class="xedit" id="<?php echo $language['code'];?>_de" data-type="text" data-pk="<?php echo $language['id'];?>" data-title="Írja be a szöveget"><?php echo $language['text_de'];?></a>
 									</td>
 								</tr>
 								<?php } ?>	

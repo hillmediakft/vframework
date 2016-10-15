@@ -46,15 +46,15 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($all_client as $value) { ?>
+                            <?php foreach ($all_client as $client) { ?>
                                 <tr class="odd gradeX">
 
-                                    <td><?php echo $value['client_order']; ?></td>
-                                    <td><?php echo $value['client_id']; ?></td>
+                                    <td><?php echo $client['client_order']; ?></td>
+                                    <td><?php echo $client['id']; ?></td>
                                     <td class="sortable_mover"><i class="fa fa-arrows"></i></td>
-                                    <td><img src="<?php echo (!empty($value['client_photo'])) ? $this->getConfig('clientphoto.upload_path') . $value['client_photo'] : $this->getConfig('clientphoto.default_photo'); ?>"/></td>
-                                    <td><?php echo $value['client_name'];?></td>
-                                    <td><?php echo $value['client_link']; ?></td>
+                                    <td><img src="<?php echo (!empty($client['photo'])) ? $this->getConfig('clientphoto.upload_path') . $client['photo'] : $this->getConfig('clientphoto.default_photo'); ?>"/></td>
+                                    <td><?php echo $client['name'];?></td>
+                                    <td><?php echo $client['link']; ?></td>
                                     <td>
 
                                         <div class="actions">
@@ -64,11 +64,11 @@
                                                 </a>
                                                 <ul class="dropdown-menu pull-right">
                                                     <?php if (1) { ?>   
-                                                        <li><a href="<?php echo 'admin/clients/update/' . $value['client_id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
+                                                        <li><a href="<?php echo 'admin/clients/update/' . $client['id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
                                                     <?php }; ?>
 
                                                     <?php if (1) { ?>   
-                                                        <li><a class="delete_item" data-id="<?php echo $value['client_id']; ?>"> <i class="fa fa-trash"></i> Töröl</a></li>
+                                                        <li><a class="delete_item" data-id="<?php echo $client['id']; ?>"> <i class="fa fa-trash"></i> Töröl</a></li>
                                                     <?php }; ?>
                                                 </ul>
                                             </div>

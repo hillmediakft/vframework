@@ -2,6 +2,7 @@
 namespace System\Admin\Controller;
 use System\Core\Admin_controller;
 use System\Core\View;
+use System\Libs\Message;
 
 class Pages extends Admin_controller {
 
@@ -32,10 +33,10 @@ class Pages extends Admin_controller {
 
 		if($this->request->has_post()) {
 			
-			$data['page_body'] = $this->request->get_post('page_body');
-			$data['page_metatitle'] = $this->request->get_post('page_metatitle');
-			$data['page_metadescription'] = $this->request->get_post('page_metadescription');
-			$data['page_metakeywords'] = $this->request->get_post('page_metakeywords');
+			$data['body'] = $this->request->get_post('page_body', 'strip_danger_tags');
+			$data['metatitle'] = $this->request->get_post('page_metatitle');
+			$data['metadescription'] = $this->request->get_post('page_metadescription');
+			$data['metakeywords'] = $this->request->get_post('page_metakeywords');
 
 			// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
 			$result = $this->pages_model->update($id, $data);

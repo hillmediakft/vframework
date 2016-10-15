@@ -5,7 +5,6 @@ use System\Core\Admin_model;
 class Pages_model extends Admin_model {
 
 	protected $table = 'pages';
-	protected $id = 'page_id';
 
 	/**
      * Constructor, létrehozza az adatbáziskapcsolatot
@@ -28,7 +27,7 @@ class Pages_model extends Admin_model {
 	 */
 	public function onePage($id)
 	{
-		$this->query->set_where('page_id', '=', $id);
+		$this->query->set_where('id', '=', $id);
 		$result = $this->query->select();
 		return $result[0];
 	}
@@ -38,7 +37,7 @@ class Pages_model extends Admin_model {
 	 */
 	public function update($id, $data)
 	{
-		$this->query->set_where('page_id', '=', $id);
+		$this->query->set_where('id', '=', $id);
 		return $this->query->update($data);		
 	}
 		

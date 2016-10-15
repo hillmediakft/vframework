@@ -6,7 +6,6 @@ use System\Core\Admin_model;
 class Client_model extends Admin_model {
 
     protected $table = 'clients';
-    protected $id = 'client_id';
 
     /**
      * Constructor, létrehozza az adatbáziskapcsolatot
@@ -21,7 +20,7 @@ class Client_model extends Admin_model {
      */
     public function oneClient($id) {
         $id = (int) $id;
-        $this->query->set_where('client_id', '=', $id);
+        $this->query->set_where('id', '=', $id);
         $result = $this->query->select();
         return $result[0];
     }
@@ -49,7 +48,7 @@ class Client_model extends Admin_model {
      */
     public function update($id, $value)
     {
-        $this->query->set_where('client_id', '=', $id);
+        $this->query->set_where('id', '=', $id);
         $result = $this->query->update($value);
     }
 
@@ -58,7 +57,7 @@ class Client_model extends Admin_model {
      */
     public function delete($id)
     {
-        return $this->query->delete('client_id', '=', $id);        
+        return $this->query->delete('id', '=', $id);        
     }
 
     /**
@@ -66,10 +65,10 @@ class Client_model extends Admin_model {
      */
     public function selectPicture($id)
     {
-        $this->query->set_columns(array('client_photo'));
-        $this->query->set_where('client_id', '=', $id);
+        $this->query->set_columns(array('photo'));
+        $this->query->set_where('id', '=', $id);
         $result = $this->query->select();
-        return $result[0]['client_photo'];
+        return $result[0]['photo'];
     }
 
     /**
@@ -90,7 +89,7 @@ class Client_model extends Admin_model {
      */
     public function order($id, $new_order)
     {
-        $this->query->set_where('client_id', '=', $id);
+        $this->query->set_where('id', '=', $id);
         $this->query->update(array('client_order' => $new_order));        
     }
 

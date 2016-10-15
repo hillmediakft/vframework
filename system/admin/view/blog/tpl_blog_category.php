@@ -69,15 +69,15 @@
 								</tr>
 							</thead>
 							<tbody>
-							<?php foreach($all_blog_category as $value) { ?>
-								<tr data-id="<?php echo $value['category_id'];?>">
+							<?php foreach($all_blog_category as $category) { ?>
+								<tr data-id="<?php echo $category['id'];?>">
 									
-									<td><?php echo $value['category_name'];?></td>
+									<td><?php echo $category['category_name'];?></td>
 										<?php
 										// megszámoljuk, hogy az éppen aktuális kategóriának mennyi eleme van a blog tábla blog_category oszlopában
 										$counter = 0;
-										foreach($category_counter as $v) {
-											if($value['category_id'] == $v['blog_category']) {
+										foreach($category_counter as $blog) {
+											if($category['id'] == $blog['category_id']) {
 												$counter++;
 											}
 										}

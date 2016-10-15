@@ -173,6 +173,11 @@ class Uploader
 	private $handle;
 
 	/**
+	 * A thumbnail kép feltöltő objektumát tartalmazza
+	 */
+	private $handle_thumb;
+
+	/**
 	 * Feltöltött kép képaránya
 	 */
 	private $ratio;
@@ -257,6 +262,20 @@ class Uploader
 		$this->ratio = null;
 	}
 
+/*
+	public function save($path)
+	{
+		$this->handle->Process($path);
+		
+		if ($this->handle->processed) {
+			// ha nincs hiba visszaadja a feltöltött file nevét
+			return $this->handle->file_dst_name;
+		} else {
+            $this->setError($this->handle->error);
+			return false;
+		}
+	}
+*/
 
 	/**
 	 * A feltöltött kép paramétereinek megadása és végleges helyre mozgatása
@@ -290,6 +309,53 @@ class Uploader
 	public function make($path, array $args)
 	{
 		if ($this->handle->uploaded) {
+			// beállítások megadása az args tömb alapján
+			foreach ($args as $key => $value)
+			{
+				$this->handle->$key = $value;
+			}
+
+			$this->handle->Process($path);
+			
+			if ($this->handle->processed) {
+				// ha nincs hiba visszaadja a feltöltött file nevét
+				return $this->handle->file_dst_name;
+			} else {
+	            $this->setError($this->handle->error);
+				return false;
+			}
+		} else {
+            $this->setError($this->handle->error);
+			return false;			
+		}
+	}
+
+	/**
+	 * Kép feltöltése
+	 */
+	public function makeImage($path, array $args)
+	{
+		if ($this->handle->uploaded) {
+			
+			$thumb = false;
+			if (isset($args['thumb'])) {
+				$thumb = (bool)$args['thumb'];
+				unset($args['thumb']);
+			}
+			if (isset($args['thumb_width'])) {
+				$thumb_width = (int)$args['thumb_width'];
+				unset($args['thumb_width']);
+			}
+			if (isset($args['thumb_height'])) {
+				$thumb_height = (int)$args['thumb_height'];
+				unset($args['thumb_height']);
+			}
+			if (isset($args['thumb_path'])) {
+				$thumb_path = $args['thumb_path'];
+				unset($args['thumb_path']);
+			}
+
+			$this->handle->allowed = array('image/*');
 
 			// beállítások megadása az args tömb alapján
 			foreach ($args as $key => $value)
@@ -297,15 +363,51 @@ class Uploader
 				$this->handle->$key = $value;
 			}
 
-			// képarány meghatározása az első képnél
-			if (is_null($this->ratio)) {
-				$this->ratio = $this->handle->image_x / $this->handle->image_y;
-			}
-
+			// kép készítése és feltöltése		
 			$this->handle->Process($path);
+
 			if ($this->handle->processed) {
-				// ha nincs hiba visszaadja a feltöltött file nevét
-				return $this->handle->file_dst_name;
+				
+				// feltöltött file neve
+				$filename = $this->handle->file_dst_name;
+				// nézőkép készítése
+				if ($thumb) {
+					// file elérési útja amiről a nézőképet csináljuk
+					$filepath = $this->handle->file_dst_pathname;
+					// eredeti fájl neve kiterjesztés nélkül
+					$filenamebody = $this->handle->file_dst_name_body;
+
+					$this->handle_thumb = new Upload($filepath);
+					$this->handle_thumb->file_new_name_body = $filenamebody;
+					$this->handle_thumb->file_name_body_add = '_thumb';
+					$this->handle_thumb->image_resize = true;
+					if (isset($thumb_width)) {
+						$this->handle_thumb->image_x = $thumb_width;
+						$this->handle_thumb->image_ratio_y = true;
+					}
+					else if (isset($thumb_height)) {
+						$this->handle_thumb->image_y = $thumb_height;
+						$this->handle_thumb->image_ratio_x = true;
+					}
+					// default, ha nem adunk meg thumb méretet
+					else {
+						$this->handle_thumb->image_x = 150;
+						$this->handle_thumb->image_ratio_y = true;
+					}
+					// nézőkép feltöltési helye, ha külön megadtuk
+					if (isset($thumb_path)) {
+						$path = $thumb_path;
+					}
+
+					$this->handle_thumb->Process($path);
+					
+					// if ($this->handle_thumb->processed) {	}
+					$this->handle_thumb = null;
+				}
+
+				// kép nevét adja vissza
+				return $filename;
+
 			} else {
 	            $this->setError($this->handle->error);
 				return false;
@@ -318,7 +420,25 @@ class Uploader
 	}
 
 	/**
-	 * Képek törlése a szerver temp könyvtárából
+	 * A feltöltött kép képarányát állítja be a ratio változóba
+	 */
+	public function setRatio()
+	{
+		if ($this->isImage()) {
+			$this->ratio = $this->handle->image_x / $this->handle->image_y;
+		}
+	}
+
+	/**
+	 * Lenullázza az objektum $handle tulajdonságát, ami az upload objektumot tartalamazza
+	 */
+	public function clearHandle()
+	{
+		$this->handle = null;
+	}
+
+	/**
+	 * Fájlok törlése a szerver temp könyvtárából
 	 */
 	public function cleanTemp()
 	{
@@ -329,5 +449,55 @@ class Uploader
 	{
 		$this->cleanTemp();
 	}
+
+
+//----------------------------------------------
+
+	/**
+	 * 
+	 */
+	public function forge($file)
+	{
+		return new Upload($file);
+	}
+
+	/**
+	 * 
+	 */
+	public function makefile($file, array $args)
+	{
+		$this->handle = $this->forge($file);	
+
+		if (!$this->handle->uploaded) {
+            $this->setError($this->handle->error);
+			return false;	
+		}	
+		
+		// beállítások megadása az args tömb alapján
+		foreach ($args as $key => $value)
+		{
+			$this->handle->$key = $value;
+		}
+
+	}
+
+	/**
+	 * 
+	 */
+	public function save($path)
+	{
+		$this->handle->Process($path);
+		
+		if ($this->handle->processed) {
+			// ha nincs hiba visszaadja a feltöltött file nevét
+			return $this->handle->file_dst_name;
+		} else {
+            $this->setError($this->handle->error);
+			return false;
+		}		
+	}
+
+
+
 }
 ?>
