@@ -259,7 +259,7 @@ class Uploader
 	 */
 	public function setRatio()
 	{
-		if ($this->isImage()) {
+		if ($this->isImage() && is_null($this->ratio)) {
 			$this->ratio = $this->handle->image_x / $this->handle->image_y;
 		}
 	}
