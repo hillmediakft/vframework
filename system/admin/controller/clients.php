@@ -86,27 +86,20 @@ class Clients extends Admin_controller {
     {
         if($this->request->is_ajax()){
             if(Auth::hasAccess('client_delete')){
-                // a POST-ban kapott user_id egy string ami egy szám vagy számok felsorolása pl.: "23" vagy "12,45,76" 
-                $id_string = $this->request->get_post('item_id');
-
-             // a sikeres törlések számát tárolja
+                // a POST-ban kapott item_id egy tömb
+                $id_arr = $this->request->get_post('item_id');
+                // a sikeres törlések számát tárolja
                 $success_counter = 0;
                 // a sikeresen törölt id-ket tartalmazó tömb
                 $success_id = array();      
                 // a sikertelen törlések számát tárolja
                 $fail_counter = 0; 
-
-                // a paraméterként kapott stringből tömböt csinálunk a , karakter mentén
-                $id_arr = explode(',', $id_string);
-                
-
+                // file helper példányosítás
                 $file_helper = DI::get('file_helper');
                 
-                // bejárjuk a $id_arr tömböt és minden elemen végrehajtjuk a törlést
                 foreach($id_arr as $id) {
                     //átalakítjuk a integer-ré a kapott adatot
                     $id = (int)$id;
-
                     //lekérdezzük a törlendő kép nevét, hogy törölhessük a szerverről
                     $photo_name = $this->client_model->selectPicture($id);
                     //rekord törlése  
@@ -117,10 +110,8 @@ class Clients extends Admin_controller {
                         if($result > 0){
                             //ha van feltöltött képe (az adatbázisban szerepel a file-név)
                             if(!empty($photo_name)){
-                                    
-                                $picture_path = Config::get('clientphoto.upload_path') . $photo_name;
                                 //kép file törlése a szerverről
-                                $file_helper->delete($picture_path);
+                                $file_helper->delete(Config::get('clientphoto.upload_path') . $photo_name);
                             }               
                             //sikeres törlés
                             $success_counter += $result;

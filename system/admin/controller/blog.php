@@ -5,6 +5,7 @@ use System\Core\View;
 use System\Libs\DI;
 use System\Libs\Message;
 use System\Libs\Config;
+use System\Libs\Uploader;
 
 class Blog extends Admin_controller {
 
@@ -36,10 +37,18 @@ class Blog extends Admin_controller {
 		if( $this->request->has_post() ){
 
 			// kép feltöltése
-			$dest_image = $this->_uploadPicture($this->request->getFiles('upload_blog_picture'));
-			if ($dest_image === false) {
+			if ($this->request->checkFiles('upload_blog_picture')) {
+				
+				$dest_image = $this->_uploadPicture($this->request->getFiles('upload_blog_picture'));
+				
+				if ($dest_image === false) {
+					$this->response->redirect('admin/blog/insert');
+				}
+			} else {
+				Message::set('error', $this->request->getFilesError('upload_blog_picture'));
 				$this->response->redirect('admin/blog/insert');
 			}
+
 
 			// az adatbázisba kerülő adatok
 			$data['title'] = $this->request->get_post('blog_title');
@@ -139,8 +148,8 @@ class Blog extends Admin_controller {
 	{
         if($this->request->is_ajax()){
 	        if(1){
-	        	// a POST-ban kapott user_id egy string ami egy szám vagy számok felsorolása pl.: "23" vagy "12,45,76" 
-	        	$id_string = $this->request->get_post('item_id');
+	        	// a POST-ban kapott item_id egy tömb
+	        	$id_arr = $this->request->get_post('item_id');
 				// a sikeres törlések számát tárolja
 				$success_counter = 0;
 		        // a sikeresen törölt id-ket tartalmazó tömb
@@ -148,7 +157,7 @@ class Blog extends Admin_controller {
 				// a sikertelen törlések számát tárolja
 				$fail_counter = 0; 
 		        // a paraméterként kapott stringből tömböt csinálunk a , karakter mentén
-		        $id_arr = explode(',', $id_string);
+		        //$id_arr = explode(',', $id_string);
 				
 				// helperek példányosítása
 				$file_helper = DI::get('file_helper');
@@ -383,103 +392,50 @@ class Blog extends Admin_controller {
         }
 	}	
 
-
 	/**
-	 *	Blog képet méretezi és tölti fel a szerverre (thumb képet is)
-	 *	(ez a metódus az update() és insert() metódusokban hívódik meg!)
-	 *
-	 *	@param	array $files_array	$_FILES['valami']
-	 *	@return	string|false - képneve vagy false
-	 */
-	private function _uploadPicture__OLD($files_array)
-	{
-		// uploader objektum létrehozása
-		$upload = new \System\Libs\Uploader($files_array);
-		// feltöltés helye
-		$upload_path = Config::get('blogphoto.upload_path');
-		// kép szélesség
-		$width = Config::get('blogphoto.width', 600);
-		// kép magasság
-		$height = Config::get('blogphoto.height', 400);
-		// normál kép készítése
-		$args = array(
-			//'file_auto_rename' => true,
-			//'file_safe_name' => true,
-			'allowed' => array('image/*'),
-			'file_new_name_body' => "blog_" . md5(uniqid()),
-			'image_resize' => true,
-			'image_x' => $width,
-			'image_y' => $height
-		);
-		// feltöltött kép nevével tér vissza ez kerül be az adatbázisba (feltoltottkep.jpg)
-		$dest_image = $upload->make($upload_path, $args);
-	
-	// nézőkép	
-		if ($dest_image !== false) {
-			// nézőkép szélesség
-			$width_thumb = Config::get('blogphoto.thumb_width', 150);	
-			// nézőkép magasság
-			$height_thumb = $upload->calcHeight($width_thumb);
-			// bélyegkép készítése
-			$args_thumb = array(
-				'file_new_name_body' => $upload->get('file_dst_name_body'),
-				'file_name_body_add' => '_thumb',
-				'image_resize' => true,
-				'image_x' => $width_thumb,
-				'image_y' => $height_thumb
-			);
-			$upload->make($upload_path, $args_thumb);
-		
-		} else {
-			Message::set('error', $upload->getError());
-			return false;
-		}
-		// kép neve
-		return $dest_image;		
-	}	
-
-
-
-
-
-
-
-
-
-
-	/**
-	 *	Blog képet méretezi és tölti fel a szerverre (thumb képet is)
-	 *	(ez a metódus az update() és insert() metódusokban hívódik meg!)
-	 *
-	 *	@param	array $files_array	$_FILES['valami']
-	 *	@return	string|false - képneve vagy false
+	 * Kép feltöltés
 	 */
 	private function _uploadPicture($files_array)
 	{
-		// uploader objektum létrehozása
-		$upload = new \System\Libs\Uploader($files_array);
-		// feltöltés helye
 		$upload_path = Config::get('blogphoto.upload_path');
-		// normál kép készítése
-		$args = array(
-			'file_new_name_body' => "blog_" . md5(uniqid()),
-			'image_resize' => true,
-			'image_x' => Config::get('blogphoto.width', 600),
-			'image_y' => Config::get('blogphoto.height', 400),
-			'thumb' => true,
-			'thumb_width' => Config::get('blogphoto.thumb_width', 150)
-		);
-		// feltöltött kép nevével tér vissza ez kerül be az adatbázisba (feltoltottkep.jpg)
-		$dest_image = $upload->makeImage($upload_path, $args);
-	
-		if ($dest_image === false) {
-			Message::set('error', $upload->getError());
-			return false;
-		}
-		// kép neve
-		return $dest_image;		
-	}	
+		$width = Config::get('blogphoto.width', 600);
+		$height = Config::get('blogphoto.height', 400);
 
+		$image = new Uploader($files_array);
+		// új filenév
+		$newfilename = 'blog_' . md5(uniqid());
+		
+		// nagy kép
+		$image->resize($width, $height);
+		
+			//$image->crop(array(100, 200, 100, 200));
+			//$image->cropPre(array(100, 200, 100, 200));
+			$image->cropExcess();
+			//$image->cropFill('#ff4d4d');
+		
+		$image->save($upload_path, $newfilename);
+		$filename = $image->getDestFilename();
+			
+		if ($image->checkError()) {
+			Message::set('error', $image->getError());
+			return false;
+
+		} else {
+			// nézőkép
+			$thumb_width = Config::get('blogphoto.thumb_width', 150);
+			$thumb_height = $image->calcHeight($thumb_width);
+			
+			$image->resize($thumb_width, $thumb_height);
+			$image->cropExcess();
+			//$image->cropFill('#66ff33');
+			$image->save($upload_path, $newfilename . '_thumb');
+		}
+
+		$image->cleanTemp();
+
+		// kép neve
+		return $filename;		
+	}
 
 
 }

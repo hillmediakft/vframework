@@ -9,6 +9,7 @@ use System\Libs\Auth;
 use System\Libs\DI;
 use System\Libs\Validate;
 use System\Libs\Session;
+use System\Libs\Uploader;
 
 class Users extends Admin_controller {
 
@@ -386,17 +387,14 @@ class Users extends Admin_controller {
 	{
         if($this->request->is_ajax()){
 	        if(Auth::hasAccess('delete_user')){
-	        	// a POST-ban kapott user_id egy string ami egy szám vagy számok felsorolása pl.: "23" vagy "12,45,76" 
-	        	$id_string = $this->request->get_post('item_id');
-
+	        	// a POST-ban kapott item_id egy tömb
+	        	$id_arr = $this->request->get_post('item_id');
 		        // a sikeres törlések számát tárolja
 		        $success_counter = 0;
 		        // a sikeresen törölt id-ket tartalmazó tömb
 		        $success_id = array();
 		        // a sikertelen törlések számát tárolja
 		        $fail_counter = 0;
-		        // a paraméterként kapott stringből tömböt csinálunk a , karakter mentén
-		        $id_arr = explode(',', $id_string);
 
 		        $file_helper = DI::get('file_helper'); 
 		        $photo_path = Config::get('user.upload_path');
@@ -473,40 +471,32 @@ class Users extends Admin_controller {
 	public function user_img_upload()
 	{
 		if( $this->request->is_ajax() ){
-			//echo $this->user_model->user_img_upload();
-		
             // feltöltés helye
-            $imagePath = Config::get('user.upload_path');
+            $upload_path = Config::get('user.upload_path');
 
             // Kiválasztott kép feltöltése
             if ($this->request->get_params('id') == 'upload') {
 
                 //képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül)	
-                $upload = new \System\Libs\Uploader($this->request->getFiles('img'));
-
-                $args = array(
-                    'file_new_name_body' => 'temp_' . uniqid(),
-                    'allowed' => array('image/*'),
-                    'image_resize' => true,
-                    'image_x' => Config::get('user.width', 600),
-                    'image_ratio_y' => true
-                );
-
-                $dest_file = $upload->make($imagePath, $args);
-
-                if ($dest_file !== false) {
-                    $this->response->json(array(
-                        "status" => 'success',
-                        "url" => $imagePath . $upload->get('file_dst_name'),
-                        "width" => $upload->get('image_dst_x'),
-                        "height" => $upload->get('image_dst_y')
-                    ));
-                } else {
+                $image = new Uploader($this->request->getFiles('img'));
+                $tempfilename = 'temp_' . uniqid();
+                $image->allowed(array('image/*'));
+    			$image->resize(Config::get('user.width', 600), null);
+				$image->save($upload_path, $tempfilename);
+					
+				if ($image->checkError()) {
                     $this->response->json(array(
                         "status" => 'error',
-                        "message" => $upload->getError()
+                        "message" => $image->getError()
                     ));
-                }
+				} else {
+                    $this->response->json(array(
+                        "status" => 'success',
+                        "url" => $upload_path . $image->getDestFilename(),
+                        "width" => $image->getDestImageWidth(),
+                        "height" => $image->getDestImageHeight()
+                    ));
+				}
             }
 
             // Kiválasztott kép vágása és vágott kép feltöltése
@@ -537,31 +527,26 @@ class Users extends Admin_controller {
                 $bottom_crop = ($imgH - $imgY1) - $cropH;
 
                 //képkezelő objektum létrehozása (a feltöltött kép elérése a paraméter)	
-                $upload = new \System\Libs\Uploader($imgUrl);
+                $image = new Uploader($imgUrl);
+                $newfilename = 'user_' . md5(uniqid());
+    			$image->resize($imgW, null);
+    			$image->crop(array($imgY1, $right_crop, $bottom_crop, $imgX1));
+				$image->save($upload_path, $newfilename);
 
-                $args = array(
-                    'file_new_name_body' => 'user_' . md5(uniqid()),
-                    'image_resize' => true,
-                    'image_x' => $imgW,
-                    'image_ratio_y' => true,
-                    'image_crop' => array($imgY1, $right_crop, $bottom_crop, $imgX1),
-                );
-
-                $dest_file = $upload->make($imagePath, $args);
-
-                if ($dest_file !== false) {
+				// hibaellenőrzés
+                if ($image->checkError()) {
+                    $this->response->json(array(
+                        "status" => 'error',
+                        "message" => $image->getError()
+                    ));                    
+                } else {
                 	// temp kép törlése
                 	DI::get('file_helper')->delete($imgUrl);
 
                     $this->response->json(array(
                         "status" => 'success',
-                        "url" => $imagePath . $upload->get('file_dst_name'),
+                        "url" => $upload_path . $image->getDestFilename()
                     ));
-                } else {
-                    $this->response->json(array(
-                        "status" => 'error',
-                        "message" => $upload->getError()
-                    ));                    
                 }
 
             }

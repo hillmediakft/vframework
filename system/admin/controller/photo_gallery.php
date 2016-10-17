@@ -192,16 +192,14 @@ class Photo_gallery extends Admin_controller {
 	{
         if($this->request->is_ajax()){
 	        if(1){
-	        	// a POST-ban kapott user_id egy string ami egy szám vagy számok felsorolása pl.: "23" vagy "12,45,76" 
-	        	$id_string = $this->request->get_post('item_id');
+	        	// a POST-ban kapott item_id egy tömb
+	        	$id_arr = $this->request->get_post('item_id');
 				// a sikeres törlések számát tárolja
 				$success_counter = 0;
 		        // a sikeresen törölt id-ket tartalmazó tömb
 		        $success_id = array();		
 				// a sikertelen törlések számát tárolja
 				$fail_counter = 0; 
-		        // a paraméterként kapott stringből tömböt csinálunk a , karakter mentén
-		        $id_arr = explode(',', $id_string);
 
 		        $file_helper = DI::get('file_helper');
 		        $url_helper = DI::get('url_helper');
@@ -290,9 +288,8 @@ class Photo_gallery extends Admin_controller {
 	{
         if($this->request->is_ajax()){
 	        if(1){
-	        	// a POST-ban kapott user_id egy string ami egy szám vagy számok felsorolása pl.: "23" vagy "12,45,76" 
+	        	// a POST-ban kapott user_id egy tömb
 	        	$id = $this->request->get_post('item_id', 'integer');
-            	
 				// a sikeres törlések számát tárolja
 				$success_counter = 0;
 				// a sikertelen törlések számát tárolja
