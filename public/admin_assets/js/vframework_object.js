@@ -18,6 +18,7 @@ var vframework = function () {
 
 			//var name = $(this).closest("tr").find('td:nth-child(3)').text();
             var id = $(this).attr('data-id'); // a törlendő elem id-je
+            var id_arr = [id]; // berakjuk egy tömbbe az id-t
             var deleteRow = $(this).closest("tr"); // a deleteHtml változóhoz rendeljük a html táblázat törlendő sorát <tr>
 			
 			bootbox.setDefaults({
@@ -25,7 +26,7 @@ var vframework = function () {
 			});
 			bootbox.confirm(options.confirm_message, function(result) {
 				if (result) {
-					_delete_item(id, deleteRow, options);
+					_delete_item(id_arr, deleteRow, options);
 				}
             }); 
         });	
@@ -71,9 +72,9 @@ var vframework = function () {
 				bootbox.confirm(options.confirm_message_group, function(result) {
 					if (result) {
 						// átalakítjuk a tömböt felsorolás stringre pl. 12,54,65
-						var id = id_array.toString();
-						// a második paraméter a törlendő html elem, de csoportos törlésnél 
-						_delete_item(id, null, options);
+						//var id = id_array.toString();
+						// a második paraméter a törlendő html elem, de csoportos törlésnél null
+						_delete_item(id_array, null, options);
 					}
 				});
 			}
@@ -84,18 +85,18 @@ var vframework = function () {
 	/**
 	 * Tábla elemek törlése ajax-al
 	 *
-	 * @param array 				id         	törlendő id-ket tartalamzó string: "12,45,78" vagy csak egyet "23"
+	 * @param array 				id_array    törlendő id-ket tartalamzó tömb
 	 * @param objektum vagy null 	deleteRow 	HTML elem, amit törölni kell a dom-ból (csoportos törlésnél null az értéke!)
 	 * @param objektum 				options 	a beállításokat tartalmazza
 	 */
-	var _delete_item = function (id, deleteRow, options) {
+	var _delete_item = function (id_array, deleteRow, options) {
 
         $.ajax({
             url: options.url,
             type: 'POST',
             dataType: 'json',
             data: {
-                item_id: id
+                item_id: id_array
             },
             beforeSend: function() {
                 App.blockUI({
