@@ -7,9 +7,18 @@ use System\Libs\Filter;
 */
 class Request {
 
+	// saját feltöltési hibakódok
+	const UPLOAD_ERR_POST_MAX_SIZE = 101;
+	const UPLOAD_ERR_NO_INDEX      = 102;
+
 	private $uri; // uri objektum
 	private $router; // router objektum
 	private $filter = null; // filter objektum
+
+	/**
+	 * File feltöltési hibákat tároló tömb
+	 */
+	private $upload_error = array();
 
 	public function __construct($uri, $router)
 	{
@@ -146,10 +155,19 @@ class Request {
 	/**
 	 * Adat visszaadása a $_FILES tömbből
 	 */
-	public function getFiles($key = null)
+	public function getFiles($key)
 	{
-		//return (is_null($key)) ? $_FILES : $_FILES[$key];
-		return $this->_fetch_from_array($_FILES, $key);
+		if (isset($_FILES[$key])) {
+			if (is_int($_FILES[$key]['error'])) {
+				return $_FILES[$key];
+			}
+			if (is_array($_FILES[$key]['error'])) {
+				// ha a tömbelem multiple átalakítjuk single-re
+				return $this->_multipleToSingle($_FILES[$key]);
+			}
+		} else {
+			throw new \Exception('Nem letezik ' . $key . ' index a $_FILES tombben!');
+		}
 	}
 
 	/**
@@ -209,57 +227,101 @@ class Request {
 	}
 
 	/**
-	 * Ellenőrzi, hogy létezik-e a paraméterként kapott index a $_FILES szuperglobális tömbben
+	 * Ellenőrzi, hogy létezik-e a paraméterként kapott index a $_FILES szuperglobális tömbben,
+	 * Ellenőrzi, hogy a error elem értéke egyenlő-e 0-val 
 	 * Ha nem adunk paramétert a metódusnak, akkor azt vizsgálja, hogy üres-e a $_FILES tömb
-	 * (ha a $_FILES tömb üres, akkor false-t ad vissza, ha nem üres, akkor true)
+	 *
+	 * @param string $index
+	 * @return bool	 
 	 */
-	public function hasFiles($index = null)
+	public function hasFiles($index)
 	{
-		if(is_null($index)){
-			return !empty($_FILES);
-		}
-		return isset($_FILES[$index]);
+		return ( isset($_FILES[$index]) && ($_FILES[$index]['error'] === UPLOAD_ERR_OK) );			
 	}
 
 	/**
-	 * Megvizsgálja, hogy nem üres-e a $_Files tömb, és nincs-e valamilyen hiba
+	 * Feltöltéskor keletkező hibák ellenőrzése (ha nincs feltöltve file az nem hiba!)
+	 * A hibák az $upload_error tömbbe kerülnek
 	 *
 	 * @param string $index
 	 * @return bool
 	 */
-	public function checkFiles($index)
+	public function checkUploadError($index)
 	{
-		if ($this->hasFiles($index)) {
-			return ($_FILES[$index]['error']) === 0 ? true : false;
-		} else {
-			return false;
+		if (!empty($_SERVER['CONTENT_LENGTH']) && empty($_FILES) && empty($_POST)) {
+			$this->upload_error[$index] = self::UPLOAD_ERR_POST_MAX_SIZE;
+			return true;
 		}
+		if (!isset($_FILES[$index])) {
+			$this->upload_error[$index] = self::UPLOAD_ERR_NO_INDEX;
+			return true;
+		}
+		if ( (is_int($_FILES[$index]['error'])) && ($_FILES[$index]['error'] !== UPLOAD_ERR_OK) && ($_FILES[$index]['error'] !== UPLOAD_ERR_NO_FILE) ) {
+			$this->upload_error[$index] = $_FILES[$index]['error'];
+			return true;
+		}
+		if (is_array($_FILES[$index]['error'])) {
+			$temp = array();
+			foreach ($_FILES[$index]['error'] as $key => $error_code)
+			{
+				if ( ($error_code !== UPLOAD_ERR_OK) && ($error_code !== UPLOAD_ERR_NO_FILE) ) {
+					$filename = $_FILES[$index]['name'][$key];
+					$temp[$filename] = $error_code;
+				}
+			}
+			$this->upload_error[$index] = $temp;
+			return true;
+		}
+		// ha nincs hiba
+		return false;
 	}
 
 	/**
-	 * A $_FILES tömb 'error' értékéhez rendelt üzenetet adja vissza
+	 * A $_FILES tömb megadott indexének 'error' eleméhez rendelt üzenetet adja vissza
+	 * Multiple feltöltésnél egy tömböt ad vissza, amiben a hibásan feltöltött elemek vannak - kulcs a file neve, érték az üzenet
 	 *
 	 * @param string $index
-	 * @return string
+	 * @return string|array
 	 */
 	public function getFilesError($index)
 	{
 		$status = array(
-			0 => 'There is no error, the file uploaded with success.',
-			1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
-			2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',
-			3 => 'The uploaded file was only partially uploaded.',
-			4 => 'No file was uploaded.',
-			6 => 'Missing a temporary folder.',
-			7 => 'Failed to write file to disk.',
-			8 => 'A PHP extension stopped the file upload.'
+			UPLOAD_ERR_OK => 'uploaded_ok',
+			UPLOAD_ERR_INI_SIZE => 'uploaded_too_big_ini',
+			UPLOAD_ERR_FORM_SIZE => 'uploaded_too_big_html',
+			UPLOAD_ERR_PARTIAL => 'uploaded_partial',
+			UPLOAD_ERR_NO_FILE => 'uploaded_missing',
+			UPLOAD_ERR_NO_TMP_DIR => 'uploaded_no_tmp_dir',
+			UPLOAD_ERR_CANT_WRITE => 'uploaded_cant_write',
+			UPLOAD_ERR_EXTENSION => 'uploaded_err_extension',
+			// saját hibakódok
+			self::UPLOAD_ERR_POST_MAX_SIZE => 'uploaded_too_big_post',
+			self::UPLOAD_ERR_NO_INDEX => 'uploaded_no_index'
 		);
 
-		if (isset($_FILES[$index]['error'])) {
-			$code = $_FILES[$index]['error'];
-			return $status[$code];
+		if (!empty($this->upload_error)) {
+
+			if (is_int($this->upload_error[$index])) {
+				if (array_key_exists($this->upload_error[$index], $status)) {
+					return $status[$this->upload_error[$index]];
+				} else {
+					return 'unknown_error';
+				}
+			}
+			if (is_array($this->upload_error[$index])) {
+				$errors = array();
+				foreach ($this->upload_error[$index] as $filename => $errorcode) {
+					$errors[$filename] = $status[$errorcode];
+				}
+				return $errors;
+			}
 		} else {
-			return 'unknown_error';
+			if ( isset($_FILES[$index]['error']) && is_int($_FILES[$index]['error']) ) {
+				$code = $_FILES[$index]['error'];
+				return $status[$code];
+			} else {
+				return 'unknown_error';
+			}
 		}
 	}
 
@@ -346,6 +408,23 @@ class Request {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Tömb átlakítása pl. $_FILES tömb esetén multiple változatról single verzióra
+	 * @param array $files_array - $FILES['upload_files']
+	 */
+	private function _multipleToSingle($files_array)
+	{
+		$files = array();
+		foreach ($files_array as $k => $l) {
+			foreach ($l as $i => $v) {
+				if (!array_key_exists($i, $files))
+				$files[$i] = array();
+				$files[$i][$k] = $v;
+			}
+		}
+		return $files;
 	}
 
 }
