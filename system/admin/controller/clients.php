@@ -6,6 +6,7 @@ use System\Libs\Auth;
 use System\Libs\DI;
 use System\Libs\Config;
 use System\Libs\Message;
+use System\Libs\Uploader;
 
 class Clients extends Admin_controller {
 
@@ -245,35 +246,29 @@ class Clients extends Admin_controller {
         if ($this->request->is_ajax()) {
         
             // feltöltés helye
-            $imagePath = Config::get('clientphoto.upload_path');
+            $upload_path = Config::get('clientphoto.upload_path');
 
             if ($this->request->get_params('id') == 'upload') {
                 //képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül) 
-                $upload = new \System\Libs\Uploader($this->request->getFiles('img'));
+                $image = new Uploader($this->request->getFiles('img'));
+                $tempfilename = 'temp_' . uniqid();
+                $width = Config::get('clientphoto.width', 150);
 
-                $args = array(
-                    'file_new_name_body' => 'temp_' . uniqid(),
-                    'file_overwrite' => true,
-                    'allowed' => array('image/*'),
-                    'image_resize' => true,
-                    'image_x' => Config::get('clientphoto.width', 150),
-                    'image_ratio_y' => true
-                );
-
-                $dest_file = $upload->make($imagePath, $args);
-
-                if ($dest_file !== false) {
-
+                $image->allowed(array('image/*'));
+                $image->resize($width, null);
+                $image->save($upload_path, $tempfilename);
+ 
+                if ($image->checkError()) {
                     $this->response->json(array(
-                        "status" => 'success',
-                        "url" => $imagePath . $upload->get('file_dst_name'),
-                        "width" => $upload->get('image_dst_x'),
-                        "height" => $upload->get('image_dst_y')
+                        "status" => 'error',
+                        "message" => $image->getError()
                     ));
                 } else {
                     $this->response->json(array(
-                        "status" => 'error',
-                        "message" => $upload->getError()
+                        "status" => 'success',
+                        "url" => $upload_path . $image->getDest('filename'),
+                        "width" => $image->getDest('width'),
+                        "height" => $image->getDest('height')
                     ));
                 }
             }
@@ -292,45 +287,39 @@ class Clients extends Admin_controller {
                 $imgH = round($this->request->get_post('imgH'));
                 // offsets
                 // megadja, hogy mennyit kell vágni a kép felső oldalából
-                $imgY1 = $this->request->get_post('imgY1');
+                $top_crop = $this->request->get_post('imgY1');
                 // megadja, hogy mennyit kell vágni a kép bal oldalából
-                $imgX1 = $this->request->get_post('imgX1');
+                $left_crop = $this->request->get_post('imgX1');
                 // crop box
                 $cropW = $this->request->get_post('cropW');
                 $cropH = $this->request->get_post('cropH');
                 // rotation angle
                 //$angle = $this->request->get_post('rotation'];
                 //a $right_crop megadja, hogy mennyit kell vágni a kép jobb oldalából
-                $right_crop = ($imgW - $imgX1) - $cropW;
+                $right_crop = ($imgW - $left_crop) - $cropW;
                 //a $bottom_crop megadja, hogy mennyit kell vágni a kép aljából
-                $bottom_crop = ($imgH - $imgY1) - $cropH;
+                $bottom_crop = ($imgH - $top_crop) - $cropH;
 
                 //képkezelő objektum létrehozása (a feltöltött kép elérése a paraméter) 
-                $upload = new \System\Libs\Uploader($imgUrl);
+                $image = new Uploader($imgUrl);
+                $newfilename = 'client_' . md5(uniqid());
+                $image->resize($imgW, null);
+                $image->crop(array($top_crop, $right_crop, $bottom_crop, $left_crop));
+                $image->save($upload_path, $newfilename);
 
-                $args = array(
-                    'file_new_name_body' => 'client_' . md5(uniqid()),
-                    'image_resize' => true,
-                    'image_x' => $imgW,
-                    'image_ratio_y' => true,
-                    'image_crop' => array($imgY1, $right_crop, $bottom_crop, $imgX1)
-                );
-
-                $dest_file = $upload->make($imagePath, $args);
-
-                if ($dest_file !== false) {
+                if ($image->checkError()) {
+                    $this->response->json(array(
+                        "status" => 'error',
+                        "message" => $image->getError()
+                    ));                    
+                } else {
                     // temp kép törlése
                     DI::get('file_helper')->delete($imgUrl);
                                         
                     $this->response->json(array(
                         "status" => 'success',
-                        "url" => $imagePath . $upload->get('file_dst_name')
+                        "url" => $upload_path . $image->getDest('filename')
                     ));
-                } else {
-                    $this->response->json(array(
-                        "status" => 'error',
-                        "message" => $upload->getError()
-                    ));                    
                 }
 
             }        

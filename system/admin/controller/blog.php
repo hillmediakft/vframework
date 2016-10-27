@@ -34,18 +34,30 @@ class Blog extends Admin_controller {
      */
     public function insert()
 	{
-		if( $this->request->has_post() ){
+		if( $this->request->is_post() ){
 
+			// kép feltöltési hiba vizsgálata
+			if($this->request->checkUploadError('upload_blog_picture')){
+				Message::set('error', $this->request->getFilesError('upload_blog_picture'));
+				$this->response->redirect('admin/blog/insert');				
+			}
+/*			
+if($this->request->checkUploadError('upload_blog_picture')){
+	foreach ($this->request->getFileError('upload_blog_picture') as $filename => $error_msg) {
+		$message = $filename . ' - ' . Message::show($error_msg);
+		Message::set('error', $message);
+		$this->response->redirect('admin/blog/insert');				
+	}
+}
+*/
 			// kép feltöltése
-			if ($this->request->checkFiles('upload_blog_picture')) {
-				
+			if ($this->request->hasFiles('upload_blog_picture')) {
 				$dest_image = $this->_uploadPicture($this->request->getFiles('upload_blog_picture'));
-				
 				if ($dest_image === false) {
 					$this->response->redirect('admin/blog/insert');
 				}
 			} else {
-				Message::set('error', $this->request->getFilesError('upload_blog_picture'));
+				Message::set('error', 'uploaded_missing');
 				$this->response->redirect('admin/blog/insert');
 			}
 
@@ -53,8 +65,8 @@ class Blog extends Admin_controller {
 			// az adatbázisba kerülő adatok
 			$data['title'] = $this->request->get_post('blog_title');
 			$data['body'] = $this->request->get_post('blog_body', 'strip_danger_tags');
-			$data['picture'] = $dest_image;
 			$data['category_id'] = $this->request->get_post('blog_category');
+			$data['picture'] = $dest_image;
 			$data['add_date'] = date('Y-m-d-G:i');
 
 			// DB lekérdezés
@@ -86,8 +98,13 @@ class Blog extends Admin_controller {
 	{
 		if( $this->request->has_post() ){
 
+			// fájl feltöltési hiba ellenőrzése
+			if($this->request->checkUploadError('upload_blog_picture')){
+				Message::set('error', $this->request->getFilesError('upload_blog_picture'));
+				$this->response->redirect('admin/blog/insert');				
+			}
 			// kép feltöltése (ellenőrizzük, hogy van-e feltöltött kép)
-			if($this->request->checkFiles('upload_blog_picture')) {
+			if($this->request->hasFiles('upload_blog_picture')) {
 				$dest_image = $this->_uploadPicture($this->request->getFiles('upload_blog_picture'));
 				if($dest_image === false) {
 					$this->response->redirect('admin/blog/update');
@@ -402,19 +419,15 @@ class Blog extends Admin_controller {
 		$height = Config::get('blogphoto.height', 400);
 
 		$image = new Uploader($files_array);
+		
 		// új filenév
 		$newfilename = 'blog_' . md5(uniqid());
-		
 		// nagy kép
-		$image->resize($width, $height);
-		
-			//$image->crop(array(100, 200, 100, 200));
-			//$image->cropPre(array(100, 200, 100, 200));
-			$image->cropExcess();
-			//$image->cropFill('#ff4d4d');
-		
+		$image->allowed(array('image/*'));
+		$image->cropToSize($width, $height);
 		$image->save($upload_path, $newfilename);
-		$filename = $image->getDestFilename();
+
+		$filename = $image->getDest('filename');
 			
 		if ($image->checkError()) {
 			Message::set('error', $image->getError());
@@ -425,9 +438,7 @@ class Blog extends Admin_controller {
 			$thumb_width = Config::get('blogphoto.thumb_width', 150);
 			$thumb_height = $image->calcHeight($thumb_width);
 			
-			$image->resize($thumb_width, $thumb_height);
-			$image->cropExcess();
-			//$image->cropFill('#66ff33');
+			$image->cropToSize($thumb_width, $thumb_height);
 			$image->save($upload_path, $newfilename . '_thumb');
 		}
 

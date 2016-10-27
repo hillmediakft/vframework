@@ -37,21 +37,26 @@ class Slider extends Admin_controller {
     {
         if ($this->request->has_post()) {
 
-           if (isset($_FILES['upload_slide_picture'])) {
-                // kép feltöltése, upload_slider_picture() metódussal (visszatér a feltöltött kép elérési útjával, vagy false-al)
-                $dest_image_name = $this->slider_model->upload_slider_picture($_FILES['upload_slide_picture']);
-
+            // fájl feltöltési hiba ellenőrzése
+            if($this->request->checkUploadError('upload_slide_picture')){
+                Message::set('error', $this->request->getFilesError('upload_slide_picture'));
+                $this->response->redirect('admin/slider/insert');             
+            }
+            // ha volt feltöltés
+            if ($this->request->hasFiles('upload_slide_picture')) {
+                // kép feltöltése, _uploadPicture() metódussal (visszatér a feltöltött kép elérési útjával, vagy false-al)
+                $dest_image_name = $this->_uploadPicture($this->request->getFiles('upload_slide_picture'));
                 if ($dest_image_name === false) {
                     $this->response->redirect('admin/slider/insert');
                 }
             } else {
-                throw new Exception('Hiba slide kep feltoltesekor: Nem letezik a \$_FILES[\'upload_slide_picture\'] elem!');
-                return false;
+                Message::set('error', 'uploaded_missing');
+                $this->response->redirect('admin/slider/insert');
             }
 
             //adatok az adatbázisba
             $data['active'] = $this->request->get_post('slider_status', 'integer');
-            $data['slider_order'] = ($this->slide_highest_order_number()) + 1;
+            $data['slider_order'] = ($this->slider_model->slide_highest_order_number()) + 1;
             $data['picture'] = $dest_image_name;
             //$data['target_url'] = "";
             $data['text'] = $this->request->get_post('slider_text');
@@ -90,11 +95,16 @@ class Slider extends Admin_controller {
 
         if ($this->request->has_post()) {
 
+            // fájl feltöltési hiba ellenőrzése
+            if($this->request->checkUploadError('update_slide_picture')){
+                Message::set('error', $this->request->getFilesError('update_slide_picture'));
+                $this->response->redirect('admin/slider/update');             
+            }
+
             //ha van új kép feltöltve
-            if ($this->request->checkFiles('update_slide_picture')) {
+            if ($this->request->hasFiles('update_slide_picture')) {
                 // kép feltöltése (visszatér a feltöltött kép nevével, vagy false-al)
                 $dest_image = $this->_uploadPicture($this->request->getFiles('update_slide_picture'));
-
                 if ($dest_image === false) {
                     $this->response->redirect('admin/slider/update');
                 }
@@ -250,38 +260,34 @@ class Slider extends Admin_controller {
     private function _uploadPicture($files_array)
     {
         // feltöltés helye
-        $imagePath = Config::get('slider.upload_path');
+        $upload_path = Config::get('slider.upload_path');
         $width = Config::get('slider.width', 1170);
         $height = Config::get('slider.height', 420);
-        $thumb_width = Config::get('slider.thumb_width', 200);
 
         //képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül) 
-        $upload = new \System\Libs\Uploader($files_array);
+        $image = new \System\Libs\Uploader($files_array);
 
-        $args = array(
-            'allowed' => array('image/*'),
-            'file_new_name_body' => "slide_" . md5(uniqid()),
-            'image_resize' => true,
-            'image_x' => $width,
-            'image_y' => $height
-        );
-        $dest_image = $upload->make($imagePath, $args);
+        $filename = 'slide_' . md5(uniqid());
+        $image->cropToSize($width, $height);
+        $image->allowed(array('image/*'));
+        $image->save($upload_path, $filename);
 
-        if ($dest_image !== false) {
-            // thumbnail kép készítése
-            $thumb_args = array(
-                'file_new_name_body' => $upload->get('file_dst_name_body'),
-                'file_name_body_add' => '_thumb',
-                'image_resize' => true,
-                'image_x' => $thumb_width,
-                'image_y' => $upload->calcHeight($thumb_width)            
-            );
-            $upload->make($imagePath, $thumb_args);
-           
-        } else {
-            Message::set('error', $upload->getError());
+        $dest_image = $image->getDest('filename');
+
+        if ($image->checkError()) {
+            Message::set('error', $image->getError());
             return false;
+
+        } else {
+            // nézőkép
+            $thumb_width = Config::get('slider.thumb_width', 200);
+            $thumb_height = Config::get('slider.thumb_height', 72);
+            $image->cropToSize($thumb_width, $thumb_height);            
+            $image->save($upload_path, $filename . '_thumb');
         }
+
+        $image->cleanTemp();
+
         // ha nincs hiba visszadja a feltöltött kép nevét
         return $dest_image;
     }

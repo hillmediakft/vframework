@@ -5,6 +5,7 @@ use System\Core\View;
 use System\Libs\DI;
 use System\Libs\Config;
 use System\Libs\Message;
+use System\Libs\Uploader;
 
 class Photo_gallery extends Admin_controller {
 
@@ -49,34 +50,15 @@ class Photo_gallery extends Admin_controller {
 	{
 		if($this->request->has_post()) {
 			
-			//képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül)	
-			$upload = new \System\Libs\Uploader($this->request->getFiles('upload_gallery_photo'));
-
-			$args = array(
-				'allowed' => array('image/*'),
-				'image_resize' => true,
-				'image_x' => $this->photo_width,
-				'image_ratio_y' => true,
-				'file_new_name_body' => md5(uniqid())
-			);
-			$filename = $upload->make($this->image_path, $args);
-
-			if ($filename !== false) {
-				// thumbnail kép készítés
-				$args_thumb = array(
-					'image_resize'            => true,
-					'image_x'                 => $this->thumb_width,
-					'image_ratio_y'           => true,
-					'file_new_name_body' 	 =>  $upload->get('file_dst_name_body'),
-					'file_name_body_add' 	 =>  '_thumb'
-				);
-				$upload->make($this->image_path, $args_thumb);
-
+			if ($this->request->hasFiles('upload_gallery_photo')) {
+				$filename = $this->_uploadImage($this->request->getFiles('upload_gallery_photo'));
+				if ($filename === false) {
+					$this->response->redirect('admin/photo_gallery/insert');					
+				}
 			} else {
-				Message::set('error', $upload->getError());
-				$this->response->redirect('admin/photo_gallery/insert');
+				Message::set('error', $this->request->getFilesError('upload_gallery_photo'));
+				$this->response->redirect('admin/photo_gallery/insert');					
 			}
-
 
 			$data['photo_filename'] =  $filename;
 			$data['photo_caption'] = $this->request->get_post('photo_caption');
@@ -114,42 +96,16 @@ class Photo_gallery extends Admin_controller {
 	{
 		$id = (int)$this->request->get_params('id');
 
-		if($this->request->has_post()) {
+		if ($this->request->has_post()) {
 			
-			if($this->request->checkFiles('upload_gallery_photo')) {
+			if ($this->request->hasFiles('upload_gallery_photo')) {
 			
-				//képkezelő objektum létrehozása
-				$upload = new \System\Libs\Uploader($this->request->getFiles('upload_gallery_photo'));
-
-				$args = array(
-					'allowed' => array('image/*'),
-					'image_resize' => true,
-					'image_x' => $this->photo_width,
-					'image_ratio_y' => true,
-					'file_new_name_body' => md5(uniqid())
-				);
-				$filename = $upload->make($this->image_path, $args);
-
-				if ($filename !== false) {
-					// thumbnail kép készítés
-					$args_thumb = array(
-						'image_resize'            => true,
-						'image_x'                 => $this->thumb_width,
-						'image_ratio_y'           => true,
-						'file_new_name_body' 	 =>  $upload->get('file_dst_name_body'),
-						'file_name_body_add' 	 =>  '_thumb'
-					);
-					$upload->make($this->image_path, $args_thumb);
-
-				} else {
-                    Message::set('error', $upload->getError());
+				$filename = $this->_uploadImage($this->request->getFiles('upload_gallery_photo'));
+				if ($filename === false) {
 					$this->response->redirect('admin/photo_gallery/update');					
 				}
 
-
-				if (isset($filename)) {
-					$data['photo_filename'] = $filename;
-				}	
+				$data['photo_filename'] = $filename;
 				$data['photo_caption'] = $this->request->get_post('photo_caption');
 				$data['photo_category'] = $this->request->get_post('photo_category', 'integer');
 				$data['photo_slider'] = ($this->request->has_post('photo_slider')) ? $this->request->get_post('photo_slider', 'integer') : 0;
@@ -171,6 +127,11 @@ class Photo_gallery extends Admin_controller {
 				}
 
 				$this->response->redirect('admin/photo-gallery');
+			} else {
+				if (!$this->request->fileNoUploaded('upload_gallery_photo')) {
+					Message::set('error', $this->request->getFileError($index));
+					$this->response->redirect('admin/photo_gallery/update');
+				}
 			}
 		}
 		
@@ -192,8 +153,8 @@ class Photo_gallery extends Admin_controller {
 	{
         if($this->request->is_ajax()){
 	        if(1){
-	        	// a POST-ban kapott item_id egy tömb
-	        	$id_arr = $this->request->get_post('item_id');
+	        	// a POST-ban kapott item_id egy string
+	        	$id_arr = array($this->request->get_post('item_id'));
 				// a sikeres törlések számát tárolja
 				$success_counter = 0;
 		        // a sikeresen törölt id-ket tartalmazó tömb
@@ -431,6 +392,40 @@ class Photo_gallery extends Admin_controller {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Kép feltöltés
+	 * @param array $files_array - $_FILES['valami']
+	 * @return string
+	 */
+	private function _uploadImage($files_array)
+	{
+		$upload_path = Config::get('photogallery.upload_path');	
+		$photo_width = Config::get('photogallery.width', 800);
+		$photo_height = Config::get('photogallery.height', 600);
+
+		$image = new Uploader($files_array);
+	
+		$newfilename = md5(uniqid());
+		$image->allowed(array('image/*'));
+		$image->cropToSize($photo_width, $photo_height);
+		$image->save($upload_path, $newfilename);
+
+		$dest_filename = $image->getDest('filename');
+
+		if ($image->checkError()) {
+			Message::set('error', $image->getError());
+			return false;
+		} else {
+			$thumb_width = Config::get('photogallery.thumb_width', 320);
+			$thumb_height = Config::get('photogallery.thumb_height', 240);
+			
+			$image->cropToSize($thumb_width, $thumb_height);
+			$image->save($upload_path, $newfilename . '_thumb');
+		}
+		// visszatér a kép nevével
+		return $dest_filename;
 	}
 
 }

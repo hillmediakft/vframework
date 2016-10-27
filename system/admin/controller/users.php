@@ -428,7 +428,7 @@ class Users extends Admin_controller {
 		                // ha a törlési sql parancsban hiba van
 		                $this->response->json(array(
 		                    'status' => 'error',                  
-		                    'message_error' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!',                  
+		                    'message_error' => 'unknown_error',                  
 		                ));
 		            }
 		        }
@@ -492,9 +492,9 @@ class Users extends Admin_controller {
 				} else {
                     $this->response->json(array(
                         "status" => 'success',
-                        "url" => $upload_path . $image->getDestFilename(),
-                        "width" => $image->getDestImageWidth(),
-                        "height" => $image->getDestImageHeight()
+                        "url" => $upload_path . $image->getDest('filename'),
+                        "width" => $image->getDest('width'),
+                        "height" => $image->getDest('height')
                     ));
 				}
             }
@@ -545,7 +545,7 @@ class Users extends Admin_controller {
 
                     $this->response->json(array(
                         "status" => 'success',
-                        "url" => $upload_path . $image->getDestFilename()
+                        "url" => $upload_path . $image->getDest('filename')
                     ));
                 }
 
