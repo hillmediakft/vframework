@@ -2,174 +2,27 @@
 namespace System\Libs;
 
 /**
-    // beállítható tulajdonságok az upload osztályban
-
-        $this->file_new_name_body       = null;     // replace the name body
-        $this->file_name_body_add       = null;     // append to the name body
-        $this->file_name_body_pre       = null;     // prepend to the name body
-        $this->file_new_name_ext        = null;     // replace the file extension
-        $this->file_safe_name           = true;     // format safely the filename
-        $this->file_force_extension     = true;     // forces extension if there isn't one
-        $this->file_overwrite           = false;    // allows overwritting if the file already exists
-        $this->file_auto_rename         = true;     // auto-rename if the file already exists
-        $this->dir_auto_create          = true;     // auto-creates directory if missing
-        $this->dir_auto_chmod           = true;     // auto-chmod directory if not writeable
-        $this->dir_chmod                = 0777;     // default chmod to use
-
-        $this->no_script                = true;     // turns scripts into test files
-        $this->mime_check               = true;     // checks the mime type against the allowed list
-
-        // these are the different MIME detection methods. if one of these method doesn't work on your
-        // system, you can deactivate it here; just set it to false
-        $this->mime_fileinfo            = true;     // MIME detection with Fileinfo PECL extension
-        $this->mime_file                = true;     // MIME detection with UNIX file() command
-        $this->mime_magic               = true;     // MIME detection with mime_magic (mime_content_type())
-        $this->mime_getimagesize        = true;     // MIME detection with getimagesize()
-
-        // get the default max size from php.ini
-        $this->file_max_size = ;
-
-        $this->image_resize             = false;    // resize the image
-        $this->image_convert            = '';       // convert. values :''; 'png'; 'jpeg'; 'gif'; 'bmp'
-
-        $this->image_x                  = 150;
-        $this->image_y                  = 150;
-        $this->image_ratio              = false;    // keeps aspect ratio with x and y dimensions
-        $this->image_ratio_crop         = false;    // keeps aspect ratio with x and y dimensions, filling the space
-        $this->image_ratio_fill         = false;    // keeps aspect ratio with x and y dimensions, fitting the image in the space, and coloring the rest
-        $this->image_ratio_pixels       = false;    // keeps aspect ratio, calculating x and y so that the image is approx the set number of pixels
-        $this->image_ratio_no_zoom_in   = false;
-        $this->image_ratio_no_zoom_out  = false;
-        $this->image_ratio_x            = false;    // calculate the $image_x if true
-        $this->image_ratio_y            = false;    // calculate the $image_y if true
-        $this->png_compression          = null;
-        $this->jpeg_quality             = 85;
-        $this->jpeg_size                = null;
-        $this->image_interlace          = false;
-        $this->preserve_transparency    = false;
-        $this->image_is_transparent     = false;
-        $this->image_transparent_color  = null;
-        $this->image_background_color   = null;
-        $this->image_default_color      = '#ffffff';
-        $this->image_is_palette         = false;
-
-        $this->image_max_width          = null;
-        $this->image_max_height         = null;
-        $this->image_max_pixels         = null;
-        $this->image_max_ratio          = null;
-        $this->image_min_width          = null;
-        $this->image_min_height         = null;
-        $this->image_min_pixels         = null;
-        $this->image_min_ratio          = null;
-
-        $this->image_brightness         = null;
-        $this->image_contrast           = null;
-        $this->image_opacity            = null;
-        $this->image_threshold          = null;
-        $this->image_tint_color         = null;
-        $this->image_overlay_color      = null;
-        $this->image_overlay_opacity    = null;
-        $this->image_overlay_percent    = null;
-        $this->image_negative           = false;
-        $this->image_greyscale          = false;
-        $this->image_pixelate           = null;
-        $this->image_unsharp            = false;
-        $this->image_unsharp_amount     = 80;
-        $this->image_unsharp_radius     = 0.5;
-        $this->image_unsharp_threshold  = 1;
-
-        $this->image_text               = null;
-        $this->image_text_direction     = null;
-        $this->image_text_color         = '#FFFFFF';
-        $this->image_text_opacity       = 100;
-        $this->image_text_percent       = 100;
-        $this->image_text_background    = null;
-        $this->image_text_background_opacity = 100;
-        $this->image_text_background_percent = 100;
-        $this->image_text_font          = 5;
-        $this->image_text_x             = null;
-        $this->image_text_y             = null;
-        $this->image_text_position      = null;
-        $this->image_text_padding       = 0;
-        $this->image_text_padding_x     = null;
-        $this->image_text_padding_y     = null;
-        $this->image_text_alignment     = 'C';
-        $this->image_text_line_spacing  = 0;
-
-        $this->image_reflection_height  = null;
-        $this->image_reflection_space   = 2;
-        $this->image_reflection_color   = '#ffffff';
-        $this->image_reflection_opacity = 60;
-
-        $this->image_watermark          = null;
-        $this->image_watermark_x        = null;
-        $this->image_watermark_y        = null;
-        $this->image_watermark_position = null;
-        $this->image_watermark_no_zoom_in  = true;
-        $this->image_watermark_no_zoom_out = false;
-
-        $this->image_flip               = null;
-        $this->image_rotate             = null;
-        $this->image_crop               = null;
-        $this->image_precrop            = null;
-
-        $this->image_bevel              = null;
-        $this->image_bevel_color1       = '#FFFFFF';
-        $this->image_bevel_color2       = '#000000';
-        $this->image_border             = null;
-        $this->image_border_color       = '#FFFFFF';
-        $this->image_border_opacity     = 100;
-        $this->image_border_transparent = null;
-        $this->image_frame              = null;
-        $this->image_frame_colors       = '#FFFFFF #999999 #666666 #000000';
-        $this->image_frame_opacity      = 100;
-
-        $this->forbidden = array();
-        $this->allowed = array();
-
-
-        $this->file_src_name      = '';
-        $this->file_src_name_body = '';
-        $this->file_src_name_ext  = '';
-        $this->file_src_mime      = '';
-        $this->file_src_size      = '';
-        $this->file_src_error     = '';
-        $this->file_src_pathname  = '';
-        $this->file_src_temp      = '';
-
-        $this->file_dst_path      = '';
-        $this->file_dst_name      = '';
-        $this->file_dst_name_body = '';
-        $this->file_dst_name_ext  = '';
-        $this->file_dst_pathname  = '';
-
-        $this->image_src_x        = null;
-        $this->image_src_y        = null;
-        $this->image_src_bits     = null;
-        $this->image_src_type     = null;
-        $this->image_src_pixels   = null;
-        $this->image_dst_x        = 0;
-        $this->image_dst_y        = 0;
-        $this->image_dst_type     = '';			
-
-	METÓDUSOK:
-		Uploader::setError();
-		Uploader::getError();
-		Uploader::checkError();
-
-		Uploader::isImage();
-
-		Uploader::calcHeight();
-		Uploader::calcWidth();
-		Uploader::getRatio();
-		Uploader::getRatioResized();
-		Uploader::cleanRatioResized();
-
-		Uploader::cleanTemp();
-		
-
-
-*/
+ * Képkezelő osztály
+ *
+ *	Metódusok:
+ *
+ *		Uploader::setError();
+ *		Uploader::getError();
+ *		Uploader::checkError();
+ *		Uploader::checkUpload();
+ *		Uploader::isImage();
+ *
+ *		Uploader::calcHeight();
+ *		Uploader::calcWidth();
+ *		Uploader::getRatio();
+ *		Uploader::getRatioResized();
+ *		Uploader::cleanRatioResized();
+ *		Uploader::forge();
+ *
+ *		Uploader::cleanTemp();
+ *		
+ *
+ */
 class Uploader
 {
 	/**
@@ -241,14 +94,6 @@ class Uploader
 	public function calcWidth($height)
 	{
 		return round($height * $this->ratio_resized);
-	}
-
-	/**
-	 * Eredeti (forrás kép) képarány visszaadása
-	 */
-	public function getRatio()
-	{
-		return $this->image_src_x / $this->image_src_y;
 	}
 
 	/**
@@ -353,7 +198,6 @@ class Uploader
 		if (!is_null($color)) {
 			$this->handle->image_background_color = $color;
 		}	
-		
 		$this->handle->image_ratio_fill = true;
 	}
 
@@ -361,19 +205,49 @@ class Uploader
 	 * Képből vág alul és felül, vagy a két oldalon, hogy megtartsa a beállított képarányt
 	 * A metódus meghívása előtt be kell állítani a resize($width, $height) metódussal a kép méreteit	 
 	 */
-	public function cropExcess()
+	public function cropRatio()
 	{
 		$this->handle->image_ratio_crop = true;
+	}
+
+	/**
+	 * Képből vág alul és felül, vagy a két oldalon, hogy megtartsa a beállított képarányt
+	 *
+	 * @param integer $width - kép szélessége
+	 * @param integer $height - kép magassága 
+	 */
+	public function cropToSize($width, $height)
+	{
+		$this->resize($width, $height);
+		$this->handle->image_ratio_crop = true;
+	}
+
+	/**
+	 * Képből vág alul és felül, vagy a két oldalon, hogy megtartsa a beállított képarányt
+	 *
+	 * @param integer $width - kép szélessége
+	 * @param integer $height - kép magassága
+	 * @param string $color - #ff0066	 	  
+	 */
+	public function cropFillToSize($width, $height, $color = null)
+	{
+		$this->resize($width, $height);
+		if (!is_null($color)) {
+			$this->handle->image_background_color = $color;
+		}	
+		$this->handle->image_ratio_fill = true;
 	}	
 
 	/**
-	 * Kép háttér színének beállítása
+	 * Kép háttér és default színének beállítása
 	 *
+	 * @param string $param - background | default
 	 * @param string $color - #ff0066
 	 */
-	public function setBackgroundColor($color)
+	public function color($param, $color)
 	{
-		$this->handle->image_background_color = $color;
+		$property = 'image_' . $param . '_color';
+		$this->handle->$property = $color;
 	}
 
 	/**
@@ -387,31 +261,344 @@ class Uploader
 	}
 
 	/**
-	 * Feltöltött file nevét adja vissza
-	 * @return string
+	 * Kép effect-ek hozzáadása
+     *
+	 *	brightness 			- if set, corrects the brightness. value between -127 and 127 (default: null)
+	 *	contrast 			- if set, corrects the contrast. value between -127 and 127 (default: null)
+	 *	opacity 			- if set, changes the image opacity. value between 0 and 100 (default: null)
+	 *	tint_color  		- if set, will tint the image with a color, value as hexadecimal #FFFFFF (default: null)
+	 *	overlay_color 		- if set, will add a colored overlay, value as hexadecimal #FFFFFF (default: null)
+	 *	overlay_opacity 	- used when image_overlay_color is set, determines the opacity (default: 50)
+	 *	negative 			- inverts the colors in the image (default: false)
+	 *	greyscale 			- transforms an image into greyscale (default: false)
+	 *	threshold 			- applies a threshold filter. value between -127 and 127 (default: null)
+	 *	pixelate 			- pixelate an image, value is block size (default: null)
+	 *	unsharp 			- applies an unsharp mask, with alpha transparency support (default: false)
+	 *	unsharp_amount 		- unsharp mask amount, typically 50 - 200 (default: 80)
+	 *	unsharp_radius 		- unsharp mask radius, typically 0.5 - 1 (default: 0.5)
+	 *	unsharp_threshold 	- unsharp mask threshold, typically 0 - 5 (default: 1)
+	 * 
+	 * @param string $effect
+	 * @param mixed $value
 	 */
-	public function getDestFilename()
+	public function effect($effect, $value)
 	{
-		return $this->handle->file_dst_name;
+		$property = 'image_' . $effect;
+		$this->handle->$property = $value;
 	}
 
 	/**
-	 * Feltöltött file szélességét adja vissza (px)
-	 * @return integer
+	 * Vízjel hozzáadása és beállításai
+	 *
+	 * picture		- adds a watermark on the image, value is a local filename. accepted files are GIF, JPG, BMP, PNG and PNG alpha
+	 * x 			- absolute watermark position, in pixels from the left border. can be negative (default: null)
+	 * y 			- absolute watermark position, in pixels from the top border. can be negative (default: null)
+	 * position 	- watermark position withing the image, a combination of one or two from 'TBLR': top, bottom, left, right (default: null)
+	 * no_zoom_in 	- prevents the watermark to be resized up if it is smaller than the image (default: true)
+	 * no_zoom_out 	- prevents the watermark to be resized down if it is bigger than the image (default: false)
+	 *
+	 * @param string $prop
+	 * @param mixed $value
 	 */
-	public function getDestImageWidth()
+	public function watermark($param, $value)
 	{
-		return $this->handle->image_dst_x;
+		if ($param == 'picture') {
+			$this->handle->image_watermark = $value;
+		} else {
+			$property = 'image_watermark_' . $param;
+			$this->handle->$property = $value;
+		}
 	}
 
 	/**
-	 * Feltöltött file magasságát adja vissza (px)
-	 * @return integer
+	 * Kép elforgatása
+	 * Lehetséges értékek 90, 180 és 270
+	 * @param integer $angle
 	 */
-	public function getDestImageHeight()
+	public function rotate(int $angle)
 	{
-		return $this->handle->image_dst_y;
+		// if ($angle == 90 || $angle == 180 || $angle == 270) {}
+		$this->handle->image_rotate = $angle;
 	}
+
+	/**
+	 * Kép tükrözése 
+	 * @param string $axis - 'h' horizontal vagy 'v' vertical
+	 */
+	public function flip($axis)
+	{
+		$this->handle->image_flip = $axis;
+	}
+
+	/**
+	 * Képfelirat hozzáadása és paraméterek megadása
+	 *
+	 *	text 				- creates a text label on the image, value is a string, with eventual replacement tokens
+	 *	direction 			- text label direction, either 'h' horizontal or 'v' vertical (default: 'h')
+	 *	color 				- text color for the text label, in hexadecimal (default: #FFFFFF)
+	 *	opacity 			- text opacity on the text label, integer between 0 and 100 (default: 100)
+	 *	background 			- text label background color, in hexadecimal (default: null)
+	 *	background_opacity 	- text label background opacity, integer between 0 and 100 (default: 100)
+	 *	font 				- built-in font for the text label, from 1 to 5. 1 is the smallest (default: 5). Value can also be a string, which represents the path to a GDF or TTF font (TrueType).
+	 *	size 				- font size for TrueType fonts, in pixels (GD1) or points (GD1) (default: 16) (TrueType fonts only)
+	 *	angle 				- text angle for TrueType fonts, in degrees, with 0 degrees being left-to-right reading text(default: null) (TrueType fonts only)
+	 *	x 					- absolute text label position, in pixels from the left border. can be negative (default: null)
+	 *	y 					- absolute text label position, in pixels from the top border. can be negative (default: null)
+	 *	position 			- text label position withing the image, a combination of one or two from 'TBLR': top, bottom, left, right (default: null)
+	 *	padding 			- text label padding, in pixels. can be overridden by image_text_padding_x and image_text_padding_y (default: 0)
+	 *	padding_x 			- text label horizontal padding (default: null)
+	 *	padding_y 			- text label vertical padding (default: null)
+	 *	alignment 			- text alignment when text has multiple lines, either 'L', 'C' or 'R' (default: 'C') (GD fonts only)
+	 *	line_spacing 		- space between lines in pixels, when text has multiple lines (default: 0) (GD fonts only)
+     *
+	 * @param string $param
+	 * @param mixed $value
+	 */
+	public function text($param, $value)
+	{
+		if ($param == 'text') {
+			$this->handle->image_text = $value;
+		} else {
+			$property = 'image_text_' . $param;
+			$this->handle->$property = $value;
+		}
+	}
+
+	/**
+	 * Kép convertálása más fileformátumba
+	 * @param string $type - megadható értékek : 'png'|'jpeg'|'gif'|'bmp'
+	 */
+	public function convert($type)
+	{	
+		if (in_array($type, array('png', 'jpeg', 'gif', 'bmp'))) {
+			$this->handle->image_convert = $type;
+		}
+	}
+
+	/**
+	 * quality 	- sets the compression quality for JPEG images (default: 85)
+	 * size 	- set to a size in bytes, will approximate jpeg_quality so the output image fits within the size
+	 *
+	 * @param string $param - quality | size
+	 * @param integer $value
+	 */
+	public function jpeg($param, $value)
+	{
+		$property = 'jpeg_' . $param;	
+		$this->handle->jpeg_quality = (int)$value;
+	}
+
+	/**
+	 * sets maximum upload size (default: upload_max_filesize from php.ini)
+	 * @param integer $size
+	 */
+	public function maxFileSize($size)
+	{
+		$this->handle->file_max_size = (int)$size;
+	}
+
+	/**
+	 * sets behaviour if file already exists
+	 * @param bool $value
+	 */
+	public function overwrite($value = true)
+	{
+		$this->handle->file_overwrite = $value;
+	}
+
+	/**
+	 * Kép (minimum) paraméterek beállítása
+	 *
+	 *  width 	- if set to a dimension in pixels, the upload will be invalid if the image width is lower (default: null)
+	 *  height 	- if set to a dimension in pixels, the upload will be invalid if the image height is lower (default: null)
+	 *  pixels 	- if set to a number of pixels, the upload will be invalid if the image number of pixels is lower (default: null)
+	 *  ratio 	- if set to a aspect ratio (width/height), the upload will be invalid if the image apect ratio is lower (default: null)
+	 *
+	 * @param string $param
+	 * @param mixed $value
+	 */
+	public function setMin($param, $value)
+	{
+		$property = 'image_min_' . $param;
+		$this->handle->$property = $value;
+	}
+
+	/**
+	 * Kép (maximum) paraméterek beállítása
+	 *
+	 *  width 	- if set to a dimension in pixels, the upload will be invalid if the image width is greater (default: null)
+	 *  height 	- if set to a dimension in pixels, the upload will be invalid if the image height is greater (default: null)
+	 *  pixels 	- if set to a number of pixels, the upload will be invalid if the image number of pixels is greater (default: null)
+	 *  ratio 	- if set to a aspect ratio (width/height), the upload will be invalid if the image apect ratio is greater (default: null)
+	 *
+	 * @param string $param
+	 * @param mixed $value
+	 */
+	public function setMax($param, $value)
+	{
+		$property = 'image_max_' . $param;
+		$this->handle->$property = $value;
+	}
+
+
+	/**
+	 * Cél file adatait adja vissza
+	 * 
+	 * @param string $param - filename | path | body | ext | pathname | width | height | type | ratio
+	 */
+	public function getDest($param)
+	{
+		$property = 'file_dst_';
+		$property_image = 'image_dst_';
+
+		switch ($param) {
+			case 'filename':
+				$property .= 'name';
+				return $this->handle->$property;
+				break;
+
+			case 'path':
+				$property .= $param;
+				return $this->handle->$property;
+				break;
+
+			case 'body':
+				$property .= 'name_' . $param;
+				return $this->handle->$property;
+				break;
+
+			case 'ext':
+				$property .= 'name_' . $param;
+				return $this->handle->$property;
+				break;
+
+			case 'pathname':
+				$property .= $param;
+				return $this->handle->$property;
+				break;
+
+			case 'width':
+				$property_image .= 'x';
+				return $this->handle->$property_image;
+				break;
+
+			case 'height':
+				$property_image .= 'y';
+				return $this->handle->$property_image;
+				break;
+
+			case 'type':
+				$property_image .= $param;
+				return $this->handle->$property_image;
+				break;
+
+			case 'ratio':
+				return $this->handle->image_dst_x / $this->handle->image_dst_y;
+				break;
+			
+			default:
+				return false;
+				break;
+		}
+	}
+
+	/**
+	 * Forrásfile adatait adja vissza a paramétertől függően
+	 *
+	 *  filename 	- Source file name
+	 *  body 		- Source file name body
+	 *  ext 		- Source file extension
+	 *  pathname 	- Source file complete path and name
+	 *  mime 		- Source file mime type
+	 *  size 		- Source file size in bytes
+	 *  error 		- Upload error code
+	 *
+	 * Képek esetén:
+	 *  width 		- Source file width in pixels
+	 *  height 		- Source file height in pixels
+	 *  ratio  		- Source file width / height
+	 *  pixels 		- Source file number of pixels
+	 *  type 		- Source file type (png, jpg, gif or bmp)
+	 *  bits  		- Source file color depth
+	 *
+	 * @param string $param
+	 */
+	public function getSource($param)
+	{
+		$property = 'file_src_';
+		$property_image = 'image_src_';
+
+		switch ($param) {
+			case 'filename':
+				$property .= 'name';
+				return $this->handle->$property;
+				break;
+
+			case 'body':
+				$property .= 'name_' . $param;
+				return $this->handle->$property;
+				break;
+
+			case 'ext':
+				$property .= 'name_' . $param;
+				return $this->handle->$property;
+				break;
+
+			case 'pathname':
+				$property .= $param;
+				return $this->handle->$property;
+				break;
+
+			case 'mime':
+				$property .= $param;
+				return $this->handle->$property;
+				break;
+
+			case 'size':
+				$property .= $param;
+				return $this->handle->$property;
+				break;
+
+			case 'error':
+				$property .= $param;
+				return $this->handle->$property;
+				break;
+
+			case 'width':
+				$property_image .= 'x';
+				return $this->handle->$property;
+				break;
+
+			case 'height':
+				$property_image .= 'y';
+				return $this->handle->$property;
+				break;
+
+			case 'type':
+				$property_image .= $param;
+				return $this->handle->$property;
+				break;
+
+			case 'pixels':
+				$property_image .= $param;
+				return $this->handle->$property;
+				break;
+
+			case 'bits':
+				$property_image .= $param;
+				return $this->handle->$property;
+				break;
+
+			case 'ratio':
+				return $this->handle->image_src_x / $this->handle->image_src_y;
+				break;
+			
+			default:
+				return false;
+				break;
+		}
+	}
+
 
 	/**
 	 * File mentése
