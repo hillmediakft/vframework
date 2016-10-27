@@ -79,6 +79,7 @@
 								<div class="form-group">
 									<label for="blog_category">Kategória</label>
 									<select name="blog_category" class="form-control input-xlarge">
+										<option value="0">Válasszon kategóriát</option>
 									<?php foreach($category_list as $category) { ?>
 										<option value="<?php echo $category['id']?>"><?php echo $category['category_name']?></option>
 									<?php } ?>
