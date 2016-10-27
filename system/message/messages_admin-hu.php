@@ -109,3 +109,14 @@ $msg['user_photo_can_not_be_deleted'] = 'A felhasználó képe nem létezik, vag
 $msg['category_created'] = 'Új kategória létrehozva!';
 $msg['category_already_exists'] = 'Már létezik ilyen nevű kategória!';
 $msg['category_updated'] = 'Kategória módosítva!';
+
+// file upload
+$msg['uploaded_ok'] = 'A feltöltés sikerült.';
+$msg['uploaded_too_big_ini'] = 'Az elküldött fájl túllépi a php.ini-ben beállított értéket.';
+$msg['uploaded_too_big_html'] = 'Az elküldött fájl túllépi a HTML űrlapban beállított MAX_FILE_SIZE értéket.';
+$msg['uploaded_partial'] = 'A elküldött fájl csak egy része került feltöltésre.';
+$msg['uploaded_missing'] = 'Nem volt feltöltve fájl.';
+$msg['uploaded_no_tmp_dir'] = 'Hiányzik az ideiglenes mappa.';
+$msg['uploaded_cant_write'] = 'Nem sikerült lemezre írni a fájlt.';
+$msg['uploaded_err_extension'] = 'A fájl feltöltése megállt egy bővítmény miatt.';
+$msg['uploaded_too_big_post'] = 'Az elküldött fájl túllépi a feltölthető maximális méretet.';

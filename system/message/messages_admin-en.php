@@ -100,3 +100,14 @@ $msg['photo_delete_success'] = 'A kép sikeresen törölve a képgalériából!'
 $msg['photo_update_success'] = 'A kép módosításai sikeresen elmentve!';
 
 $msg['superadmin_can_not_be_blocked'] = 'Szuperadminisztrátor nem bolkkolható!';
+
+// file upload
+$msg['uploaded_ok'] = 'There is no error, the file uploaded with success.';
+$msg['uploaded_too_big_ini'] = 'The uploaded file exceeds the upload_max_filesize directive in php.ini';
+$msg['uploaded_too_big_html'] = 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.';
+$msg['uploaded_partial'] = 'The uploaded file was only partially uploaded.';
+$msg['uploaded_missing'] = 'No file was uploaded.';
+$msg['uploaded_no_tmp_dir'] = 'Missing a temporary folder.';
+$msg['uploaded_cant_write'] = 'Failed to write file to disk.';
+$msg['uploaded_err_extension'] = 'A PHP extension stopped the file upload.';
+$msg['uploaded_too_big_post'] = 'The uploaded file is larger than the maximum size.';
