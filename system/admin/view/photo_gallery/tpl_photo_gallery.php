@@ -53,23 +53,23 @@
 								</ul>
 								<div class="row mix-grid">
 								
-								<?php foreach($all_photos as $value) { ?>						
+								<?php foreach($all_photos as $photo) { ?>						
 											
-									<div id="photo_<?php echo $value['photo_id'];?>" class="col-md-3 col-sm-4 mix category_<?php echo $value['photo_category'];?>">
+									<div id="photo_<?php echo $photo['photo_id'];?>" class="col-md-3 col-sm-4 mix category_<?php echo $photo['photo_category'];?>">
 										<div class="mix-inner">
 											<div class="photo_slider_label">
-												<?php echo ($value['photo_slider'] == 1) ? '<span class="label label-info">Kiemelt</span>' : '';?>
+												<?php echo ($photo['photo_slider'] == 1) ? '<span class="label label-info">Kiemelt</span>' : '';?>
 											</div>
-											<img class="img-responsive" src="<?php echo $this->getConfig('photogallery.upload_path') . $this->url_helper->thumbPath( $value['photo_filename']);?>" alt="">
+											<img class="img-responsive" src="<?php echo $this->getConfig('photogallery.upload_path') . $this->url_helper->thumbPath($photo['photo_filename']);?>" alt="">
 											<div class="mix-details">
-												<h4><?php echo $value['photo_caption'];?></h4>
-												<a class="mix-delete" data-id="<?php echo $value['photo_id'];?>">
+												<h4><?php echo $photo['photo_caption'];?></h4>
+												<a class="mix-delete" data-id="<?php echo $photo['photo_id'];?>">
 													<i class="fa fa-trash"></i>
 												</a>
-												<a class="mix-edit" href="admin/photo-gallery/update/<?php echo $value['photo_id'];?>">
+												<a class="mix-edit" href="admin/photo-gallery/update/<?php echo $photo['photo_id'];?>">
 													<i class="fa fa-edit"></i>
 												</a>
-												<a class="mix-preview fancybox-button" href="<?php echo $value['photo_filename'];?>" title="Project Name" data-rel="fancybox-button">
+												<a class="mix-preview fancybox-button" href="<?php echo $photo['photo_filename'];?>" title="Project Name" data-rel="fancybox-button">
 													<i class="fa fa-search"></i>
 												</a>
 											</div>
