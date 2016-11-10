@@ -24,7 +24,8 @@ class Request {
 	{
 		$this->uri = $uri;
 		$this->router = $router;
-		$this->router->find($this->uri->get('path'), $this->uri->get('area'));
+		// útvonal átadása a routernek 
+		$this->router->setCurrentUri($this->uri->get('path_full'));
 	}
 
 	/**
