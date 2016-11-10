@@ -2,182 +2,517 @@
 namespace System\Libs;
 
 /**
- * Router
- *
- * Deconstructs URLs into meaningful paths according
- * to the rules defined in /config/routes.php.
- *
- * Uses Router::find() to parse URL. Returns an array of
- * arrays:
- *   Array (
- *     Array ( controller, action ),
- *     Array ( [param, [param ...]] )
- *   )
- * Where the "params" are defined in the routes.php file.
+ * Class Router
+ * @package     Bramus\Router MÓDOSÍTVA!!!
+ * @author      Bram(us) Van Damme <bramus@bram.us>
+ * @copyright   Copyright (c), 2013 Bram(us) Van Damme
+ * @license     MIT public license
  */
 class Router
 {
-	private $shorthand = array(
-		':controller' => '([a-zA-Z_\-][a-zA-Z0-9_\-]+)',
-		':action'     => '([a-zA-Z_\-][a-zA-Z0-9_\-]+)',
-		':any'     => '([\w]+)',
-		':id'         => '([\d]+)',
-		':num'         => '([\d]+)',
-		':year'     => '([12][0-9]{3})',
-		':month'     => '(0[1-9]|1[012])',
-		':day'     => '(0[1-9]|[12][0-9]|3[01])',
-		':title'     => '([a-zA-Z_\-][a-zA-Z0-9_\-]+)',
-		':hash'     => '(.+)',
-	);
+        /**
+         * @var string Controller neve
+         */
+        public $controller;
 
-	/**
-	 *	A controllert tatalmazza
-	 */
-	public $controller;
-	
-	/**
-	 *	Az action-t tartalmazza
-	 */
-	public $action;
-	
-	/**
-	 *	Array
-	 *	A paramétereket tartalmazó tömb
-	 */
-	public $params = array();
+        /**
+         * @var string Controller névtere
+         */
+        private $controller_namespace = '';
 
-//-------------------------------------------------------------------------	
-	
-	public function __construct() {	}
+        /**
+         * @var string Action neve
+         */
+        public $action;
 
-	
-	/**
-	 * Beállítja a controller, action és a params tulajdonságok értékét
-	 */
-	public function find($uri_path, $area)
-	{
-		// behívjuk a $routes tömböt tartalmazó file-t
-		if ($area == 'admin') {
-			require(CORE . '/routes_admin.php');
-		} else {
-			require(CORE . '/routes.php');
-		}
+        /**
+         * @var string Paraméterek
+         */
+        public $params = array();
 
-		// a $key_url a kulcs, a $_route az érték a $routes tömbben. pl: $key_url: ':controller/:action/:id/?', $_route: array('$1/$2', 'id')
-		foreach ( $routes as $key_url => $_route ) {
-		
-		// kiveszi a $_route tömb (pl.: array('$1/$2', 'id')) első elemét, és annak értékét adja vissza (pl.: $1/$2) a $_map változóba (a controller és action stringje)
-			$_map = array_shift($_route);
+        /**
+         * @var array Helyörzők: reguláris kifejezések
+         */
+        public $shorthand = array(
+            ':controller' => '([a-zA-Z_\-][a-zA-Z0-9_\-]+)',
+            ':action' => '([a-zA-Z_\-][a-zA-Z0-9_\-]+)',
+            ':any' => '([\w]+)',
+            ':id' => '(\d+)',
+            ':num' => '([\d]+)',
+            ':year' => '([12][0-9]{3})',
+            ':month' => '(0[1-9]|1[012])',
+            ':day' => '(0[1-9]|[12][0-9]|3[01])',
+            ':title' => '([a-zA-Z_\-][a-zA-Z0-9_\-]+)',
+            ':hash' => '(.+)'
+        );
 
-////////////////// ha egy minta sem egyezik az URI-val ///////////////////////	
+        /**
+         * Current uri-t tárolja
+         */
+        public $current_uri;
 
-			// ha nincs egyezés az URI és minták között, akkor elér a ciklus az utolsó mintához ('_error'), és ezt használja a controller és action megállapításához  			
-			if ( $key_url == '_error' ) {
-				$this->map = explode('/', $_map);
-				return;
-			}
 
-////////////////// a minta és az URI összehasonlítása ///////////////////////	
-				
-			// Kicseréli a jelöléseket (pl.: :action) reguláris kifejezésekké ($shorthand tömb alapján)
-			$key_url = str_replace(array_keys($this->shorthand), array_values($this->shorthand), $key_url);
+    /**
+     * @var array The route patterns and their handling functions
+     */
+    private $afterRoutes = array();
 
-			
-			// összehasonlítja a mintát ($key_url) az URI-val, az eredményt a $matches tömbben adja vissza 	
-			// ha egyezik, akkor tovább fut a kód, és a $matches tömbben adja vissza az egyezéseket. 
-			if ( !preg_match('@^'.$key_url.'$@', $uri_path, $matches) ) {
-				// ha nincs egyezés, akkor a foreach ciklus a következő elemmel folytatódik	
-				continue;
-			}
+    /**
+     * @var array The before middleware route patterns and their handling functions
+     */
+    private $beforeRoutes = array();
 
-			//Eltávolítja a $matches tömb első elemét (a teljes egyezés pl. 'home/rolunk/param/2'), maradnak a résszminták: pl. home, rolunk, param, 2
-			array_shift($matches);
-			
-			// átalakítjuk a $_map stringet tömbbé a / jel mentén: $1/$2 
-			$_map = explode('/', $_map);
+    /**
+     * @var object|callable The function to be executed when no route has been matched
+     */
+    protected $notFoundCallback;
 
-			// a $_map tömb bejárása közben a $1 és $2 helyörzőket kicseréljük a $matces 0. és 1. elemével (miközben töröljük őket a $matches tömbből)
-			foreach ( $_map as $key => &$_p ) {
-				if ( preg_match('#\$(\d+)#', $_p, $_v) ) {
-					$_p = str_replace('$'.$_v[1], $matches[$_v[1]-1], $_p);
-					unset($matches[$_v[1]-1]);
-				} else {
-					//ha nem helyörzősen ($1/$2) van megadva az útvonal (akkor is kell venni a $mathes tömbből a controllert és az actiont)
-					unset($matches[$key]);
-				}
-			}
-				
-			// ha nincs a $_map tömbnek 1. eleme (vagyis nincs action), akkor legyen az action: index
-			if (!isset($_map[1])) {
-				$_map[1] = 'index';
-			}
-			
-			// kicseréljük a controllerben és az action-ban a - karaktert _ karakterre
-			$_map[0] = str_replace("-","_", $_map[0]);
-			$_map[1] = str_replace("-","_", $_map[1]);
+    /**
+     * @var string Current base route, used for (sub)route mounting
+     */
+    private $baseRoute = '';
 
-			// megadjuk a $controller és az $action tulajdonság értékét
-			$this->controller = $_map[0];
-			$this->action = $_map[1];
-				
-			// A $matches tömb elejéről kikerült a controller és az action, azért a kulcs számozása 2-től kezdődik. Az array_value() kiveszi az értékeket és ezekből képez tömböt, ami már 0 kulccsal kezdődik
-			$params_temp = array_values($matches);
-			
-			// megadjuk a $params tulajdonság értékét
-			$this->params = $this->params_to_assoc($_route, $params_temp);
+    /**
+     * @var string The Request Method that needs to be handled
+     */
+    private $requestedMethod = '';
 
-		return;
-		}
-	}
+                    /**
+                     * @var string The Server Base Path for Router Execution
+                     */
+                    //private $serverBasePath;
 
-	/**
-	 * Az URL paramétereket tartalmazó tömböt asszociatív tömbbé alakítja, a $_route tömbben 
-	 * lévő paraméter nevekkel. H a $_routes tömb üres, akkor a paraméterekből kulcs -> érték
-	 * párokat képez. Ha csak eg yparaméter van, azt id -> érték formában adja vissza
-	 *
-	 * @param 	array 	$params_temp paraméterek számmal indexelt tömbben
-	 * @param 	array	$_route a paraméterek neveit tartalmazó tömb (lehet üres tömb is))
-	 */
-	public function params_to_assoc($_route, $params_temp) 
-	{
-			$_params = array();
-			
-			// paraméterek száma
-			$no_of_params = count($params_temp);
-			
-			// paraméter nevek száma
-			$_maxk = count($_route);
-			
-			/* ha a tömb csak egy elemből áll (pl. : 0 => 12), akkor a következő formátumú tömb elemet hozzuk létre: 'id' => '12'. Amennyiben több elem van a $matches tömbben, akkor létrehozunk egy tömböt, amelyben kulcs => érték formában rendezzük a paramétereket
-	
-			array 
-				  'param1' => '2'
-				  'param2' => '77' 
-			*/			
-			// a $_route tömbben megadtuk a paraméter neveket pl.: array('$1/$2', 'id', 'title')
-			// ha nem üres a $_route tömb (vagyis vannak paraméter nevek):
 
-			// ha vannak paraméter nevek megadva
-			if (!empty($_route)) {
-			
-				for ( $j = 0; $j < $_maxk; $j++ ) {
-					$_params[$_route[$j]] =  $params_temp[$j];
-				}	
+        /**
+         * Controller névterének megadása
+         * @param string $namespace
+         */
+        public function setNamespace($namespace)
+        {
+            $this->controller_namespace = $namespace;
+        }
 
-			}
-			// ha nincsenek paraméter nevek megadva. 
-			else {
-				if ($no_of_params > 1) {
-					for ( $j = 0; $j < $no_of_params; $j+=2 ) {
-						$_params[$params_temp[$j]] =  $params_temp[$j+1];
-					}
-				}
-				elseif ($no_of_params == 1){
-					$_params['id'] = $params_temp[0];
-				}
-			}		
-		
-		return $_params;
-	}	
+        /**
+         * Reguláris kifejezés hozzáadása
+         * @param string $key
+         * @param string $exp
+         */
+        public function addShorthand($key, $exp)
+        {
+            if (strpos($key, ':') === false) {
+                $key = ':' . $key;
+            }
+
+            $this->shorthand[$key] = $exp;
+        }
+
+        /**
+         * Current uri beállítása
+         */
+        public function setCurrentUri($uri)
+        {
+            $this->current_uri = '/' . $uri;
+        }
+
+
+
+    /**
+     * Store a before middleware route and a handling function to be executed when accessed using one of the specified methods
+     *
+     * @param string $methods Allowed methods, | delimited
+     * @param string $pattern A route pattern such as /about/system
+     * @param object|callable $fn The handling function to be executed
+     * @param array $param_names paraméterek pl.: id
+     */
+    public function before($methods, $pattern, $fn, $param_names = array())
+    {
+        $pattern = $this->baseRoute . '/' . trim($pattern, '/');
+        $pattern = $this->baseRoute ? rtrim($pattern, '/') : $pattern;
+
+        foreach (explode('|', $methods) as $method) {
+            $this->beforeRoutes[$method][] = array(
+                'pattern' => $pattern,
+                'fn' => $fn,
+                'param_names' => $param_names                
+            );
+        }
+    }
+
+    /**
+     * Store a route and a handling function to be executed when accessed using one of the specified methods
+     *
+     * @param string $methods Allowed methods, | delimited
+     * @param string $pattern A route pattern such as /about/system
+     * @param object|callable $fn The handling function to be executed
+     * @param array $param_names paraméterek pl.: id
+     */
+    public function match($methods, $pattern, $fn, $param_names = array())
+    {
+        $pattern = $this->baseRoute . '/' . trim($pattern, '/');
+        $pattern = $this->baseRoute ? rtrim($pattern, '/') : $pattern;
+
+        foreach (explode('|', $methods) as $method) {
+            $this->afterRoutes[$method][] = array(
+                'pattern' => $pattern,
+                'fn' => $fn,
+                'param_names' => $param_names                
+            );
+        }
+    }
+
+    /**
+     * Shorthand for a route accessed using any method
+     *
+     * @param string $pattern A route pattern such as /about/system
+     * @param object|callable $fn The handling function to be executed
+     * @param array $param_names paraméterek pl.: id     
+     */
+    public function all($pattern, $fn, $param_names = array())
+    {
+        $this->match('GET|POST|PUT|DELETE|OPTIONS|PATCH|HEAD', $pattern, $fn, $param_names);
+    }
+
+    /**
+     * Shorthand for a route accessed using GET
+     *
+     * @param string $pattern A route pattern such as /about/system
+     * @param object|callable $fn The handling function to be executed
+     * @param array $param_names paraméterek pl.: id     
+     */
+    public function get($pattern, $fn, $param_names = array())
+    {
+        $this->match('GET', $pattern, $fn, $param_names);
+    }
+
+    /**
+     * Shorthand for a route accessed using POST
+     *
+     * @param string $pattern A route pattern such as /about/system
+     * @param object|callable $fn The handling function to be executed
+     * @param array $param_names paraméterek pl.: id     
+     */
+    public function post($pattern, $fn, $param_names = array())
+    {
+        $this->match('POST', $pattern, $fn, $param_names);
+    }
+
+    /**
+     * Shorthand for a route accessed using PATCH
+     *
+     * @param string $pattern A route pattern such as /about/system
+     * @param object|callable $fn The handling function to be executed
+     * @param array $param_names paraméterek pl.: id     
+     */
+    public function patch($pattern, $fn, $param_names = array())
+    {
+        $this->match('PATCH', $pattern, $fn, $param_names);
+    }
+
+    /**
+     * Shorthand for a route accessed using DELETE
+     *
+     * @param string $pattern A route pattern such as /about/system
+     * @param object|callable $fn The handling function to be executed
+     * @param array $param_names paraméterek pl.: id     
+     */
+    public function delete($pattern, $fn, $param_names = array())
+    {
+        $this->match('DELETE', $pattern, $fn, $param_names);
+    }
+
+    /**
+     * Shorthand for a route accessed using PUT
+     *
+     * @param string $pattern A route pattern such as /about/system
+     * @param object|callable $fn The handling function to be executed
+     * @param array $param_names paraméterek pl.: id     
+     */
+    public function put($pattern, $fn, $param_names = array())
+    {
+        $this->match('PUT', $pattern, $fn, $param_names);
+    }
+
+    /**
+     * Shorthand for a route accessed using OPTIONS
+     *
+     * @param string $pattern A route pattern such as /about/system
+     * @param object|callable $fn The handling function to be executed
+     * @param array $param_names paraméterek pl.: id     
+     */
+    public function options($pattern, $fn, $param_names = array())
+    {
+        $this->match('OPTIONS', $pattern, $fn, $param_names);
+    }
+
+    /**
+     * Mounts a collection of callbacks onto a base route
+     *
+     * @param string $baseRoute The route sub pattern to mount the callbacks on
+     * @param callable $fn The callback method
+     */
+    public function mount($baseRoute, $fn)
+    {
+        // Track current base route
+        $curBaseRoute = $this->baseRoute;
+
+        // Build new base route string
+        $this->baseRoute .= $baseRoute;
+
+        // Call the callable
+        call_user_func($fn);
+
+        // Restore original base route
+        $this->baseRoute = $curBaseRoute;
+    }
+
+    /**
+     * Get all request headers
+     *
+     * @return array The request headers
+     */
+    public function getRequestHeaders()
+    {
+        // If getallheaders() is available, use that
+        if (function_exists('getallheaders')) {
+            return getallheaders();
+        }
+
+        // Method getallheaders() not available: manually extract 'm
+        $headers = array();
+        foreach ($_SERVER as $name => $value) {
+            if ((substr($name, 0, 5) == 'HTTP_') || ($name == 'CONTENT_TYPE') || ($name == 'CONTENT_LENGTH')) {
+                $headers[str_replace(array(' ', 'Http'), array('-', 'HTTP'), ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+            }
+        }
+
+        return $headers;
+    }
+
+    /**
+     * Get the request method used, taking overrides into account
+     *
+     * @return string The Request method to handle
+     */
+    public function getRequestMethod()
+    {
+        // Take the method as found in $_SERVER
+        $method = $_SERVER['REQUEST_METHOD'];
+
+        // If it's a HEAD request override it to being GET and prevent any output, as per HTTP Specification
+        // @url http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.4
+        if ($_SERVER['REQUEST_METHOD'] == 'HEAD') {
+            ob_start();
+            $method = 'GET';
+        } // If it's a POST request, check for a method override header
+        elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $headers = $this->getRequestHeaders();
+            if (isset($headers['X-HTTP-Method-Override']) && in_array($headers['X-HTTP-Method-Override'], array('PUT', 'DELETE', 'PATCH'))) {
+                $method = $headers['X-HTTP-Method-Override'];
+            }
+        }
+
+        return $method;
+    }
+
+    /**
+     * Execute the router: Loop all defined before middleware's and routes, and execute the handling function if a match was found
+     *
+     * @param object|callable $callback Function to be executed after a matching route was handled (= after router middleware)
+     * @return bool
+     */
+    public function run($callback = null)
+    {
+        // Define which method we need to handle
+        $this->requestedMethod = $this->getRequestMethod();
+
+        // Handle all before middlewares
+        if (isset($this->beforeRoutes[$this->requestedMethod])) {
+            $this->handle($this->beforeRoutes[$this->requestedMethod]);
+        }
+
+        // Végigfut az útvonalakon
+        $numHandled = 0;
+        if (isset($this->afterRoutes[$this->requestedMethod])) {
+            $numHandled = $this->handle($this->afterRoutes[$this->requestedMethod], true);
+        }
+
+        // Ha nincs egyezés egyik útvonallal sem
+        if ($numHandled === 0) {
+
+            if (is_string($this->notFoundCallback) && stripos($this->notFoundCallback, '@') !== false) {
+                // explode segments of given route
+                list($controller, $method) = explode('@', $this->notFoundCallback);
+                $controller_class = $this->controller_namespace . $controller;
+
+                // check if class exists, if not just ignore.
+                if (class_exists($controller_class)) {
+                    // first check if is a static method, directly trying to invoke it. if isn't a valid static method, we will try as a normal method invocation.
+                    if (call_user_func_array(array(new $controller_class, $method), array()) === false) {
+                        // try call the method as an non-static method. (the if does nothing, only avoids the notice)
+                        if (forward_static_call_array(array($controller_class, $method), array()) === false) ;
+                    }
+                }
+            }
+            elseif ($this->notFoundCallback && is_callable($this->notFoundCallback)) {
+                call_user_func($this->notFoundCallback);
+            }
+            else {
+                header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
+            }
+
+
+
+        } // If a route was handled, perform the finish callback (if any)
+        else {
+            if ($callback) {
+                $callback();
+            }
+        }
+
+        // If it originally was a HEAD request, clean up after ourselves by emptying the output buffer
+        if ($_SERVER['REQUEST_METHOD'] == 'HEAD') {
+            ob_end_clean();
+        }
+
+        // Return true if a route was handled, false otherwise
+        if ($numHandled === 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Set the 404 handling function
+     *
+     * @param object|callable $fn The function to be executed
+     */
+    public function set404($fn)
+    {
+        $this->notFoundCallback = $fn;
+    }
+
+    /**
+     * Handle a a set of routes: if a match is found, execute the relating handling function
+     *
+     * @param array $routes Collection of route patterns and their handling functions
+     * @param boolean $quitAfterRun Does the handle function need to quit after one route was matched?
+     * @return int The number of routes handled
+     */
+    private function handle($routes, $quitAfterRun = false)
+    {
+        // Counter to keep track of the number of routes we've handled
+        $numHandled = 0;
+
+        // The current page URL
+        //$uri = $this->getCurrentUri();
+        
+        // Loop all routes
+        foreach ($routes as $route) {
+
+            // Kicseréli a jelöléseket (pl.: :action) reguláris kifejezésekké ($shorthand tömb alapján)
+            $route['pattern'] = str_replace(array_keys($this->shorthand), array_values($this->shorthand), $route['pattern']);
+
+            // we have a match!
+            if (preg_match_all('#^' . $route['pattern'] . '$#', $this->current_uri, $matches, PREG_OFFSET_CAPTURE)) {
+                // Rework matches to only contain the matches, not the orig string
+                $matches = array_slice($matches, 1);
+
+                // Extract the matched URL parameters (and only the parameters)
+                $params = array_map(function ($match, $index) use ($matches) {
+
+                    // We have a following parameter: take the substring from the current param position until the next one's position (thank you PREG_OFFSET_CAPTURE)
+                    if (isset($matches[$index + 1]) && isset($matches[$index + 1][0]) && is_array($matches[$index + 1][0])) {
+                        return trim(substr($match[0][0], 0, $matches[$index + 1][0][1] - $match[0][1]), '/');
+                    } // We have no following parameters: return the whole lot
+                    else {
+                        return (isset($match[0][0]) ? trim($match[0][0], '/') : null);
+                    }
+                }, $matches, array_keys($matches));
+
+
+
+    // névvel ellátott paraméterek beállítása
+    if(isset($params[0]) && $params[0] != null && !empty($route['param_names'])) {
+        $this->params = array_combine($route['param_names'], $params);
+    }
+
+
+                // Call the handling function with the URL parameters if the desired input is callable
+                if (is_callable($route['fn'])) {
+                    call_user_func_array($route['fn'], $params);
+                } // if not, check the existence of special parameters
+                elseif (stripos($route['fn'], '@') !== false) {
+                    // explode segments of given route
+                    list($controller, $method) = explode('@', $route['fn']);
+    
+
+    // controller es action tulajdonság beállítása                    
+    $this->controller = $controller;
+    $this->action = $method;
+    $controller_class = $this->controller_namespace . $controller;
+
+
+                    // check if class exists, if not just ignore.
+                    if (class_exists($controller_class)) {
+                        // first check if is a static method, directly trying to invoke it. if isn't a valid static method, we will try as a normal method invocation.
+                        if (call_user_func_array(array(new $controller_class, $method), $params) === false) {
+                            // try call the method as an non-static method. (the if does nothing, only avoids the notice)
+                            if (forward_static_call_array(array($controller_class, $method), $params) === false) ;
+                        }
+                    }
+                }
+
+                $numHandled++;
+
+                // If we need to quit, then quit
+                if ($quitAfterRun) {
+                    break;
+                }
+            }
+        }
+
+        // Return the number of routes handled
+        return $numHandled;
+    }
+
+
+
+                        /**
+                         * Define the current relative URI
+                         *
+                         * @return string
+                         */
+/*                        
+                        public function getCurrentUri()
+                        {
+                            // Get the current Request URI and remove rewrite base path from it (= allows one to run the router in a sub folder)
+                            $uri = substr($_SERVER['REQUEST_URI'], strlen($this->getBasePath()));
+
+                            // Don't take query params into account on the URL
+                            if (strstr($uri, '?')) {
+                                $uri = substr($uri, 0, strpos($uri, '?'));
+                            }
+
+                            // Remove trailing slash + enforce a slash at the start
+                            return '/' . trim($uri, '/');
+                        }
+*/                        
+
+                        /**
+                         * Return server base Path, and define it if isn't defined.
+                         *
+                         * @return string
+                         */
+/*                        
+                        public function getBasePath()
+                        {
+                            // Check if server base path is defined, if not define it.
+                            if (null === $this->serverBasePath) {
+                                $this->serverBasePath = implode('/', array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, -1)) . '/';
+                            }
+
+                            return $this->serverBasePath;
+                        }
+*/                        
 }
-?>
