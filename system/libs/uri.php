@@ -21,7 +21,8 @@ class Uri {
 
 	private $request_uri; // uri path + query string
 	
-	private $path; // A request uri a query string nélkül
+	private $path; // A request uri a query string, admin és nyelvi kód nélkül!
+	private $path_full; // A request uri a query string nélkül
 	private $path_arr; // Az uri path részei tömbben
 	
 	private $query; // query string
@@ -68,6 +69,7 @@ class Uri {
 		$this->_is_langcode();
 		$this->_langcode();
 		$this->_area();
+		$this->_pathFull();
 		$this->_path();
 		$this->_query_string();
 		$this->_query_arr();
@@ -79,7 +81,7 @@ class Uri {
 	}
 
 
-	public function set($key, $value)
+	private function set($key, $value)
 	{
 		$this->uri_contents[$key] = $value;
 	}
@@ -185,7 +187,6 @@ class Uri {
 		}
 	}
 
-
 	/**
 	 * Beállítja a bázis url-t (pl.: http://www.valami.hu)
 	 */
@@ -220,7 +221,15 @@ class Uri {
 	}
 
 	/**
-	 * Beállítja az uri path-t (request uri a query string nélkül)
+	 * Teljes path beállítása, amiben benne van a modul neve (admin) és a nyelvi kód
+	 */
+	private function _pathFull()
+	{
+		$this->set('path_full', $this->uri_parts['path']);
+	}
+
+	/**
+	 * Beállítja az uri path-t (request uri a query string, a modul neve (admin) és a nyelvi kód nélkül!)
 	 */
 	private function _path()
 	{
@@ -242,7 +251,7 @@ class Uri {
 	 *
 	 * @return string
 	 */
-	public function _query_string()
+	private function _query_string()
 	{
 		$this->query = $this->uri_parts['query'];
 		$this->set('query', $this->uri_parts['query']);
@@ -251,7 +260,7 @@ class Uri {
 	/**
 	 * Beállítja a query string-ből létrehozott tömböt (mint a $_GET tömb)
 	 */
-	public function _query_arr()
+	private function _query_arr()
 	{
 		if(!empty($this->uri_parts['query'])){
 			parse_str($this->uri_parts['query'], $query_arr);
@@ -265,7 +274,7 @@ class Uri {
 	/**
 	 * Beállítja a site url-t
 	 */
-	public function _site_url()
+	private function _site_url()
 	{
 		$site_url = BASE_URL;
 		if($this->is_admin === true) {
