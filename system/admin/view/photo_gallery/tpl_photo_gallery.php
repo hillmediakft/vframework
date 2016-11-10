@@ -29,8 +29,8 @@
 				<div class="portlet-title">
 					<div class="caption"><i class="fa fa-picture-o"></i>Képgalériák kezelése</div>
 					<div class="actions">
-						<a href="admin/photo_gallery/insert" class="btn blue btn-sm"><i class="fa fa-plus"></i> Új kép feltöltése</a>
-						<a href="admin/photo_gallery/category" class="btn default btn-sm"> Kategóriák</a>
+						<a href="admin/photo-gallery/insert" class="btn blue btn-sm"><i class="fa fa-plus"></i> Új kép feltöltése</a>
+						<a href="admin/photo-gallery/category" class="btn default btn-sm"> Kategóriák</a>
 					</div>
 				</div>
 				<div class="portlet-body">

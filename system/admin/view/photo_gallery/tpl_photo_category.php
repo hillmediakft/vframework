@@ -10,10 +10,10 @@
 				<i class="fa fa-angle-right"></i>
 			</li>
 			<li>
-				<a href="admin/photo_gallery">Képgaléria</a>
+				<a href="admin/photo-gallery">Képgaléria</a>
 				<i class="fa fa-angle-right"></i>
 			</li>
-			<li><a href="admin/photo_gallery/category">Kategóriák</a></li>
+			<li><a href="admin/photo-gallery/category">Kategóriák</a></li>
 		</ul>
 	</div>
 	<!-- END PAGE TITLE & BREADCRUMB-->
