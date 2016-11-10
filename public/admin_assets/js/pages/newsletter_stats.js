@@ -113,7 +113,7 @@ var Newsletter_stats = function () {
 
 			vframework.deleteItems({
                 table_id: "newsletter_table",
-                url: "admin/newsletter/delete_newsletter_AJAX"
+                url: "admin/newsletter/delete"
             });
 
 /*

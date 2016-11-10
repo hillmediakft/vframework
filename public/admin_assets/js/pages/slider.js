@@ -113,17 +113,6 @@ var Slider = function () {
     };
 
 
-
-
-
-
-
-
-
-
-
-
-
     return {
         //main function to initiate the module
         init: function () {
@@ -133,7 +122,7 @@ var Slider = function () {
 
             vframework.deleteItems({
                 table_id: "slider_table",
-                url: "admin/slider/delete_slider_AJAX"
+                url: "admin/slider/delete"
             });
         }
     };

@@ -251,7 +251,7 @@ var Photo_category = function () {
                         data: {
                             item_id: id
                         },
-                        url: "admin/photo_gallery/delete_category_AJAX",
+                        url: "admin/photo-gallery/delete_category",
                         dataType: "json",
                         beforeSend: function () {
                             App.blockUI({
@@ -466,7 +466,7 @@ var Photo_category = function () {
 /*
             vframework.deleteItems({
                 table_id: "photo_category", // táblázat html elem id attribútuma
-                url: "admin/photo_gallery/delete_category_AJAX", // ajax hívás url-je
+                url: "admin/photo-gallery/delete_category", // ajax hívás url-je
             });
 */	
         }

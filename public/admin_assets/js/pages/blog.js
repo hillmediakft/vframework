@@ -93,7 +93,7 @@ var Blog = function () {
 
             vframework.deleteItems({
                 table_id: "blog",
-                url: "admin/blog/delete_blog_AJAX"
+                url: "admin/blog/delete"
             });
 
 /*

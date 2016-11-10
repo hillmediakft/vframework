@@ -106,7 +106,7 @@ var Users = function () {
 
             vframework.deleteItems({
                 table_id: "users",
-                url: "admin/users/delete_user_AJAX"
+                url: "admin/users/delete"
             });
 
             vframework.changeStatus({

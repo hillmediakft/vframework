@@ -34,7 +34,7 @@ var Portfolio = function () {
 	var delete_photo = function (id, deleted_photo) {
 
         $.ajax({
-            url: "admin/photo_gallery/delete_photo_AJAX",
+            url: "admin/photo-gallery/delete_photo",
             type: 'POST',
             dataType: 'json',
             data: {

@@ -122,7 +122,7 @@ var Clients = function () {
 
             vframework.deleteItems({
                 table_id: "clients",
-                url: "admin/clients/delete_client_AJAX"
+                url: "admin/clients/delete"
             });
 
             vframework.hideAlert();
