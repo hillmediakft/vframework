@@ -134,25 +134,15 @@ DI::setContainer(new \Pimple\Container());
 	DI::set('url_helper', function(){
 		return new \System\Helper\Url();
 	});
+	DI::set('arr_helper', function(){
+		return new \System\Helper\Arr();
+	});
 
 /*
 	DI::factory('query', function($c){
 		return new \System\Libs\Query($c['connect']);
 	});
 */
-
-
-// alkalmazás indítása OLD
-
-	// Registry objektum létrehozása
-	// $registry = Registry::getInstance();
-	// uri objektum példányosítása a registry-be
-	// $uri = new Uri(Config::get('language_default'), Config::get('allowed_languages'));
-	// router objektum példányosítása		
-	// $router = new Router();
-	// request objektum példányosítása
-	// $request = new Request($uri, $router);
-	
 
 	// application objektum példányosítása	
 	$application = new Application();
