@@ -28,9 +28,9 @@ class Content extends Admin_controller {
 	/**
 	 *	Tartalmi elemek módosítása
 	 */
-	public function edit()
+	public function edit($id)
 	{
-		$id = (int)$this->request->get_params('id');
+		$id = (int)$id;
 
 		if($this->request->has_post('submit_update_content')) {
 		

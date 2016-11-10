@@ -72,32 +72,34 @@ class Newsletter extends Admin_controller {
 	/**
 	 * Hírlevél módosítása
 	 */
-	public function update()
+	public function update($id)
 	{
-		if($this->request->has_post()) {
-	
-			$data['newsletter_name'] = $this->request->get_post('newsletter_name');
-			$data['newsletter_subject'] = $this->request->get_post('newsletter_subject');
-			$data['newsletter_body'] = $this->request->get_post('newsletter_body');
-			$data['newsletter_status'] = $this->request->get_post('newsletter_status', 'integer');
-			$data['newsletter_create_date'] = date('Y-m-d-G:i');
+		$id = (int)$id;
 
-			$result = $this->newsletter_model->update((int)$this->request->get_params('id'), $data);
-			
-			if($result !== false) {
-				Message::set('success', 'Hírlevél módosítva!');
+			if($this->request->has_post()) {
+		
+				$data['newsletter_name'] = $this->request->get_post('newsletter_name');
+				$data['newsletter_subject'] = $this->request->get_post('newsletter_subject');
+				$data['newsletter_body'] = $this->request->get_post('newsletter_body');
+				$data['newsletter_status'] = $this->request->get_post('newsletter_status', 'integer');
+				$data['newsletter_create_date'] = date('Y-m-d-G:i');
+
+				$result = $this->newsletter_model->update($id, $data);
+				
+				if($result !== false) {
+					Message::set('success', 'Hírlevél módosítva!');
+				}
+				else {
+					Message::set('error', 'unknown_error');
+				}
+				$this->response->redirect('admin/newsletter');
 			}
-			else {
-				Message::set('error', 'unknown_error');
-			}
-			$this->response->redirect('admin/newsletter');
-		}
 
 		$view = new View();
 
 		$data['title'] = 'Hírlevél szerkesztése';
 		$data['description'] = 'Hírlevél oldal description';
-		$data['newsletter'] = $this->newsletter_model->selectNewsletter((int)$this->request->get_params('id'));
+		$data['newsletter'] = $this->newsletter_model->selectNewsletter($id);
 	
 		$view->add_links(array('bootbox', 'ckeditor', 'vframework', 'newsletter_update'));
 		$view->render('newsletter/tpl_newsletter_update', $data);	
@@ -106,7 +108,7 @@ class Newsletter extends Admin_controller {
 	/**
 	 *	Hírlevél törlése AJAX-al
 	 */
-	public function delete_newsletter_AJAX()
+	public function delete()
 	{
         if($this->request->is_ajax()){
 	        if(1){

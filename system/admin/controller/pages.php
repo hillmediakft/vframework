@@ -27,29 +27,28 @@ class Pages extends Admin_controller {
 	/**
 	 *	Oldal adatainak módosítása
 	 */
-	public function update()
+	public function update($id)
 	{
-		$id = (int)$this->request->get_params('id');
+		$id = (int) $id;
 
-		if($this->request->has_post()) {
-			
-			$data['body'] = $this->request->get_post('page_body', 'strip_danger_tags');
-			$data['metatitle'] = $this->request->get_post('page_metatitle');
-			$data['metadescription'] = $this->request->get_post('page_metadescription');
-			$data['metakeywords'] = $this->request->get_post('page_metakeywords');
+			if($this->request->is_post()) {
+				
+				$data['body'] = $this->request->get_post('page_body', 'strip_danger_tags');
+				$data['metatitle'] = $this->request->get_post('page_metatitle');
+				$data['metadescription'] = $this->request->get_post('page_metadescription');
+				$data['metakeywords'] = $this->request->get_post('page_metakeywords');
 
-			// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
-			$result = $this->pages_model->update($id, $data);
-			
-			if($result !== false) {
-	            Message::set('success', 'page_update_success');
-				$this->response->redirect('admin/pages');
-			} else {
-	            Message::set('error', 'unknown_error');
-				$this->response->redirect('admin/pages/update/' . $id);
-			}
-
-		}	
+				// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
+				$result = $this->pages_model->update($id, $data);
+				
+				if($result !== false) {
+		            Message::set('success', 'page_update_success');
+					$this->response->redirect('admin/pages');
+				} else {
+		            Message::set('error', 'unknown_error');
+					$this->response->redirect('admin/pages/update/' . $id);
+				}
+			}	
 		
 		$view = new View();
 		

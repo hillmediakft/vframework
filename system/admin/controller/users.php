@@ -383,7 +383,7 @@ class Users extends Admin_controller {
 	/**
 	 *	User törlése AJAX-al
 	 */
-	public function delete_user_AJAX()
+	public function delete()
 	{
         if($this->request->is_ajax()){
 	        if(Auth::hasAccess('delete_user')){
@@ -475,7 +475,7 @@ class Users extends Admin_controller {
             $upload_path = Config::get('user.upload_path');
 
             // Kiválasztott kép feltöltése
-            if ($this->request->get_params('id') == 'upload') {
+            if ($this->request->has_params('upload')) {
 
                 //képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül)	
                 $image = new Uploader($this->request->getFiles('img'));
@@ -500,7 +500,7 @@ class Users extends Admin_controller {
             }
 
             // Kiválasztott kép vágása és vágott kép feltöltése
-            else if ($this->request->get_params('id') == 'crop') {
+            else if ($this->request->has_params('crop')) {
 
                 // a croppic js küldi ezeket a POST adatokat 	
                 $imgUrl = $this->request->get_post('imgUrl');

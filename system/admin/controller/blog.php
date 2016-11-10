@@ -94,8 +94,10 @@ if($this->request->checkUploadError('upload_blog_picture')){
     /**
      * Blog bejegyzés módosítása
      */
-	public function update()
+	public function update($id)
 	{
+		$id = (int)$id;
+
 		if( $this->request->has_post() ){
 
 			// fájl feltöltési hiba ellenőrzése
@@ -128,7 +130,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 			$data['add_date'] = date('Y-m-d-G:i');
 
 		// adatbázis lekérdezés	
-			$result = $this->blog_model->update((int)$this->request->get_params('id'), $data);
+			$result = $this->blog_model->update($id, $data);
 		
 			if($result !== false) {
 	            // megvizsgáljuk, hogy létezik-e új feltöltött kép
@@ -142,7 +144,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 				$this->response->redirect('admin/blog');
 			} else {
 				Message::set('error', 'unknown_error');
-				$this->response->redirect('admin/blog/update/' . $this->request->get_params('id'));
+				$this->response->redirect('admin/blog/update/' . $id);
 			}	
 
 		}
@@ -152,7 +154,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 		$data['title'] = 'Admin blog oldal';
 		$data['description'] = 'Admin blog oldal description';	
 		$data['category_list'] = $this->blogcategory_model->selectCategory();
-		$data['blog'] = $this->blog_model->selectBlog($this->request->get_params('id'));
+		$data['blog'] = $this->blog_model->selectBlog($id);
 // $view->debug(true);		
 		$view->add_links(array('bootstrap-fileupload', 'ckeditor', 'vframework', 'blog_update'));
 		$view->render('blog/tpl_blog_update', $data);
@@ -161,7 +163,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 	/**
 	 *	Blog törlése AJAX-al
 	 */
-	public function delete_blog_AJAX()
+	public function delete()
 	{
         if($this->request->is_ajax()){
 	        if(1){

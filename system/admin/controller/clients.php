@@ -83,7 +83,7 @@ class Clients extends Admin_controller {
     /**
      * 	Partner törlése AJAX
      */
-    public function delete_client_AJAX()
+    public function delete()
     {
         if($this->request->is_ajax()){
             if(Auth::hasAccess('client_delete')){
@@ -159,9 +159,9 @@ class Clients extends Admin_controller {
     /**
      * 	Partner módosítása
      */
-    public function update()
+    public function update($id)
     {
-        $id = (int)$this->request->get_params('id');
+        $id = (int)$id;
         
         if ($this->request->has_post()) {
 
@@ -205,7 +205,7 @@ class Clients extends Admin_controller {
 
         $data['title'] = 'Partner módosítása oldal';
         $data['description'] = 'Partner módosítása description';
-        $data['client'] = $this->client_model->oneClient($this->request->get_params('id'));
+        $data['client'] = $this->client_model->oneClient($id);
 
         $view->add_links(array('bootstrap-fileupload', 'croppic', 'vframework', 'client_update'));
         $view->render('clients/tpl_client_update', $data);
@@ -244,11 +244,11 @@ class Clients extends Admin_controller {
     public function client_img_upload()
     {
         if ($this->request->is_ajax()) {
-        
+       
             // feltöltés helye
             $upload_path = Config::get('clientphoto.upload_path');
 
-            if ($this->request->get_params('id') == 'upload') {
+            if ($this->request->has_params('upload')) {
                 //képkezelő objektum létrehozása (a kép a szerveren a tmp könyvtárba kerül) 
                 $image = new Uploader($this->request->getFiles('img'));
                 $tempfilename = 'temp_' . uniqid();
@@ -274,7 +274,7 @@ class Clients extends Admin_controller {
             }
 
             // Kiválasztott kép vágása és vágott kép feltöltése
-            else if ($this->request->get_params('id') == 'crop') {
+            else if ($this->request->has_params('crop')) {
 
                 // a croppic js küldi ezeket a POST adatokat    
                 $imgUrl = $this->request->get_post('imgUrl');

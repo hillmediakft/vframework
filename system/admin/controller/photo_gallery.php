@@ -48,34 +48,34 @@ class Photo_gallery extends Admin_controller {
 	 */
 	public function insert()
 	{
-		if($this->request->has_post()) {
-			
-			if ($this->request->hasFiles('upload_gallery_photo')) {
-				$filename = $this->_uploadImage($this->request->getFiles('upload_gallery_photo'));
-				if ($filename === false) {
-					$this->response->redirect('admin/photo_gallery/insert');					
-				}
-			} else {
-				Message::set('error', $this->request->getFilesError('upload_gallery_photo'));
-				$this->response->redirect('admin/photo_gallery/insert');					
-			}
-
-			$data['photo_filename'] =  $filename;
-			$data['photo_caption'] = $this->request->get_post('photo_caption');
-			$data['photo_category'] = $this->request->get_post('photo_category', 'integer');
-			$data['photo_slider'] = ($this->request->has_post('photo_slider')) ? $this->request->get_post('photo_slider', 'integer') : 0;
+			if($this->request->has_post()) {
 				
-			// adatbázis lekérdezés
-			$result = $this->photo_gallery_model->insert($data);
-		
-			if($result !== false) {
-	            Message::set('success', 'new_photo_gallery_success');
-			} else {
-	            Message::set('error', 'unknown_error');
-			}
+				if ($this->request->hasFiles('upload_gallery_photo')) {
+					$filename = $this->_uploadImage($this->request->getFiles('upload_gallery_photo'));
+					if ($filename === false) {
+						$this->response->redirect('admin/photo-gallery/insert');					
+					}
+				} else {
+					Message::set('error', $this->request->getFilesError('upload_gallery_photo'));
+					$this->response->redirect('admin/photo-gallery/insert');					
+				}
 
-			$this->response->redirect('admin/photo-gallery');
-		}
+				$data['photo_filename'] =  $filename;
+				$data['photo_caption'] = $this->request->get_post('photo_caption');
+				$data['photo_category'] = $this->request->get_post('photo_category', 'integer');
+				$data['photo_slider'] = ($this->request->has_post('photo_slider')) ? $this->request->get_post('photo_slider', 'integer') : 0;
+					
+				// adatbázis lekérdezés
+				$result = $this->photo_gallery_model->insert($data);
+			
+				if($result !== false) {
+		            Message::set('success', 'new_photo_gallery_success');
+				} else {
+		            Message::set('error', 'unknown_error');
+				}
+
+				$this->response->redirect('admin/photo-gallery');
+			}
 		
 		$view = new View();
 
@@ -92,48 +92,48 @@ class Photo_gallery extends Admin_controller {
 	 *
 	 * @return void
 	 */
-	public function update()
+	public function update($id)
 	{
-		$id = (int)$this->request->get_params('id');
+		$id = (int)$id;
 
-		if ($this->request->has_post()) {
-			
-			if ($this->request->hasFiles('upload_gallery_photo')) {
-			
-				$filename = $this->_uploadImage($this->request->getFiles('upload_gallery_photo'));
-				if ($filename === false) {
-					$this->response->redirect('admin/photo_gallery/update');					
-				}
-
-				$data['photo_filename'] = $filename;
-				$data['photo_caption'] = $this->request->get_post('photo_caption');
-				$data['photo_category'] = $this->request->get_post('photo_category', 'integer');
-				$data['photo_slider'] = ($this->request->has_post('photo_slider')) ? $this->request->get_post('photo_slider', 'integer') : 0;
-
-				// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
-				$result = $this->photo_gallery_model->update($id, $data);
-						
-				if($result !== false) {
-					
-					if(isset($filename)){
-						$old_img = $this->image_path . $this->request->get_post('old_photo');
-						$old_img_thumb = DI::get('url_helper')->thumbPath($old_img);
-						DI::get('file_helper')->delete(array($old_img, $old_img_thumb));
+			if ($this->request->has_post()) {
+				
+				if ($this->request->hasFiles('upload_gallery_photo')) {
+				
+					$filename = $this->_uploadImage($this->request->getFiles('upload_gallery_photo'));
+					if ($filename === false) {
+						$this->response->redirect('admin/photo-gallery/update');					
 					}
-		            
-		            Message::set('success', 'photo_update_success');
-				} else {
-		            Message::set('error', 'unknown_error');
-				}
 
-				$this->response->redirect('admin/photo-gallery');
-			} else {
-				if (!$this->request->fileNoUploaded('upload_gallery_photo')) {
-					Message::set('error', $this->request->getFileError($index));
-					$this->response->redirect('admin/photo_gallery/update');
+					$data['photo_filename'] = $filename;
+					$data['photo_caption'] = $this->request->get_post('photo_caption');
+					$data['photo_category'] = $this->request->get_post('photo_category', 'integer');
+					$data['photo_slider'] = ($this->request->has_post('photo_slider')) ? $this->request->get_post('photo_slider', 'integer') : 0;
+
+					// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
+					$result = $this->photo_gallery_model->update($id, $data);
+							
+					if($result !== false) {
+						
+						if(isset($filename)){
+							$old_img = $this->image_path . $this->request->get_post('old_photo');
+							$old_img_thumb = DI::get('url_helper')->thumbPath($old_img);
+							DI::get('file_helper')->delete(array($old_img, $old_img_thumb));
+						}
+			            
+			            Message::set('success', 'photo_update_success');
+					} else {
+			            Message::set('error', 'unknown_error');
+					}
+
+					$this->response->redirect('admin/photo-gallery');
+				} else {
+					if (!$this->request->fileNoUploaded('upload_gallery_photo')) {
+						Message::set('error', $this->request->getFileError($index));
+						$this->response->redirect('admin/photo-gallery/update');
+					}
 				}
 			}
-		}
 		
 		$view = new View();
 
@@ -149,7 +149,7 @@ class Photo_gallery extends Admin_controller {
 	/**
 	 *	Photo törlése AJAX-al
 	 */
-	public function delete_photo_AJAX()
+	public function delete_photo()
 	{
         if($this->request->is_ajax()){
 	        if(1){
@@ -245,7 +245,7 @@ class Photo_gallery extends Admin_controller {
 	/**
 	 *	Kategória törlése AJAX-al
 	 */
-	public function delete_category_AJAX()
+	public function delete_category()
 	{
         if($this->request->is_ajax()){
 	        if(1){
