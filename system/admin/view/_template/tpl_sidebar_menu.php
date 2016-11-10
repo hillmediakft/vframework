@@ -102,12 +102,12 @@
             </a>
             <ul class="sub-menu">
                 <li class="nav-item <?php $this->menu_active('photo_gallery', 'index'); ?> ">
-                    <a href="admin/photo_gallery" class="nav-link ">
+                    <a href="admin/photo-gallery" class="nav-link ">
                         <span class="title">Képgaléria</span>
                     </a>
                 </li>
                 <li class="nav-item <?php $this->menu_active('photo_gallery', 'category'); ?> ">
-                    <a href="admin/photo_gallery/category" class="nav-link ">
+                    <a href="admin/photo-gallery/category" class="nav-link ">
                         <span class="title">Képgaléria kategóriák</span>
                     </a>
                 </li>
