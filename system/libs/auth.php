@@ -694,7 +694,7 @@ class Auth {
      */
     public function getAllPerms()
     {
-        $sth = $this->connect->query("SELECT `perm_id`, `perm_key`, `perm_desc` FROM `permissions`");
+        $sth = $this->connect->query("SELECT `perm_id`, `perm_key`, `perm_desc` FROM `permissions` ORDER BY `perm_key`");
         return $sth->fetchAll(PDO::FETCH_ASSOC);
     }
 
