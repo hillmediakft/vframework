@@ -350,10 +350,13 @@ class Users extends Admin_controller {
         $view->render('users/tpl_user_roles', $data);
     }
 	
-	
- 	public function edit_roles()
+	/**
+	 * Felhasználói csoport engedélyeinek módosítása
+	 */
+ 	public function edit_roles($id)
  	{
-        $role_id = (int)$this->request->get_params('id');
+        // $role_id = (int)$this->request->get_params('id');
+        $role_id = (int)$id;
         
         if ($this->request->has_post('submit_edit_roles')) {
 
