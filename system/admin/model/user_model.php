@@ -46,9 +46,9 @@ class User_model extends Admin_model {
             'users.user_role_id',
             'users.user_phone',
             'users.user_photo',
-            'roles.role_name'
+            'roles.role'
         ));
-        $this->query->set_join('left', 'roles', 'users.user_role_id', '=', 'roles.role_id');
+        $this->query->set_join('left', 'roles', 'users.user_role_id', '=', 'roles.id');
         
         if(!is_null($user_id)){
             $this->query->set_where('user_id', '=', $user_id);
