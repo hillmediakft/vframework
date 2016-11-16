@@ -24,7 +24,7 @@
             <!-- echo out the system feedback (error and success messages) -->
             <?php $this->renderFeedbackMessages(); ?>
  
-            <form action="admin/users/edit_roles/<?Php echo $role['role_id']; ?>" method="POST" id="edit_roles">				
+            <form action="admin/users/edit_roles/<?Php echo $role['id']; ?>" method="POST" id="edit_roles">				
             
                 <div class="portlet">
                     <div class="portlet-title">
@@ -40,7 +40,7 @@
                     
                     <div class="portlet-body">
                         <div class="table-toolbar">
-                            Felhasználói csoport: <span class="label label-info"><?php echo $role['role_name']; ?></span>
+                            Felhasználói csoport: <span class="label label-info"><?php echo $role['role']; ?></span>
                         </div>
 
                         <table class="table table-striped table-bordered table-hover">
@@ -52,16 +52,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($role_permissions as $permission) { 
-                                    $selected = (in_array($permission['perm_key'], $role['role_permissions']));
-                                    //$permission['bool']
+                                <?php foreach ($permissions as $permission) { 
+                                    $selected = (in_array($permission['key'], $allowed_permissions));
                                 ?>
                                 <tr class="odd gradeX">
-                                    <td><?php echo $permission['perm_key']; ?></td>
-                                    <td><?php echo $permission['perm_desc']; ?></td>
+                                    <td><?php echo $permission['key']; ?></td>
+                                    <td><?php echo $permission['desc']; ?></td>
                                     <td>
                                         <div class="form-group">
-                                            <select name="<?php echo $permission['perm_key']; ?>" class="form-control small" <?php echo($permission['perm_key'] == 'menu_home') ? 'disabled' : '';?>>
+                                            <select name="<?php echo $permission['id']; ?>" class="form-control small" <?php echo($permission['key'] == 'home_menu') ? 'disabled' : '';?>>
                                                 <option value="0" <?php echo (!$selected) ? 'selected' : '';?>>Tiltott</option>
                                                 <option value="1" <?php echo ($selected) ? 'selected' : '';?>>Engedélyezett</option>
                                             </select>

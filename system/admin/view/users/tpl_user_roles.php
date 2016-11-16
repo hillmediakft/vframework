@@ -50,23 +50,23 @@
                         </thead>
                         <tbody>
 
-                            <?php foreach ($roles as $value) { ?>
+                            <?php foreach ($roles as $role) { ?>
                                 <tr class="odd gradeX">
-                                    <td><?php echo $value['role_id']; ?></td>
-                                    <td><?php echo $value['role_name']; ?></td>
-                                    <td><?php echo $value['role_desc']; ?></td>
+                                    <td><?php echo $role['id']; ?></td>
+                                    <td><?php echo $role['role']; ?></td>
+                                    <td><?php echo $role['desc']; ?></td>
                                     <?php
                                         // megszámoljuk, hogy az éppen aktuális kategóriának mennyi eleme van a jobs tábla job_category_id oszlopában
                                         $counter = 0;
                                         foreach ($roles_counter as $v) {
-                                            if ($value['role_id'] == $v['user_role_id']) {
+                                            if ($role['id'] == $v['user_role_id']) {
                                                 $counter++;
                                             }
                                         }
                                         ?>
                                     <td><?php echo $counter; ?></td>			
                                     <td>
-                                        <a class="btn btn-sm grey-steel" href="admin/users/edit_roles/<?php echo $value['role_id'];?>" ><i class="fa fa-pencil"></i>
+                                        <a class="btn btn-sm grey-steel" href="admin/users/edit_roles/<?php echo $role['id'];?>" ><i class="fa fa-pencil"></i>
                                             Szerkeszt</a>
                                     </td>
                                 </tr>

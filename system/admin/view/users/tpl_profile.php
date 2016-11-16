@@ -33,7 +33,7 @@
 				<table class="table table-striped">  
 					<tbody>
 						<tr><td>Felhasználó név:</td><td><?php echo $user['user_name'];?></td></tr>
-						<tr><td>Jogosultság:</td><td><?php echo $user['role_name'];?></td></tr>
+						<tr><td>Jogosultság:</td><td><?php echo $user['role'];?></td></tr>
 						<tr><td>E-mail:</td><td><?php echo $user['user_email'];?></td></tr>
 						<tr><td>Telefon:</td><td><?php echo $user['user_phone'];?></td></tr>
 					</tbody>

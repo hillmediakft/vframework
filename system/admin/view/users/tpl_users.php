@@ -79,23 +79,23 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($all_user as $value) { ?>
+                                <?php foreach ($users as $user) { ?>
                                 <tr class="odd gradeX">
                                     <td>
-                                    <?php if (Auth::hasAccess('delete_user') && $value['user_id'] != $loggedin_user_id) { ?>
-                                        <input type="checkbox" class="checkboxes" name="user_id_<?php echo $value['user_id']; ?>" value="<?php echo $value['user_id']; ?>"/>
+                                    <?php if (Auth::hasAccess('user_delete') && $user['user_id'] != $loggedin_user_id) { ?>
+                                        <input type="checkbox" class="checkboxes" name="user_id_<?php echo $user['user_id']; ?>" value="<?php echo $user['user_id']; ?>"/>
                                     <?php } ?>	
                                     </td>
-                                    <td><img src="<?php echo $this->getConfig('user.upload_path') . $value['user_photo']; ?>" width="60" height="60"/></td>
-                                    <td><?php echo $value['user_name']; ?></td>
-                                    <td><?php echo $value['user_first_name'] . ' ' . $value['user_last_name']; ?></td>
-                                    <td><a href="mailto:<?php echo $value['user_email']; ?>"><?php echo $value['user_email']; ?> </a></td>
-                                    <td><?php echo $value['user_phone']; ?></td>
-                                    <td><?php echo $value['role_name']; ?></td>
-                                    <?php if ($value['user_active'] == 1) { ?>
+                                    <td><img src="<?php echo $this->getConfig('user.upload_path') . $user['user_photo']; ?>" width="60" height="60"/></td>
+                                    <td><?php echo $user['user_name']; ?></td>
+                                    <td><?php echo $user['user_first_name'] . ' ' . $user['user_last_name']; ?></td>
+                                    <td><a href="mailto:<?php echo $user['user_email']; ?>"><?php echo $user['user_email']; ?> </a></td>
+                                    <td><?php echo $user['user_phone']; ?></td>
+                                    <td><?php echo $user['role']; ?></td>
+                                    <?php if ($user['user_active'] == 1) { ?>
                                         <td><span class="label label-sm label-success">Aktív</span></td>
                                     <?php } ?>
-                                    <?php if ($value['user_active'] == 0) { ?>
+                                    <?php if ($user['user_active'] == 0) { ?>
                                         <td><span class="label label-sm label-danger">Inaktív</span></td>
                                     <?php } ?>
                                     <td>									
@@ -104,23 +104,23 @@
 
                                                 <a class="btn btn-sm grey-steel" title="műveletek" data-toggle="dropdown"><i class="fa fa-cogs"></i></a>
                                                 <ul class="dropdown-menu pull-right">
-                                                    <?php if (Auth::hasAccess('update_user')) { ?>	
-                                                        <li><a href="admin/users/profile/<?php echo $value['user_id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
+                                                    <?php if (Auth::hasAccess('user_update')) { ?>	
+                                                        <li><a href="admin/users/profile/<?php echo $user['user_id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
                                                     <?php } else { ?>
                                                         <!-- <li class="disabled-link"><a class="disable-target"><i class="fa fa-pencil"></i> Szerkeszt</a></li> -->
                                                     <?php } 
-                                                        if (Auth::hasAccess('delete_user') && $value['user_id'] != $loggedin_user_id) { ?>
-                                                        <li><a class="delete_item" data-id="<?php echo $value['user_id']; ?>"> <i class="fa fa-trash"></i> Töröl</a></li>
+                                                        if (Auth::hasAccess('user_delete') && $user['user_id'] != $loggedin_user_id) { ?>
+                                                        <li><a class="delete_item" data-id="<?php echo $user['user_id']; ?>"> <i class="fa fa-trash"></i> Töröl</a></li>
                                                     <?php } else { ?>
                                                         <!-- <li class="disabled-link"><a class="disable-target" title="Nem törölhető"><i class="fa fa-trash"></i> Töröl</a></li> -->
                                                     <?php } ?>
 
-                                                    <?php if (Auth::hasAccess('change_status_user') && $value['user_id'] != $loggedin_user_id) { ?>	
-                                                        <?php if ($value['user_active'] == 1) { ?>
-                                                            <li><a class="change_status" data-id="<?php echo $value['user_id']; ?>" data-action="make_inactive"><i class="fa fa-ban"></i> Blokkol</a></li>
+                                                    <?php if (Auth::hasAccess('user_changestatus') && $user['user_id'] != $loggedin_user_id) { ?>	
+                                                        <?php if ($user['user_active'] == 1) { ?>
+                                                            <li><a class="change_status" data-id="<?php echo $user['user_id']; ?>" data-action="make_inactive"><i class="fa fa-ban"></i> Blokkol</a></li>
                                                         <?php } ?>
-                                                        <?php if ($value['user_active'] == 0) { ?>
-                                                            <li><a class="change_status" data-id="<?php echo $value['user_id']; ?>" data-action="make_active"><i class="fa fa-check"></i> Aktivál</a></li>
+                                                        <?php if ($user['user_active'] == 0) { ?>
+                                                            <li><a class="change_status" data-id="<?php echo $user['user_id']; ?>" data-action="make_active"><i class="fa fa-check"></i> Aktivál</a></li>
                                                         <?php } ?>
                                                     <?php } ?>	
                                                 </ul>
