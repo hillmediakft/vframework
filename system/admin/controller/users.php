@@ -27,7 +27,7 @@ class Users extends Admin_controller {
 
 		$data['title'] = 'Users oldal';
 		$data['description'] = 'Users oldal description';
-        $data['all_user'] = $this->user_model->selectUser();
+        $data['users'] = $this->user_model->selectUser();
 
 		$view->add_links(array('datatable', 'bootbox','vframework','users'));
 		$view->render('users/tpl_users', $data);
@@ -374,11 +374,13 @@ class Users extends Admin_controller {
         $data['description'] = 'Felhasználói jogosultságok szerkesztése description';
 		
 		$auth = DI::get('auth');
-		// összes permission	
-		$data['role_permissions'] = $auth->getAllPerms();
-		// a $role_id-hez tartozó szerep adatai és engedélyei
+		// összes permissiont	
+		$data['permissions'] = $auth->getAllPerms();
+		// a $role_id-hez tartozó szerep adatai
 		$data['role'] = $auth->getRoles($role_id);
-
+		// a $role_id-hez tartozó szerep engedélyei
+		$data['allowed_permissions'] = $auth->getRolePerms($role_id);
+		
 		$view->add_link('js', ADMIN_JS . 'pages/common.js');
         $view->render('users/tpl_edit_roles', $data);
     }
