@@ -590,8 +590,6 @@ class Auth {
 
 // ---- ACL -------------
 
-
-// JSON tömbös megoldás -------------------------------------------------
     /**
      * Felhasználó engedélyének ellenőrzése a megadott művlethez 
      * 
@@ -606,7 +604,7 @@ class Auth {
 
         // ha még nincsenek lekérdezve a bejelentkezett felhasználó permission-jai
         if (is_null($instance->permissions)) {
-            $role_id = $instance->getRoleId();                            
+            $role_id = (Auth::isUserLoggedIn()) ? $instance->getRoleId() : 4;
             $instance->permissions = $instance->getRolePerms($role_id);
         }
 
@@ -625,22 +623,32 @@ class Auth {
      * Engedélyek mentése
      *
      * @param integer $role_id
-     * @param array $permission_data - engedély_kulcsa => '1', engedély_kulcsa => '0'... 
+     * @param array $permission_data - engedély_id => '1', engedély_id => '0'... 
      */
     public function savePerms($role_id, $permissions_data)
     {
-        $temp = array();
-        foreach ($permissions_data as $key => $value) {
-            if ($value == '1' || $value == 'on') {
-                $temp[] = $key;  
-            }    
+        // lekérdezzük a role_perms tábla megadott szerephez tartozó permission id-it és berakjuk egy tömbbe
+        $role_perms_arr = array();    
+        $sql = "SELECT * FROM `role_perm` WHERE `role_id` = {$role_id}";
+        $sth = $this->connect->query($sql);
+        while ($row = $sth->fetch(PDO::FETCH_ASSOC)) {
+            $role_perms_arr[] = $row['perm_id'];
         }
 
-        $role_permissions = json_encode($temp);
+        foreach ($permissions_data as $perm_id => $value)
+        {
+            $privilege = ($value == '1' || $value == 'on') ? 1 : 0;
 
-        $sql = "UPDATE `roles` SET `role_permissions` = :role_permissions WHERE `role_id` = :role_id";
-        $sth = $this->connect->prepare($sql);
-        $sth->execute(array(':role_permissions' => $role_permissions,':role_id' => $role_id));
+            // megnézzük, hogy role-hoz engedélyezve van-e már a permission
+            if (!in_array($perm_id, $role_perms_arr) && $privilege == 1) {
+                $sql_insert = "INSERT INTO `role_perm` (`role_id`, `perm_id`) VALUES ({$role_id}, {$perm_id})";
+                $this->connect->query($sql_insert);
+            }
+            elseif (in_array($perm_id, $role_perms_arr) && $privilege == 0) {
+                $sql_delete = "DELETE FROM `role_perm` WHERE `role_id` = {$role_id} AND `perm_id` = {$perm_id}";
+                $this->connect->query($sql_delete);
+            }
+        }
     }
 
     /**
@@ -648,27 +656,16 @@ class Auth {
      * @param integer $id
      * @return array
      */
-    public function getRoles($role_id = null)
+    public function getRoles($id = null)
     {
         $where = "";
-        if (!is_null($role_id)) {
-            $role_id = (int)$role_id;
-            $where .= " WHERE `role_id` = {$role_id}"; 
+        if (!is_null($id)) {
+            $id = (int)$id;
+            $where .= " WHERE `id` = {$id}"; 
         }    
         $sth = $this->connect->query("SELECT * FROM `roles`" . $where);
         $result = $sth->fetchAll(PDO::FETCH_ASSOC);
-
-        if (count($result) == 1) {
-            $result[0]['role_permissions'] = json_decode($result[0]['role_permissions']); 
-            return $result[0];
-        } else {
-            foreach ($result as $key => &$value) {
-                $value['role_permissions'] = json_decode($value['role_permissions']);
-            }
-            return $result;
-        }
-
-        //return (count($result) == 1) ? $result[0] : $result;
+        return (count($result) == 1) ? $result[0] : $result;
     }
 
     /**
@@ -679,22 +676,26 @@ class Auth {
     public function getRolePerms($role_id)
     {
         $role_id = (int)$role_id;    
-        $sth = $this->connect->query("SELECT `role_permissions` FROM `roles` WHERE `role_id` = {$role_id}");
-        $result = $sth->fetch(PDO::FETCH_ASSOC);
-            //$sql = "SELECT `role_permissions` FROM `roles` WHERE `role_id` = :role_id";
-            //$sth = $this->connect->prepare($sql);
-            //$sth->execute(array(':role_id' => (int)$role_id));
-            //$result = $sth->fetch(PDO::FETCH_ASSOC);
-        return json_decode($result['role_permissions']);
+        $sql = "SELECT `permissions`.`key` FROM `role_perm`
+                JOIN `permissions` ON `role_perm`.`perm_id` = `permissions`.`id`
+                WHERE `role_perm`.`role_id` = {$role_id}";
+        
+        $sth = $this->connect->query($sql);
+
+        $permissions = array();
+        while ($row = $sth->fetch(PDO::FETCH_ASSOC)) {
+            $permissions[] = $row['key'];
+        }
+        return $permissions;
     }
 
     /**
-     * Visszaadja az összes permissions-t (`perm_id`, `perm_key`, `perm_desc` oszlop tartalmát)
+     * Visszaadja az összes permissions-t (`id`, `key`, `desc` oszlop tartalmát)
      * @return array
      */
     public function getAllPerms()
     {
-        $sth = $this->connect->query("SELECT `perm_id`, `perm_key`, `perm_desc` FROM `permissions` ORDER BY `perm_key`");
+        $sth = $this->connect->query("SELECT `id`, `key`, `desc` FROM `permissions` ORDER BY `key`");
         return $sth->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -747,120 +748,6 @@ class Auth {
         header('location: ' . $target_url);
         exit;
     }
-
-// JSON tömbös megoldás VÉGE -------------------------------------------------
-
-
-// Hagyományos megoldás adatok a role_perm táblából JOIN-al ------------------
-
-    /**
-     *
-     * @param string $permission    egy művelet neve pl.: delete_user 
-     * @param string $target_url    egy átirányítási hely, ha nincs engedély 
-     * @return void
-     */
-/*    
-    public static function has_access($permission, $target_url = null)
-    {
-        $instance = self::instance();    
-
-        // ha még nincsenek lekérdezve a bejelentkezett felhasználó permission-jai
-        if (is_null($instance->permissions)) {
-            $role_id = $instance->getRoleId();                            
-            $instance->permissions = $instance->get_role_perms($role_id);
-        }
-
-        if($instance->_checkAccess($permission)){
-            return true;
-        }
-        else {
-            if(!is_null($target_url)) {
-                $instance->_accessDenied($permission, $target_url);
-            }
-            return false;
-        }
-    } 
-*/
-
-    /**
-     * Lekérdezi, hogy egy bizonyos felhasználói csoport milyen engedélyekkel rendelkezik
-     * (permissions tábla perm_key elemeiből adja vissza azokat, amelyek engedélyezve vannak a paraméterben kapott felhasználói csoportnak)
-     * 
-     * @param integer $role_id      felhasználói csoport role_id-je
-     * @return array 
-     */
-/*
-    public function get_role_perms($role_id)
-    {
-        $role_id = (int)$role_id;    
-        $sql = "SELECT `permissions`.`perm_key` FROM `role_perm`
-                JOIN `permissions` ON `role_perm`.`perm_id` = `permissions`.`perm_id`
-                WHERE `role_perm`.`role_id` = {$role_id}";
-        
-        $sth = $this->connect->query($sql);
-        $permissions = array();
-        while ($row = $sth->fetch(PDO::FETCH_ASSOC)) {
-            $permissions[] = $row['perm_key'];
-        }
-        return $permissions;
-    }
-*/
-
-    /**
-     * Visszaadja a megadott role_id-jű csoport mindent adatát (paraméter nélkül minden adatot) a roles táblából 
-     * @param integer $id
-     * @return array
-     */
-/*
-    public function get_roles($role_id = null)
-    {
-        $where = "";
-        if (!is_null($role_id)) {
-            $role_id = (int)$role_id;
-            $where .= " WHERE `role_id` = {$role_id}"; 
-        }    
-        $sth = $this->connect->query("SELECT * FROM `roles`" . $where);
-        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
-        return (count($result) == 1) ? $result[0] : $result;
-    }
-*/
-
-    /**
-     * A módosított emgedélyek listájának lementése  
-     * @param   int     $role_id a felhasználó csoport id-je
-     * @return  boolean true ha sikeres, false ha sikertelen
-     */
-/*
-    public function save_role_permissions($role_id, $permissions_data)
-    {
-        $permission_list = $this->getAllPerms();
-        
-        foreach ($permission_list as $val) {
-            $perm_list[$val['perm_key']] = $val['perm_id'];
-        }
-
-        foreach ($permissions_data as $key => $value) {
-            // megnézzük, hogy role-hoz engedélyezve van-e már a permission
-            $sql = "SELECT * FROM `role_perm` WHERE `role_id` = {$role_id} AND `perm_id` = {$perm_list[$key]}";
-            $sth = $this->connect->query($sql);
-            $result = $sth->fetchAll();
-
-            if (empty($result) && $value == '1') {
-                // adatbázisba írás  $role_id= 2 és $perm_id = $perm_list[$key]
-                $sql_insert = "INSERT INTO `role_perm` (`role_id`, `perm_id`) VALUES ({$role_id}, {$perm_list[$key]})";
-                $sth = $this->connect->query($sql_insert);
-            }
-            elseif (!empty($result) && $value == '0') {
-                $sql_delete = "DELETE FROM `role_perm` WHERE `role_id` = {$role_id} AND `perm_id` = {$perm_list[$key]}";
-                $sth = $this->connect->query($sql_delete);
-            }
-        }
-
-        Message::set('success', 'Módosítások elmentve!');
-        return true;
-    }
-*/
-// Hagyományos megoldás adatok a role_perm táblából JOIN-al VÉGE -------------
 
 } //osztály vége
 ?>
