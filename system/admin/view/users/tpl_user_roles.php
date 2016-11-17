@@ -59,7 +59,7 @@
                                         // megszámoljuk, hogy az éppen aktuális kategóriának mennyi eleme van a jobs tábla job_category_id oszlopában
                                         $counter = 0;
                                         foreach ($roles_counter as $v) {
-                                            if ($role['id'] == $v['user_role_id']) {
+                                            if ($role['id'] == $v['role_id']) {
                                                 $counter++;
                                             }
                                         }
