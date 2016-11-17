@@ -81,7 +81,7 @@
                 </li>
                 <?php } ?>
                 <li class="nav-item <?php $this->menu_active('users', 'profile'); ?> ">
-                    <a href="admin/users/profile/<?php echo Auth::getUser('user_id'); ?>" class="nav-link ">
+                    <a href="admin/users/profile/<?php echo Auth::getUser('id'); ?>" class="nav-link ">
                         <span class="title">Profilom</span>
                     </a>
                 </li>
