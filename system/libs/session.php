@@ -64,6 +64,8 @@ class Session
     	if (strpos($key, '.') === false) {
 	    	if (isset($_SESSION[$key])) {
 	            return $_SESSION[$key];
+	        } else {
+	        	return false;
 	        }
     	} else {
 			return self::_get_array_value($_SESSION, $key);
