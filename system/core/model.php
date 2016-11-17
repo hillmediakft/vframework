@@ -72,7 +72,7 @@ class Model {
 	 *
 	 *		'where' => array(
 	 *				   	 array('color', '=', 'red'),
-	 *				   	 array('name', '=', 'ede')
+	 *				   	 array('name', '=', 'ede', or)
 	 *				   );	
 	 *
 	 * 		'limit' => 5,
@@ -91,7 +91,8 @@ class Model {
 
 		if (is_int($args)) {
 			$this->query->set_where($this->id, '=', $args);
-			return $this->query->select();
+			$result = $this->query->select();
+			return $result[0];
 		}
 
 		if (is_array($args)) {
@@ -106,21 +107,15 @@ class Model {
 
 				foreach ($args['where'] as $where_arr) {
 					if (is_array($where_arr)) {
-						foreach ($where_arr as $v) {
-							if (isset($v[3])) {
-								$this->query->set_where($v[0], $v[1], $v[2], $v[3]);
-							} else {
-								$this->query->set_where($v[0], $v[1], $v[2]);
-							}
-						}
-					} else {
 						if (isset($where_arr[3])) {
 							$this->query->set_where($where_arr[0], $where_arr[1], $where_arr[2], $where_arr[3]);
 						} else {
 							$this->query->set_where($where_arr[0], $where_arr[1], $where_arr[2]);
 						}
+					} else {
+						$this->query->set_where($args['where'][0], $args['where'][1], $args['where'][2]);
+						break;
 					}
-
 				}
 
 			}
@@ -134,7 +129,7 @@ class Model {
 				list($columns, $exposure) = $args['orderby'];
 				$this->query->set_orderby($columns, $exposure); 
 			}
-			
+//$this->query->debug();			
 			return $this->query->select();
 		}
 
