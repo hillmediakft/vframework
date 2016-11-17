@@ -86,7 +86,7 @@ class Auth {
     protected $guest_login = array(
         'id' => 0,
         'name' => 'guest',
-        'role_id' => '4',
+        'role_id' => '0',
         'email' => false
     );
 */
@@ -602,10 +602,16 @@ class Auth {
         //$instance = self::instance();   
         $instance = DI::get('auth');
 
-        // ha még nincsenek lekérdezve a bejelentkezett felhasználó permission-jai
+        // ha még nincsenek lekérdezve a felhasználó permission-jai
         if (is_null($instance->permissions)) {
-            $role_id = (Auth::isUserLoggedIn()) ? $instance->getRoleId() : 4;
-            $instance->permissions = $instance->getRolePerms($role_id);
+            
+            if (Auth::isUserLoggedIn()) {
+                $role_id = $instance->getRoleId();
+                $instance->permissions = ($role_id == 1) ? array('*') : $instance->getRolePerms($role_id);
+                //$instance->permissions = $instance->getRolePerms($role_id);
+            } else {
+                $instance->permissions = array();
+            }
         }
 
         if($instance->_checkAccess($permission)){
@@ -707,7 +713,7 @@ class Auth {
     private function _checkAccess($permission)
     {
             /*
-            $sql = "SELECT `perm_id` FROM `permissions` WHERE `perm_key` = :perm_key";    
+            $sql = "SELECT `id` FROM `permissions` WHERE `key` = :perm_key";    
             $sth = $this->connect->prepare($sql);
             $sth->execute(array(':perm_key' => $permission));
             $result = $sth->fetch(PDO::FETCH_ASSOC);
@@ -715,7 +721,12 @@ class Auth {
                 return false;
             }
             */
-        return in_array($permission, $this->permissions);
+
+        if ($this->permissions[0] == '*') {
+            return true;
+        } else {
+            return in_array($permission, $this->permissions);
+        }
     }
 
     /**
