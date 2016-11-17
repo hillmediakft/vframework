@@ -22,15 +22,15 @@ $config['auth'] = array(
 	/**
 	 * A user tábla username oszlop neve
 	 */
-	'username_colname' => 'user_name',
+	'username_colname' => 'name',
 	/**
 	 * A user tábla username oszlop neve
 	 */
-	'email_colname' => 'user_email',
+	'email_colname' => 'email',
 	/**
 	 * A user tábla password oszlop neve
 	 */
-	'password_colname' => 'user_password_hash',
+	'password_colname' => 'password_hash',
 	/**
 	 * Átirányítás helye: pl.: login (ilyenkor a site_url/login oldalra fog irányítani)
 	 * Ez lesz az alapbeállítás, ha a handleExpire(), vagy handleLogin() metódust paraméter nélkül hívjuk meg
