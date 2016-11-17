@@ -23,19 +23,19 @@
 			
 			<div class="row user-profile">
 				<div class="col-md-3">
-					<img class="img-responsive" src="<?php echo $this->getConfig('user.upload_path') . $user['user_photo']; ?>" alt="">
+					<img class="img-responsive" src="<?php echo $this->getConfig('user.upload_path') . $user['photo']; ?>" alt="">
 				</div>
 				
 				<div class="col-md-4">
-				<h3 style="margin-top: 0px;"><?php echo $user['user_first_name'] . " " . $user['user_last_name'];?></h3>
+				<h3 style="margin-top: 0px;"><?php echo $user['first_name'] . " " . $user['last_name'];?></h3>
 			
 				
 				<table class="table table-striped">  
 					<tbody>
-						<tr><td>Felhasználó név:</td><td><?php echo $user['user_name'];?></td></tr>
+						<tr><td>Felhasználó név:</td><td><?php echo $user['name'];?></td></tr>
 						<tr><td>Jogosultság:</td><td><?php echo $user['role'];?></td></tr>
-						<tr><td>E-mail:</td><td><?php echo $user['user_email'];?></td></tr>
-						<tr><td>Telefon:</td><td><?php echo $user['user_phone'];?></td></tr>
+						<tr><td>E-mail:</td><td><?php echo $user['email'];?></td></tr>
+						<tr><td>Telefon:</td><td><?php echo $user['phone'];?></td></tr>
 					</tbody>
 				</table>		
 				</div>
@@ -71,7 +71,7 @@
 								<li class="active"><a data-toggle="tab" href="#tab_1_1"><i class="fa fa-cog"></i>Személyes adatok</a><span class="after"></span></li>
 								<li ><a data-toggle="tab" href="#tab_2_2"><i class="fa fa-picture-o"></i> Profil kép</a></li>
 								<li ><a data-toggle="tab" href="#tab_3_3"><i class="fa fa-lock"></i> Jelszó</a></li>
-								<?php if(Auth::hasAccess('update_user_perm')) { ?>
+								<?php if(Auth::hasAccess('user_updateperm')) { ?>
 								<li ><a data-toggle="tab" href="#tab_4_4"><i class="fa fa-wrench"></i> Jogosultságok</a></li>
 								<?php } ?>
 							</ul>
@@ -87,23 +87,23 @@
 
 									<div class="form-group">
 										<label for="name" class="control-label">Felhasználó név<span class="required">*</span></label>
-										<input type="text" name="name" id="name" value="<?php echo $user['user_name'];?>" placeholder="minimum hat karakter, ékezetek nélkül" class="form-control input-xlarge" />
+										<input type="text" name="name" id="name" value="<?php echo $user['name'];?>" placeholder="minimum hat karakter, ékezetek nélkül" class="form-control input-xlarge" />
 									</div>
 									<div class="form-group">
 										<label for="last_name" class="control-label">Vezetéknév<span class="required">*</span></label>
-										<input type="text" name="first_name" id="last_name" value="<?php echo $user['user_first_name'];?>" placeholder="" class="form-control input-xlarge" />
+										<input type="text" name="first_name" id="last_name" value="<?php echo $user['first_name'];?>" placeholder="" class="form-control input-xlarge" />
 									</div>
 									<div class="form-group">
 										<label for="first_name" class="control-label">Keresztnév<span class="required">*</span></label>
-										<input type="text" name="last_name" id="first_name" value="<?php echo $user['user_last_name'];?>" placeholder="" class="form-control input-xlarge" />
+										<input type="text" name="last_name" id="first_name" value="<?php echo $user['last_name'];?>" placeholder="" class="form-control input-xlarge" />
 									</div>
 									<div class="form-group">
 										<label class="control-label">Telefonszám</label>
-										<input type="text" name="phone" value="<?php echo $user['user_phone'];?>" placeholder="országkód-körzetszám-xxx-xxx formátumban" class="form-control input-xlarge" />
+										<input type="text" name="phone" value="<?php echo $user['phone'];?>" placeholder="országkód-körzetszám-xxx-xxx formátumban" class="form-control input-xlarge" />
 									</div>
 									<div class="form-group">
 										<label for="email" class="control-label">E-mail cím<span class="required">*</span></label>
-										<input type="text" value="<?php echo $user['user_email'];?>" placeholder="" name="email" id="email" class="form-control input-xlarge" />
+										<input type="text" value="<?php echo $user['email'];?>" placeholder="" name="email" id="email" class="form-control input-xlarge" />
 									</div>
 
 								</div>
@@ -115,7 +115,7 @@
 										
 									<div id="user_image"></div>	
 									<input type="hidden" name="img_url" id="OutputId" >			
-									<input type="hidden" id="old_img"  value="<?php echo $this->getConfig('user.upload_path') . $user['user_photo'];?>" name="old_img">
+									<input type="hidden" id="old_img"  value="<?php echo $this->getConfig('user.upload_path') . $user['photo'];?>" name="old_img">
 									
 									<div class="clearfix"></div>
 
@@ -145,7 +145,7 @@
 								
 <!-- ****************************** JOGOSULTSÁGOK ***************************** -->										
 								
-                            <?php if(Auth::hasAccess('update_user_perm')) { ?>
+                            <?php if(Auth::hasAccess('user_updateperm')) { ?>
 								<div id="tab_4_4" class="tab-pane">
 								
 									<h3>Felhasználói jogosultság</h3>
@@ -158,15 +158,15 @@
 										<label><strong>Felhasználói csoportok</strong></label>
 										<div class="radio-list">
 											<label>
-											<input type="radio" name="user_group" value="1" <?php echo ($user['user_role_id'] == 1) ? 'checked' : '';?> />
+											<input type="radio" name="user_group" value="1" <?php echo ($user['role_id'] == 1) ? 'checked' : '';?> />
 											Szuper adminisztrátor - teljes jogkör
 											</label>
 											<label>
-											<input type="radio" name="user_group" value="2" <?php echo ($user['user_role_id'] == 2) ? 'checked' : '';?> />
+											<input type="radio" name="user_group" value="2" <?php echo ($user['role_id'] == 2) ? 'checked' : '';?> />
 											Adminisztrátor - széles körű jogkör
 											</label>  
 								<!--			<label>
-											<input type="radio" name="user_group" value="3" <?php //echo ($user['user_role_id'] == 3) ? 'checked' : '';?> />
+											<input type="radio" name="user_group" value="3" <?php //echo ($user['role_id'] == 3) ? 'checked' : '';?> />
 											Regisztrált felhasználó - korlátozott jogkör
 											</label>    -->
 										</div>
