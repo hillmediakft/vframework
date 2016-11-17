@@ -10,11 +10,11 @@ use PDO;
 *   Publikus statikus metódusok:
 *       
 *       Auth::init(); - Auth beállítások betöltése a config tömbbe, area megadása
-*       Auth::instance(); - Visszadja az Auth objektumot
+*       DI konténer esetén nincs használatban! Auth::instance(); - Visszadja az Auth objektumot
 *       Auth::check(); - Ellenőrzi, hogy be van-e jelentkezve a felhasználó és lejárt e a munkamenet időkorlát
 *       Auth::isUserLoggedIn(); - Ellenőrzi, hogy be van-e jelentkezve a felhasználó (a session user_logged_in elem meglétét és tartalmát vizsgálja)
 *       Auth::getUser('valamilyen_adat'); - Bejelentkezett user paraméterben megadott adatának visszaadása a 'data_user' session elemből
-*       Auth::getRoleId(); - A bejelentkezett felhasználó role_id-jét adja vissza a asessionből
+*       Auth::getRoleId(); - A bejelentkezett felhasználó role_id-jét adja vissza a sessionből
 * ACL:       
 *       Auth::hasAccess('valamilyen_művelet'); - Felhasználó engedélyének ellenőrzése a megadott művlethez
 *
@@ -84,10 +84,10 @@ class Auth {
      */
 /*    
     protected $guest_login = array(
-        'user_id' => 0,
-        'user_name' => 'guest',
-        'user_role_id' => '0',
-        'user_email' => false
+        'id' => 0,
+        'name' => 'guest',
+        'role_id' => '4',
+        'email' => false
     );
 */
 
@@ -149,7 +149,7 @@ class Auth {
        
             // ha admin felületre akar belépni a felhasználó, akkor megvizsgáljuk, hogy van-e jogosultsága hozzá
             if(self::$area == 'admin') {
-                if(Session::get('user_data.user_provider_type') !== 'admin') {
+                if(Session::get('user_data.provider_type') !== 'admin') {
                     Message::set('error', 'Nincs jogosultsága az oldalra való belépéshez!');
                     return false;
                 }
@@ -217,7 +217,7 @@ class Auth {
      */
     public function getRoleId()
     {
-        return Session::get('user_data.user_role_id');
+        return Session::get('user_data.role_id');
     }
 
     /**
@@ -260,29 +260,29 @@ class Auth {
             return false;
         }
     // block login attempt if somebody has already failed 3 times and the last login attempt is less than 30sec ago
-        if (($this->user->user_failed_logins >= 3) AND ($this->user->user_last_failed_login > (time()-30))) {
+        if (($this->user->failed_logins >= 3) AND ($this->user->last_failed_login > (time()-30))) {
             $this->setError('password_wrong_3_times');
             return false;
         }
     // ha hibás a jelszó
-        if (!$this->_verifyPassword($password, $this->user->user_password_hash)) {
+        if (!$this->_verifyPassword($password, $this->user->password_hash)) {
             $this->_registerFailedLogin($username_or_email);
             return false;
         }
     // a user_active mező értékének vizsgálata         
-        if (!$this->_isActive($this->user->user_active)) {
+        if (!$this->_isActive($this->user->active)) {
             $this->setError('Az ön belépési engedélye fel van függesztve!');
             return false;
         }
 
     // user login adatok eltárolása session-ben
         $user_data = array(
-            'user_id' => $this->user->user_id,
-            'user_name' => $this->user->user_name,
-            'user_email' => $this->user->user_email,
-            'user_role_id' => $this->user->user_role_id,
-            'user_photo' => $this->user->user_photo,
-            'user_provider_type' => $this->user->user_provider_type
+            'id' => $this->user->id,
+            'name' => $this->user->name,
+            'email' => $this->user->email,
+            'role_id' => $this->user->role_id,
+            'photo' => $this->user->photo,
+            'provider_type' => $this->user->provider_type
         );
 
         Session::init();
@@ -299,10 +299,10 @@ class Auth {
             // generálunk egy 64 karakter hosszú string-et
             $random_token_string = hash('sha256', mt_rand());
             // adat a pdo objektum execute metódusának    
-            $data[':user_rememberme_token'] = $random_token_string; 
+            $data[':rememberme_token'] = $random_token_string; 
 
             // generate cookie string that consists of user id, random string and combined hash of both
-            $cookie_string_first_part = $this->user->user_id . ':' . $random_token_string;
+            $cookie_string_first_part = $this->user->id . ':' . $random_token_string;
             $cookie_string_hash = hash('sha256', $cookie_string_first_part);
             $cookie_string = $cookie_string_first_part . ':' . $cookie_string_hash;
 
@@ -312,10 +312,10 @@ class Auth {
         }
 
         // generate integer-timestamp for saving of last-login date
-        $user_last_login_timestamp = time();
+        $last_login_timestamp = time();
         // adatok a pdo objektum execute metódusának    
-        $data[':user_last_login_timestamp'] = $user_last_login_timestamp; 
-        $data[':user_id'] = $this->user->user_id;
+        $data[':last_login_timestamp'] = $last_login_timestamp; 
+        $data[':id'] = $this->user->id;
 
         // sikeres bejelentkezés esetén adatok rögzítése az adatbázisban
         $this->_registerSuccessLogin($data, $rememberme);
@@ -356,19 +356,19 @@ class Auth {
             return false;
         }
     // a user_active mező értékének vizsgálata         
-        if (!$this->_isActive($this->user->user_active)) {
+        if (!$this->_isActive($this->user->active)) {
             $this->setError('Az ön belépési engedélye fel van függesztve!');            
             return false;
         }
 
     // user login adatok eltárolása session-ben
         $user_data = array(
-            'user_id' => $this->user->user_id,
-            'user_name' => $this->user->user_name,
-            'user_email' => $this->user->user_email,
-            'user_role_id' => $this->user->user_role_id,
-            'user_photo' => $this->user->user_photo,
-            'user_provider_type' => $this->user->user_provider_type
+            'id' => $this->user->id,
+            'name' => $this->user->name,
+            'email' => $this->user->email,
+            'role_id' => $this->user->role_id,
+            'photo' => $this->user->photo,
+            'provider_type' => $this->user->provider_type
         );
 
         Session::init();
@@ -378,11 +378,11 @@ class Auth {
 
 
         // generate integer-timestamp for saving of last-login date
-        $user_last_login_timestamp = time();
+        $last_login_timestamp = time();
         // adatok a pdo objektum execute metódusának    
         $data = array(
-            ':user_id' => $this->user->user_id,
-            ':user_last_login_timestamp' => $user_last_login_timestamp
+            ':id' => $this->user->id,
+            ':last_login_timestamp' => $last_login_timestamp
             );
 
         // sikeres bejelentkezés esetén adatok rögzítése az adatbázisban (2. paraméter a rememberme)
@@ -429,10 +429,10 @@ class Auth {
     public function getUserData($username_or_email)
     {
         // ha a felület admin, akkor csak azt a usert adja vissza aki admin
-        $role_sql = (self::$area == 'admin') ? " AND `user_provider_type` = 'admin'" : '';
+        $role_sql = (self::$area == 'admin') ? " AND `provider_type` = 'admin'" : '';
         
-        $data = array(':user_name' => $username_or_email);
-        $sql = "SELECT * FROM `{$this->table_name}` WHERE (`{$this->username_colname}` = :user_name OR `{$this->email_colname}` = :user_name)" . $role_sql;
+        $data = array(':username_or_email' => $username_or_email);
+        $sql = "SELECT * FROM `{$this->table_name}` WHERE (`{$this->username_colname}` = :username_or_email OR `{$this->email_colname}` = :username_or_email)" . $role_sql;
         $sth = $this->connect->prepare($sql);
         $sth->execute($data);
         return $sth->fetch(PDO::FETCH_OBJ);
@@ -442,24 +442,24 @@ class Auth {
      * Visszadja a megadott id-vel rendelkező felhasználó adatait
      * 2. paraméter megadásakor a rememberme token egyezést is figyelembe veszi a felhasználó visszaadásakor 
      *
-     * @param string $user_id
+     * @param string $id
      * @param string $rememberme_token
      * @return object || false
      */
-    public function getUserDataById($user_id, $rememberme_token = null)
+    public function getUserDataById($id, $rememberme_token = null)
     {
         // ha a felület admin, akkor csak azt a usert adja vissza aki admin
-        $role_sql = (self::$area == 'admin') ? " AND `user_provider_type` = 'admin'" : '';                                
+        $role_sql = (self::$area == 'admin') ? " AND `provider_type` = 'admin'" : '';                                
 
-        $data = array(':user_id' => $user_id);
+        $data = array(':id' => $id);
 
         $rememberme_sql = '';
         if (!is_null($rememberme_token)) {
-            $rememberme_sql .= " AND `user_rememberme_token` = :user_rememberme_token AND `user_rememberme_token` IS NOT NULL";
-            $data[':user_rememberme_token'] = $rememberme_token;
+            $rememberme_sql .= " AND `rememberme_token` = :rememberme_token AND `rememberme_token` IS NOT NULL";
+            $data[':rememberme_token'] = $rememberme_token;
         }
 
-        $sql = "SELECT * FROM `{$this->table_name}` WHERE `user_id` = :user_id" . $rememberme_sql . $role_sql;
+        $sql = "SELECT * FROM `{$this->table_name}` WHERE `id` = :id" . $rememberme_sql . $role_sql;
         $sth = $this->connect->prepare($sql);
         $sth->execute($data);
         return $sth->fetch(PDO::FETCH_OBJ);    
@@ -520,7 +520,7 @@ class Auth {
      * Sikeres bejelentkezésrögzítése
      * Utolsó sikertelen bejelentkezés idejének NULL-ra állítása
      * Bejelentkezés idejének beállítása
-     * Ha a $rememberme értéke true, hozzáadja az sql parancshoz a user_rememberme_token mező update-jét is
+     * Ha a $rememberme értéke true, hozzáadja az sql parancshoz a rememberme_token mező update-jét is
      *
      * @param array $data 
      * @param bool $rememberme
@@ -528,24 +528,24 @@ class Auth {
      */
     private function _registerSuccessLogin($data, $rememberme = false)
     {
-        $rememberme_sql = ($rememberme && array_key_exists(':user_rememberme_token', $data)) ? ", `user_rememberme_token` = :user_rememberme_token" : "";
+        $rememberme_sql = ($rememberme && array_key_exists(':rememberme_token', $data)) ? ", `rememberme_token` = :rememberme_token" : "";
 
-        $sql = "UPDATE `{$this->table_name}` SET `user_failed_logins` = 0, `user_last_failed_login` = NULL, user_last_login_timestamp = :user_last_login_timestamp" . $rememberme_sql . " WHERE `user_id` = :user_id";
+        $sql = "UPDATE `{$this->table_name}` SET `failed_logins` = 0, `last_failed_login` = NULL, last_login_timestamp = :last_login_timestamp" . $rememberme_sql . " WHERE `id` = :id";
         $sth = $this->connect->prepare($sql);
         $sth->execute($data);
     }
 
     /**
-     * Sikertelen bejelentkezés idejének rögzítése az adatbázisba, és a user_failed_logins mező értékének növelése 1-el 
+     * Sikertelen bejelentkezés idejének rögzítése az adatbázisba, és a failed_logins mező értékének növelése 1-el 
      *
      * @param string $username_or_email
      * @return void
      */
     private function _registerFailedLogin($username_or_email)
     {
-        $sql = "UPDATE `{$this->table_name}` SET `user_failed_logins` = user_failed_logins+1, `user_last_failed_login` = :user_last_failed_login WHERE `{$this->username_colname}` = :user_name OR '{$this->email_colname}' = :user_name";
+        $sql = "UPDATE `{$this->table_name}` SET `failed_logins` = failed_logins+1, `last_failed_login` = :last_failed_login WHERE `{$this->username_colname}` = :username_or_email OR '{$this->email_colname}' = :username_or_email";
         $sth = $this->connect->prepare($sql);
-        $sth->execute(array( ':user_name' => $username_or_email, ':user_last_failed_login' => time() ));
+        $sth->execute(array( ':username_or_email' => $username_or_email, ':last_failed_login' => time() ));
     }
 
     /**
@@ -732,13 +732,13 @@ class Auth {
             exit;
             */
  
-        $sql = "SELECT perm_message FROM permissions WHERE perm_key = :perm_key";
+        $sql = "SELECT `message` FROM `permissions` WHERE `key` = :perm_key";
         $sth = $this->connect->prepare($sql);
         $sth->execute(array(":perm_key" => $permission));
         $result = $sth->fetch(PDO::FETCH_ASSOC);
 
         if($result){
-            Message::set('error', $result['perm_message']);
+            Message::set('error', $result['message']);
         } else {
             throw new Exception('Nincs ilyen muvelet az adatbazisban!');
             exit;
