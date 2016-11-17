@@ -86,29 +86,29 @@ class Users extends Admin_controller {
 
 	        // HIBAELLENŐRZÉS - ha valamilyen hiba van a form adataiban
 	        if(!$validate->passed()){
-	            foreach ($validate->get_error() as $value) {
-	                Message::set('error', $value);
+	            foreach ($validate->get_error() as $error_msg) {
+	                Message::set('error', $error_msg);
 	            }
 	            $this->response->redirect('admin/users/insert');
 	        }
 	        else {
 	        // végrehajtás, ha nincs hiba 
-	            $data = array();
-	            $data['user_name'] = $this->request->get_post('name');
-	            $data['user_first_name'] = $this->request->get_post('first_name');
-	            $data['user_last_name'] = $this->request->get_post('last_name');
-	            $data['user_email'] = $this->request->get_post('email');
-	            $data['user_phone'] = $this->request->get_post('phone');
+	            $user = array();
+	            $user['name'] = $this->request->get_post('name');
+	            $user['first_name'] = $this->request->get_post('first_name');
+	            $user['last_name'] = $this->request->get_post('last_name');
+	            $user['email'] = $this->request->get_post('email');
+	            $user['phone'] = $this->request->get_post('phone');
 
 	            if (empty($this->request->get_post('img_url'))) {
-	                $data['user_photo'] = Config::get('user.default_photo');
+	                $user['photo'] = Config::get('user.default_photo');
 	            } else {
 	                $path_parts = pathinfo($this->request->get_post('img_url'));
-	                $data['user_photo'] = $path_parts['filename'] . '.' . $path_parts['extension'];
+	                $user['photo'] = $path_parts['filename'] . '.' . $path_parts['extension'];
 	            }
 
-	            $data['user_role_id'] = $this->request->get_post('user_group', 'integer');
-	            $data['user_provider_type'] = ($this->request->get_uri('area') == 'admin') ? 'admin' : null;
+	            $user['role_id'] = $this->request->get_post('user_group', 'integer');
+	            $user['provider_type'] = ($this->request->get_uri('area') == 'admin') ? 'admin' : null;
 
 	                // jelszó kompatibilitás library betöltése régebbi php verzió esetén
 	                $this->user_model->load_password_compatibility();
@@ -118,17 +118,17 @@ class Users extends Admin_controller {
 	                // how those PHP 5.5 functions want the parameter: as an array with, currently only used with 'cost' => XX
 	                $hash_cost_factor = (Config::get('hash_cost_factor') !== null) ? Config::get('hash_cost_factor') : null;
 
-	            $data['user_password_hash'] = password_hash($this->request->get_post('password'), PASSWORD_DEFAULT, array('cost' => $hash_cost_factor));
+	            $user['password_hash'] = password_hash($this->request->get_post('password'), PASSWORD_DEFAULT, array('cost' => $hash_cost_factor));
 
 	                // ellenőrzés, hogy létezik-e már ilyen felhasználói név az adatbázisban
-	                if ($this->user_model->checkUsername($data['user_name'])) {
+	                if ($this->user_model->checkUsername($user['name'])) {
 	                    Message::set('error', 'username_already_taken');
 	                    $this->response->redirect('admin/users/insert');
 	                }
 
-			        if(!is_null($data['user_email'])){
+			        if(!is_null($user['email'])){
 		                // ellenőrzés, hogy létezik-e már ilyen email cím az adatbázisban
-		                if ($this->user_model->checkEmail($data['user_email'])) {
+		                if ($this->user_model->checkEmail($user['email'])) {
 		                    Message::set('error', 'user_email_already_taken');
 		                    $this->response->redirect('admin/users/insert');
 		                }
@@ -137,18 +137,18 @@ class Users extends Admin_controller {
 	            // ha be van állítva e-mail ellenőrzéses regisztráció
 	            if ($this->email_verify === true) {
 	                // generate random hash for email verification (40 char string)
-	                $data['user_activation_hash'] = sha1(uniqid(mt_rand(), true));
-	                $data['user_active'] = 0;
+	                $user['activation_hash'] = sha1(uniqid(mt_rand(), true));
+	                $user['active'] = 0;
 	            } else {
-	                $data['user_activation_hash'] = null;
-	                $data['user_active'] = 1;
+	                $user['activation_hash'] = null;
+	                $user['active'] = 1;
 	            }
 	            // generate integer-timestamp for saving of account-creating date
-	            $data['user_creation_timestamp'] = time();
+	            $user['creation_timestamp'] = time();
 
 
 	            // Új felhasználó adatainak beírása az adatbázisba
-	            $last_inserted_id = $this->user_model->insert($data);
+	            $last_inserted_id = $this->user_model->insert($user);
 	            if (!$last_inserted_id) {
 	                Message::set('error', 'account_creation_failed');
 	                $this->response->redirect('admin/users/insert');
@@ -159,7 +159,7 @@ class Users extends Admin_controller {
 	            if ($this->email_verify === true) {
 
 	                // ellenőrző email küldése, ha az ellenőrző email küldése sikertelen: felhasználó törlése az databázisból
-	                if ($this->user_model->_sendVerificationEmail($last_inserted_id, $data['user_email'], $data['user_activation_hash'])) {
+	                if ($this->user_model->_sendVerificationEmail($last_inserted_id, $user['email'], $user['activation_hash'])) {
 	                    Message::set('success', 'account_successfully_created');
 	                } else {
 	                    $this->user_model->delete($last_inserted_id);
@@ -189,9 +189,10 @@ class Users extends Admin_controller {
      *
 	 * A metódusnak szüksége van egy user id-jére amit módosítani akarunk ($this->request->get_params('id'))
 	 */
-	public function profile()
+	public function profile($id)
 	{
-		$user_id = (int)$this->request->get_params('id');	
+		// $id = (int)$this->request->get_params('id');	
+		$id = (int)$id;	
 
 		if($this->request->has_post('submit_edit_user')) {
             
@@ -246,17 +247,18 @@ class Users extends Admin_controller {
 
 	        // HIBAELLENŐRZÉS - ha valamilyen hiba van a form adataiban
 	        if(!$validate->passed()){
-	            foreach ($validate->get_error() as $value) {
-	                Message::set('error', $value);
+	            foreach ($validate->get_error() as $error_msg) {
+	                Message::set('error', $error_msg);
 	            }
-	            $this->response->redirect('admin/users/profile/' . $user_id);
+	            $this->response->redirect('admin/users/profile/' . $id);
 	        }
 	        else {
-	        // végrehajtás, ha nincs hiba	
-	            $data['user_name'] = $this->request->get_post('name');
-	            $data['user_first_name'] = $this->request->get_post('first_name');
-	            $data['user_last_name'] = $this->request->get_post('last_name');
-	            $data['user_phone'] = $this->request->get_post('phone');
+	        // végrehajtás, ha nincs hiba
+	        	$user = array();
+	            $user['name'] = $this->request->get_post('name');
+	            $user['first_name'] = $this->request->get_post('first_name');
+	            $user['last_name'] = $this->request->get_post('last_name');
+	            $user['phone'] = $this->request->get_post('phone');
 
 	            //ha nem létezik a $password_empty változó, vagyis nem üres mindkét password mező	
 	            if (!isset($password_empty)) {
@@ -268,69 +270,68 @@ class Users extends Admin_controller {
 	                // by the password hashing compatibility library. the third parameter looks a little bit shitty, but that's
 	                // how those PHP 5.5 functions want the parameter: as an array with, currently only used with 'cost' => XX
 	                $hash_cost_factor = (Config::get('hash_cost_factor') !== null) ? Config::get('hash_cost_factor') : null;
-	                $data['user_password_hash'] = password_hash($this->request->get_post('password'), PASSWORD_DEFAULT, array('cost' => $hash_cost_factor));
+	                $user['password_hash'] = password_hash($this->request->get_post('password'), PASSWORD_DEFAULT, array('cost' => $hash_cost_factor));
 	            }
 
-	            $data['user_email'] = $this->request->get_post('email');
+	            $user['email'] = $this->request->get_post('email');
 
 	            if ($this->request->has_post('user_group')) {
-	                $data['user_role_id'] = $this->request->get_post('user_group', 'integer');
+	                $user['role_id'] = $this->request->get_post('user_group', 'integer');
 	            }
 
 	            //ha van feltöltve user kép
 	            if (!empty($this->request->get_post('img_url'))) {
 	                $path_parts = pathinfo($this->request->get_post('img_url'));
-	                $data['user_photo'] = $path_parts['filename'] . '.' . $path_parts['extension'];
+	                $user['photo'] = $path_parts['filename'] . '.' . $path_parts['extension'];
 	            }
 
 	            // Megvizsgáljuk, hogy van-e már ilyen nevű user (de nem az amit módosítani akarunk)
-	            if ($this->user_model->checkUserNoLoggedIn($user_id, $data['user_name'])) {
+	            if ($this->user_model->checkUserNoLoggedIn($id, $user['name'])) {
 	                Message::set('error', 'username_already_taken');
-	                $this->response->redirect('admin/user/profile/' . $user_id);
+	                $this->response->redirect('admin/user/profile/' . $id);
 	            }
 
 	  		/*
-	              if(!is_null($data['user_email'])){
+	              if(!is_null($user['email'])){
 	              // Megvizsgáljuk, hogy van-e már ilyen email cím (de nem az amit módosítani akarunk)
 
 		            // ha már van ilyen email cím
-	              	if ($this->user_model->checkEmailNoLoggedIn($user_id, $data['user_email'])) {
+	              	if ($this->user_model->checkEmailNoLoggedIn($id, $user['email'])) {
 						Message::set('error', 'user_email_already_taken');
 	                	$this->response->redirect('admin/user/profile');
 	              	}
 	              }
 	        */   
 
-	            // új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
-	            $result = $this->user_model->update($user_id, $data);
+	            // új adatok beírása az adatbázisba (update) a $user tömb tartalmazza a frissítendő adatokat 
+	            $result = $this->user_model->update($id, $user);
 
 	            if ($result !== false) {
 	                // ha a bejelentkezett user adatait módosítjuk, akkor a session adatokat is frissíteni kell
-	                if (Session::get('user_data.user_id') == $user_id) {
+	                if (Session::get('user_data.id') == $id) {
 	                    // Módosítjuk a $_SESSION tömben is a user adatait!
-	                    Session::set('user_data.user_name', $data['user_name']);
-	                    Session::set('user_data.user_email', $data['user_email']);
-	                    if (isset($data['user_role_id'])) {
-	                        Session::set('user_data.user_role_id', $data['user_role_id']);
+	                    Session::set('user_data.name', $user['name']);
+	                    Session::set('user_data.email', $user['email']);
+	                    if (isset($user['role_id'])) {
+	                        Session::set('user_data.role_id', $user['role_id']);
 	                    }
-	                    if (isset($data['user_photo'])) {
-	                        Session::set('user_data.user_photo', $data['user_photo']);
+	                    if (isset($user['user_photo'])) {
+	                        Session::set('user_data.photo', $user['photo']);
 	                    }
 	                }
 	                Message::set('success', 'user_data_update_success');
 	                $this->response->redirect('admin/users');
 	            } else {
 	                Message::set('error', 'unknown_error');
-	                $this->response->redirect('admin/users/profile/' . $user_id);
+	                $this->response->redirect('admin/users/profile/' . $id);
 	            }
 	        } 
 		}
-		
 		$view = new View();
 
 		$data['title'] = 'Profilom oldal';
 		$data['description'] = 'Profilom description';
-		$data['user'] = $this->user_model->selectUser($user_id);
+		$data['user'] = $this->user_model->selectUser($id);
 
 		$view->add_links(array('bootstrap-fileupload', 'croppic', 'validation', 'user_profile'));
 		$view->render('users/tpl_profile', $data);
@@ -647,8 +648,8 @@ class Users extends Admin_controller {
                     exit();                
                 }
             
-            $to_name = $result[0]['user_name'];
-            $old_pw = $result[0]['user_password_hash'];
+            $to_name = $result[0]['name'];
+            $old_pw = $result[0]['password_hash'];
                   
                 // 8 karakter hosszú új jelszó generálása (str_shuffle összekeveri a stringet, substr levágja az első 8 karaktert)
                 $new_password = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 8);
