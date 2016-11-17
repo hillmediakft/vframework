@@ -14,7 +14,7 @@ class User_model extends Admin_model {
     // tábla neve
     protected $table = 'users';
     // id neve
-    protected $id = 'user_id';
+    //protected $id = 'id';
 
     /**
      * Constructor, létrehozza az adatbáziskapcsolatot
@@ -31,27 +31,28 @@ class User_model extends Admin_model {
     /**
      *  Felhasználók adatainak lekérdezése
      *
-     *  @param  string|integer    $user_id (csak ennek a felhasználónak az adatait adja vissza
+     *  @param  string|integer    $id (csak ennek a felhasználónak az adatait adja vissza)
      *  @return array|false
      */
-    public function selectUser($user_id = null)
+    public function selectUser($id = null)
     {
         $this->query->set_columns(array(
-            'users.user_id',
-            'users.user_name',
-            'users.user_first_name',
-            'users.user_last_name',
-            'users.user_active',
-            'users.user_email',
-            'users.user_role_id',
-            'users.user_phone',
-            'users.user_photo',
+            'users.id',
+            'users.name',
+            'users.first_name',
+            'users.last_name',
+            'users.active',
+            'users.email',
+            'users.role_id',
+            'users.phone',
+            'users.photo',
             'roles.role'
         ));
-        $this->query->set_join('left', 'roles', 'users.user_role_id', '=', 'roles.id');
+        $this->query->set_join('left', 'roles', 'users.role_id', '=', 'roles.id');
         
-        if(!is_null($user_id)){
-            $this->query->set_where('user_id', '=', $user_id);
+        if(!is_null($id)){
+            $this->query->set_where('users.id', '=', $id);
+// $this->query->debug();            
             $result = $this->query->select();
             return $result[0];
         } else {
@@ -64,8 +65,8 @@ class User_model extends Admin_model {
      */
     public function checkUsername($username)
     {
-        $sth = $this->connect->prepare("SELECT COUNT(*) FROM `users` WHERE user_name = :user_name");
-        $sth->execute(array(':user_name' => $username));
+        $sth = $this->connect->prepare("SELECT COUNT(*) FROM `users` WHERE `name` = :name");
+        $sth->execute(array(':name' => $username));
         if ($sth->fetchColumn() == 1) {
             return true;
         }
@@ -77,10 +78,10 @@ class User_model extends Admin_model {
      */
     public function checkUserNoLoggedIn($id, $username)
     {
-        $this->query->set_columns(array('user_id'));
-        $this->query->set_where('user_name', '=', $username);
+        $this->query->set_columns(array('id'));
+        $this->query->set_where('name', '=', $username);
         //itt megadjuk, hogy nem vonatkozik a bejelentkezett user-re (mert ha nem módosítja a nevet akkor már van ilyen user név)
-        $this->query->set_where('user_id', '!=', $id);
+        $this->query->set_where('id', '!=', $id);
         $result = $this->query->select();
         // ha már van ilyen nevű felhasználó
         if (count($result) == 1) {
@@ -92,10 +93,10 @@ class User_model extends Admin_model {
     /**
      * ellenőrzés, hogy létezik-e már ilyen email cím az adatbázisban
      */
-    public function checkEmail($useremail)
+    public function checkEmail($email)
     {
-        $sth = $this->connect->prepare("SELECT COUNT(*) FROM users WHERE user_email = :user_email");
-        $sth->execute(array(':user_email' => $useremail));
+        $sth = $this->connect->prepare("SELECT COUNT(*) FROM `users` WHERE `email` = :email");
+        $sth->execute(array(':email' => $email));
         if ($sth->fetchColumn() == 1) {
             return true;
         }    
@@ -107,10 +108,10 @@ class User_model extends Admin_model {
      */
     public function checkEmailNoLoggedIn($id, $email)
     {
-        $this->query->set_columns(array('user_email'));
-        $this->query->set_where('user_email', '=', $email);
+        $this->query->set_columns(array('email'));
+        $this->query->set_where('email', '=', $email);
         //itt megadjuk, hogy nem vonatkozik a bejelentkezett user-re (mert ha nem módosítja a nevet akkor már van ilyen user név)
-        $this->query->set_where('user_id', '!=', $id);
+        $this->query->set_where('id', '!=', $id);
         $result = $this->query->select();
         if (count($result) == 1) {
             return true;
@@ -131,7 +132,7 @@ class User_model extends Admin_model {
      */
     public function update($id, $data)
     {
-        $this->query->set_where('user_id', '=', $id);
+        $this->query->set_where('id', '=', $id);
         return $this->query->update($data);        
     }
 
@@ -140,7 +141,7 @@ class User_model extends Admin_model {
      */
     public function delete($id)
     {
-        return $this->query->delete('user_id', '=', $id);        
+        return $this->query->delete('id', '=', $id);        
     }
 
     /**
@@ -148,10 +149,10 @@ class User_model extends Admin_model {
      */
     public function selectPicture($id)
     {
-        $this->query->set_columns(array('user_photo'));
-        $this->query->set_where('user_id', '=', $id);
+        $this->query->set_columns(array('photo'));
+        $this->query->set_where('id', '=', $id);
         $result = $this->query->select();
-        return $result[0]['user_photo'];
+        return $result[0]['photo'];
     }
 
 
@@ -206,21 +207,21 @@ class User_model extends Admin_model {
                 public function verifyNewUser($user_id, $user_activation_verification_code)
                 {
                     // megnézzük, hogy már sikerült-e a regisztráció (ha frissíti az oldalt)
-                    $this->query->set_columns(array('user_id'));
-                    $this->query->set_where('user_id', '=', $user_id);
-                    $this->query->set_where('user_active', '=', 1, 'and');
-                    $this->query->set_where('user_activation_hash', '=', null, 'and');
+                    $this->query->set_columns(array('id'));
+                    $this->query->set_where('id', '=', $user_id);
+                    $this->query->set_where('active', '=', 1);
+                    $this->query->set_where('activation_hash', '=', null, 'and');
                     $result = $this->query->select();
 
                     if($result){
                         return true;
                     }
                             
-                    $data['user_active'] = 1;
-                    $data['user_activation_hash'] = null;
+                    $data['active'] = 1;
+                    $data['activation_hash'] = null;
                     
-                    $this->query->set_where('user_id', '=', $user_id);
-                    $this->query->set_where('user_activation_hash', '=', $user_activation_verification_code, 'and');
+                    $this->query->set_where('id', '=', $user_id);
+                    $this->query->set_where('activation_hash', '=', $user_activation_verification_code, 'and');
                     $result = $this->query->update($data);
                     
                     if ($result == 1) {
@@ -240,8 +241,8 @@ class User_model extends Admin_model {
      */
     public function changeStatus($id, $data)
     {
-        $this->query->set_where('user_id', '=', $id);
-        return $this->query->update(array('user_active' => $data));
+        $this->query->set_where('id', '=', $id);
+        return $this->query->update(array('active' => $data));
     }
 
     /**
@@ -251,10 +252,10 @@ class User_model extends Admin_model {
      */
     public function is_user_superadmin($id)
     {
-        $this->query->set_columns(array('user_role_id'));
-        $this->query->set_where('user_id', '=', $id);
+        $this->query->set_columns(array('role_id'));
+        $this->query->set_where('id', '=', $id);
         $result = $this->query->select();
-        return ($result[0]['user_role_id'] == '1') ? true : false;
+        return ($result[0]['role_id'] == '1') ? true : false;
     }
 
     /**
@@ -263,7 +264,7 @@ class User_model extends Admin_model {
      */
     public function rolesCounter()
     {
-        $this->query->set_columns('user_role_id');
+        $this->query->set_columns('role_id');
         return $this->query->select();
     }
 
@@ -273,25 +274,25 @@ class User_model extends Admin_model {
     /*
      * Lekérdezzük egy bizonyos e-mail címmel rendelkező user nevét és password-ját (elfelejtett jelszó esetén)
      *
-     *  @param  string  $email_address
+     *  @param  string  $email
      */
-    public function getPasswordHash($email_address)
+    public function getPasswordHash($email)
     {
-        $this->query->set_columns(array('user_name', 'user_password_hash'));
-        $this->query->set_where('user_email', '=', $email_address);
+        $this->query->set_columns(array('name', 'password_hash'));
+        $this->query->set_where('email', '=', $email);
         return $this->query->select();
     }
 
     /*
      * Új jelszó adatbázisba írása (elfelejtett jelszó esetén)
      *
-     * @param  string  $email_address
-     * @param string  $password_hash
+     * @param string $email
+     * @param string $password_hash
      */
-    public function setNewPassword($email_address, $password_hash)
+    public function setNewPassword($email, $password_hash)
     {
-        $this->query->set_where('user_email', '=', $email_address);
-        return $this->query->update(array('user_password_hash' => $password_hash));
+        $this->query->set_where('email', '=', $email);
+        return $this->query->update(array('password_hash' => $password_hash));
     }    
 
 
