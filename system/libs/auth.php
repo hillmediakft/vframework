@@ -5,7 +5,7 @@ use PDO;
 
 /**
 * Class Auth
-* v2.0
+* v2.1
 *
 *   Publikus statikus metódusok:
 *       
@@ -15,8 +15,9 @@ use PDO;
 *       Auth::isUserLoggedIn(); - Ellenőrzi, hogy be van-e jelentkezve a felhasználó (a session user_logged_in elem meglétét és tartalmát vizsgálja)
 *       Auth::getUser('valamilyen_adat'); - Bejelentkezett user paraméterben megadott adatának visszaadása a 'data_user' session elemből
 *       Auth::getRoleId(); - A bejelentkezett felhasználó role_id-jét adja vissza a sessionből
+*       Auth::isSuperadmin(); - Megnézi, hogy a bejelentkezett felhasználó szuperadmin-e
 * ACL:       
-*       Auth::hasAccess('valamilyen_művelet'); - Felhasználó engedélyének ellenőrzése a megadott művlethez
+*       Auth::hasAccess('valamilyen_művelet', 'átirányítási url'); - Felhasználó engedélyének ellenőrzése a megadott művlethez
 *
 *   Publikus metódusok:
 *       Auth::login('username_or_email', 'password', 'rememberme'); - Felhasználó bejelentkezése
@@ -32,7 +33,7 @@ use PDO;
 * ACL:
 *       Auth::getRoles(); - Visszaadja a megadott role_id-jű csoport mindent adatát (paraméter nélkül minden adatot) a roles táblából
 *       Auth::getRolePerms($role_id); - Visszaadja a paraméterben megadott felhasználói csoport engedélyezett permission kulcsait
-*       Auth::getAllPerms(); - Visszaadja az összes permissions-t (`perm_id`, `perm_key`, `perm_desc` oszlop tartalmát)
+*       Auth::getAllPerms(); - Visszaadja az összes permissions-t (a permissions tábla `id`, `key`, `desc` oszlopát)
 *       Auth::savePerms(); - Engedélyek mentése
 *
 */
@@ -213,6 +214,18 @@ class Auth {
     }
 
     /**
+     * Ellenőrzi, hogy a bejelentkezett felhasználó szuperadmin
+     */
+    public static function isSuperadmin()
+    {
+        return (self::getUser('id') == 1) ? true : false;
+    }
+
+
+// -------- OBJEKTUM METÓDUSOK ----------------
+
+
+    /**
      * A bejelentkezett felhasználó role_id-jét adja vissza
      */
     public function getRoleId()
@@ -228,9 +241,6 @@ class Auth {
         return $this->permissions;
     }
     
-
-// -------- OBJEKTUM METÓDUSOK ----------------
-
     /**
      * Felhasználó bejelentkezése
      *
@@ -607,7 +617,7 @@ class Auth {
             
             if (Auth::isUserLoggedIn()) {
                 $role_id = $instance->getRoleId();
-                $instance->permissions = ($role_id == 1) ? array('*') : $instance->getRolePerms($role_id);
+                $instance->permissions = ($role_id == 1) ? '*' : $instance->getRolePerms($role_id);
                 //$instance->permissions = $instance->getRolePerms($role_id);
             } else {
                 $instance->permissions = array();
@@ -722,7 +732,7 @@ class Auth {
             }
             */
 
-        if ($this->permissions[0] == '*') {
+        if ($this->permissions === '*') {
             return true;
         } else {
             return in_array($permission, $this->permissions);
