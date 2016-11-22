@@ -73,7 +73,7 @@
                         <span class="title">Felhasználók listája</span>
                     </a>
                 </li>
-                <?php if (1) { ?>
+                <?php if (Auth::hasAccess('user_insert')) { ?>
                 <li class="nav-item <?php $this->menu_active('users', 'insert'); ?> ">
                     <a href="admin/users/insert" class="nav-link ">
                         <span class="title">Új felhasználó</span>
@@ -85,11 +85,13 @@
                         <span class="title">Profilom</span>
                     </a>
                 </li>
+                <?php if (Auth::isSuperadmin()) { ?>
                 <li class="nav-item <?php $this->menu_active('users', 'user_roles|edit_roles'); ?> ">
                     <a href="admin/users/user_roles" class="nav-link ">
                         <span class="title">Csoportok</span>
                     </a>
                 </li>
+                <?php } ?>
             </ul>
         </li>
 
