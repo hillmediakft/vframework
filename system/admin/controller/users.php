@@ -174,13 +174,19 @@ class Users extends Admin_controller {
 	        }
 		}
 
-		$view = new View();
+		if (Auth::hasAccess('user_insert')) {
+			$view = new View();
 
-		$data['title'] = 'Új felhasználó oldal';
-		$data['description'] = 'Új felhasználó description';
+			$data['title'] = 'Új felhasználó oldal';
+			$data['description'] = 'Új felhasználó description';
 
-		$view->add_links(array('bootstrap-fileupload','croppic','validation','user_insert'));
-		$view->render('users/tpl_user_insert', $data);
+			$view->add_links(array('bootstrap-fileupload','croppic','validation','user_insert'));
+			$view->render('users/tpl_user_insert', $data);
+		} else {
+	        Message::set('error', 'Nincs engedélye felhasználót létrehozni.');
+	        $this->response->redirect('admin/users');
+		}
+
 	}
 	
 	
@@ -369,21 +375,34 @@ class Users extends Admin_controller {
     	   	$this->response->redirect('admin/users/edit_roles/' . $role_id);
         }
 
-		$view = new View();
+        // csak akkor lehet szerkeszteni a jogokat, ha nem szuperadmint akarunk szerkeszteni, tehát az $id nem 1
+        // és csak szuperadmin szerkeszthet
+        if ($id != 1 && Auth::isSuperadmin()) {
+        
+			$view = new View();
 
-        $data['title'] = 'Felhasználói jogosultságok szerkesztése oldal';
-        $data['description'] = 'Felhasználói jogosultságok szerkesztése description';
-		
-		$auth = DI::get('auth');
-		// összes permissiont	
-		$data['permissions'] = $auth->getAllPerms();
-		// a $role_id-hez tartozó szerep adatai
-		$data['role'] = $auth->getRoles($role_id);
-		// a $role_id-hez tartozó szerep engedélyei
-		$data['allowed_permissions'] = $auth->getRolePerms($role_id);
-		
-		$view->add_link('js', ADMIN_JS . 'pages/common.js');
-        $view->render('users/tpl_edit_roles', $data);
+	        $data['title'] = 'Felhasználói jogosultságok szerkesztése oldal';
+	        $data['description'] = 'Felhasználói jogosultságok szerkesztése description';
+			
+			$auth = DI::get('auth');
+			// összes permissiont	
+			$data['permissions'] = $auth->getAllPerms();
+			// a $role_id-hez tartozó szerep adatai
+			$data['role'] = $auth->getRoles($role_id);
+				if (empty($data['role'])) {
+        			Message::set('error', 'A felhasználói csoport nem létezik.');
+					$this->response->redirect('admin/users/user_roles');
+				}
+
+			// a $role_id-hez tartozó szerep engedélyei
+			$data['allowed_permissions'] = $auth->getRolePerms($role_id);
+			
+			$view->add_link('js', ADMIN_JS . 'pages/common.js');
+	        $view->render('users/tpl_edit_roles', $data);
+        } else{
+        	Message::set('error', 'A művelet nem engedélyezett.');
+        	$this->response->redirect('admin/users/user_roles');
+        }
     }
 	
 	/**
@@ -392,7 +411,7 @@ class Users extends Admin_controller {
 	public function delete()
 	{
         if($this->request->is_ajax()){
-	        if(Auth::hasAccess('delete_user')){
+	        if(Auth::hasAccess('user_delete')){
 	        	// a POST-ban kapott item_id egy tömb
 	        	$id_arr = $this->request->get_post('item_id');
 		        // a sikeres törlések számát tárolja
@@ -567,55 +586,66 @@ class Users extends Admin_controller {
     public function change_status()
     {
         if ( $this->request->is_ajax() ) {
-            if ( $this->request->has_post('action') && $this->request->has_post('id') ) {
-			
-				$id = $this->request->get_post('id', 'integer');
-				$action = $this->request->get_post('action');
-
-				if($action == 'make_active') {
-					$result = $this->user_model->changeStatus($id, 1);
-					if($result !== false){
-						$this->response->json(array(
-							"status" => 'success',
-							"message" => 'A felhasználó aktiválása megtörtént!'
-						)); 	
-					} else {
-						$this->response->json(array(
-							"status" => 'error',
-							"message" => 'Adatbázis hiba! A felhasználó státusza nem változott meg!'
-						));
-					}
-				}
-				if($action == 'make_inactive') {
-					//ha a szuperadmint akarjuk blokkolni 
-					if($this->user_model->is_user_superadmin($id)) {
-						$this->response->json(array(
-							"status" => 'error',
-							"message" => 'Szuperadminisztrátor nem blokkolható!'
-						));
-						return;					
-					}
+        	// jogosultság vizsgálat
+        	if (Auth::hasAccess('user_changestatus')) {
+        	
+	            if ( $this->request->has_post('action') && $this->request->has_post('id') ) {
 				
-					$result = $this->user_model->changeStatus($id, 0);
-					if($result !== false){
-						$this->response->json(array(
-							"status" => 'success',
-							"message" => 'A felhasználó blokkolása megtörtént!'
-						)); 	
-					} else {
-						$this->response->json(array(
-							"status" => 'error',
-							"message" => 'Adatbázis hiba! A felhasználó státusza nem változott meg!'
-						));
+					$id = $this->request->get_post('id', 'integer');
+					$action = $this->request->get_post('action');
+
+					if($action == 'make_active') {
+						$result = $this->user_model->changeStatus($id, 1);
+						if($result !== false){
+							$this->response->json(array(
+								"status" => 'success',
+								"message" => 'A felhasználó aktiválása megtörtént!'
+							)); 	
+						} else {
+							$this->response->json(array(
+								"status" => 'error',
+								"message" => 'Adatbázis hiba! A felhasználó státusza nem változott meg!'
+							));
+						}
 					}
+					if($action == 'make_inactive') {
+						//ha a szuperadmint akarjuk blokkolni 
+						if($this->user_model->is_user_superadmin($id)) {
+							$this->response->json(array(
+								"status" => 'error',
+								"message" => 'Szuperadminisztrátor nem blokkolható!'
+							));
+							return;					
+						}
 					
+						$result = $this->user_model->changeStatus($id, 0);
+						if($result !== false){
+							$this->response->json(array(
+								"status" => 'success',
+								"message" => 'A felhasználó blokkolása megtörtént!'
+							)); 	
+						} else {
+							$this->response->json(array(
+								"status" => 'error',
+								"message" => 'Adatbázis hiba! A felhasználó státusza nem változott meg!'
+							));
+						}
+						
+					}
+				} else {
+					$this->response->json(array(
+						"status" => 'error',
+						"message" => 'unknown_error'
+					));
 				}
+
 			} else {
 				$this->response->json(array(
 					"status" => 'error',
-					"message" => 'unknown_error'
+					"message" => 'Nincs engedélye a művelet végrehajtásához.'
 				));
 			}
+
 		} else {
 			$this->response->redirect('admin/error');
 		}
