@@ -20,6 +20,9 @@
     <div class="row">
         <div class="col-md-12">
 
+            <!-- echo out the system feedback (error and success messages) -->
+            <?php $this->renderFeedbackMessages(); ?>        
+
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
             <div class="portlet">
                 <div class="portlet-title">
@@ -66,8 +69,9 @@
                                         ?>
                                     <td><?php echo $counter; ?></td>			
                                     <td>
-                                        <a class="btn btn-sm grey-steel" href="admin/users/edit_roles/<?php echo $role['id'];?>" ><i class="fa fa-pencil"></i>
-                                            Szerkeszt</a>
+                                        <?php if($role['id'] != 1) { ?>
+                                        <a class="btn btn-sm grey-steel" href="admin/users/edit_roles/<?php echo $role['id'];?>" ><i class="fa fa-pencil"></i> Szerkeszt</a>
+                                        <?php } ?>
                                     </td>
                                 </tr>
                             <?php } ?>
