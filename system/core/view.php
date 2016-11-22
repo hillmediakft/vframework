@@ -2,6 +2,7 @@
 namespace System\Core;
 use System\Libs\DI;
 use System\Libs\Config;
+use System\Libs\Auth;
 
 class View {
 	
@@ -316,15 +317,17 @@ HTML;
 
 	/**
 	 * Adat visszaadása a config-ból
+	 * @param string $key
+	 * @param mixed $default
 	 */
 	public function getConfig($key, $default = null)
 	{
 		return Config::get($key, $default);
 	}
 
-
 	/**
 	 * Helperek példányosítása
+	 * @param array $helpers
 	 */
 	public function setHelper(array $helpers)
 	{
@@ -335,6 +338,14 @@ HTML;
 		}
 	}
 
+				/**
+				 * Jogosultság ellenőrzése a template-ben
+				 * @param array $permission
+				 */
+				public function hasAccess($permission)
+				{
+					return Auth::hasAccess($permission, null);
+				}
 
 	/**
 	 * Template menü elem class-t active-ra állítja, ha a controller és az action a megadott paraméterekkel egyezik
