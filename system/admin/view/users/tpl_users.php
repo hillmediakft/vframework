@@ -104,7 +104,7 @@
 
                                                 <a class="btn btn-sm grey-steel" title="műveletek" data-toggle="dropdown"><i class="fa fa-cogs"></i></a>
                                                 <ul class="dropdown-menu pull-right">
-                                                    <?php if (Auth::hasAccess('user_update')) { ?>	
+                                                    <?php if (Auth::hasAccess('user_update') || $user['id'] == $loggedin_user_id) { ?>	
                                                         <li><a href="admin/users/profile/<?php echo $user['id']; ?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
                                                     <?php } else { ?>
                                                         <!-- <li class="disabled-link"><a class="disable-target"><i class="fa fa-pencil"></i> Szerkeszt</a></li> -->
