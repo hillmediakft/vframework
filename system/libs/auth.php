@@ -159,7 +159,7 @@ class Auth {
             // utolsó aktivitás elem vizsgálata 
             /*
             if(!Session::has(self::$last_activity)) {
-                throw new Exception('Nem letezik a $_SESSION tombben utolso aktivitas elem!');
+                throw new \Exception('Nem letezik a $_SESSION tombben utolso aktivitas elem!');
                 exit;
             }
             */
@@ -694,7 +694,9 @@ class Auth {
         $role_id = (int)$role_id;    
         $sql = "SELECT `permissions`.`key` FROM `role_perm`
                 JOIN `permissions` ON `role_perm`.`perm_id` = `permissions`.`id`
-                WHERE `role_perm`.`role_id` = {$role_id}";
+                WHERE `role_perm`.`role_id` = {$role_id}
+                ORDER BY `permissions`.`key`
+                ";
         
         $sth = $this->connect->query($sql);
 
@@ -761,7 +763,8 @@ class Auth {
         if($result){
             Message::set('error', $result['message']);
         } else {
-            throw new Exception('Nincs ilyen muvelet az adatbazisban!');
+            //Message::set('error', 'Hozzáférés megtagadva!');
+            throw new \Exception('Nincs ilyen muvelet az adatbazisban!');
             exit;
         }
 
