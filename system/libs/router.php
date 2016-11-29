@@ -16,19 +16,19 @@ class Router
         public $controller;
 
         /**
-         * @var string Controller névtere
-         */
-        private $controller_namespace = '';
-
-        /**
          * @var string Action neve
          */
         public $action;
 
         /**
-         * @var string Paraméterek
+         * @var array Nevesített paraméterek
          */
-        public $params = array();
+        public $named_params = array();
+
+        /**
+         * @var array Paraméterek (számmal indexelt tömbben)
+         */
+        public $params;
 
         /**
          * @var array Helyörzők: reguláris kifejezések
@@ -47,7 +47,7 @@ class Router
         );
 
         /**
-         * Current uri-t tárolja
+         * @var string Current uri-t tárolja
          */
         public $current_uri;
 
@@ -84,15 +84,6 @@ class Router
 
 
         /**
-         * Controller névterének megadása
-         * @param string $namespace
-         */
-        public function setNamespace($namespace)
-        {
-            $this->controller_namespace = $namespace;
-        }
-
-        /**
          * Reguláris kifejezés hozzáadása
          * @param string $key
          * @param string $exp
@@ -113,8 +104,6 @@ class Router
         {
             $this->current_uri = '/' . $uri;
         }
-
-
 
     /**
      * Store a before middleware route and a handling function to be executed when accessed using one of the specified methods
@@ -265,28 +254,30 @@ class Router
         $this->baseRoute = $curBaseRoute;
     }
 
-    /**
-     * Get all request headers
-     *
-     * @return array The request headers
-     */
-    public function getRequestHeaders()
-    {
-        // If getallheaders() is available, use that
-        if (function_exists('getallheaders')) {
-            return getallheaders();
-        }
-
-        // Method getallheaders() not available: manually extract 'm
-        $headers = array();
-        foreach ($_SERVER as $name => $value) {
-            if ((substr($name, 0, 5) == 'HTTP_') || ($name == 'CONTENT_TYPE') || ($name == 'CONTENT_LENGTH')) {
-                $headers[str_replace(array(' ', 'Http'), array('-', 'HTTP'), ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+        /**
+         * Get all request headers
+         *
+         * @return array The request headers
+         */
+        /*
+        public function getRequestHeaders()
+        {
+            // If getallheaders() is available, use that
+            if (function_exists('getallheaders')) {
+                return getallheaders();
             }
-        }
 
-        return $headers;
-    }
+            // Method getallheaders() not available: manually extract 'm
+            $headers = array();
+            foreach ($_SERVER as $name => $value) {
+                if ((substr($name, 0, 5) == 'HTTP_') || ($name == 'CONTENT_TYPE') || ($name == 'CONTENT_LENGTH')) {
+                    $headers[str_replace(array(' ', 'Http'), array('-', 'HTTP'), ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+                }
+            }
+
+            return $headers;
+        }
+        */
 
     /**
      * Get the request method used, taking overrides into account
@@ -295,16 +286,13 @@ class Router
      */
     public function getRequestMethod()
     {
+        return $_SERVER['REQUEST_METHOD'];
+
+/*
         // Take the method as found in $_SERVER
         $method = $_SERVER['REQUEST_METHOD'];
 
-        // If it's a HEAD request override it to being GET and prevent any output, as per HTTP Specification
-        // @url http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.4
-        if ($_SERVER['REQUEST_METHOD'] == 'HEAD') {
-            ob_start();
-            $method = 'GET';
-        } // If it's a POST request, check for a method override header
-        elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $headers = $this->getRequestHeaders();
             if (isset($headers['X-HTTP-Method-Override']) && in_array($headers['X-HTTP-Method-Override'], array('PUT', 'DELETE', 'PATCH'))) {
                 $method = $headers['X-HTTP-Method-Override'];
@@ -312,74 +300,76 @@ class Router
         }
 
         return $method;
+*/  
+    }
+
+
+    /**
+     * @return array
+     */
+    public function runBefore()
+    {
+        // Define which method we need to handle
+        $this->requestedMethod = $this->getRequestMethod();
+
+        $callbacks = array();
+        // Handle all before middlewares
+        if (isset($this->beforeRoutes[$this->requestedMethod])) {
+            $callbacks = $this->handle($this->beforeRoutes[$this->requestedMethod]);
+        }
+
+        return $callbacks;    
+    }
+
+    /**
+     * 
+     */
+    public function runAfter($callback = null)
+    {
+        if ($callback) {
+            $callback();
+        }       
     }
 
     /**
      * Execute the router: Loop all defined before middleware's and routes, and execute the handling function if a match was found
      *
-     * @param object|callable $callback Function to be executed after a matching route was handled (= after router middleware)
-     * @return bool
+     * @return array
      */
-    public function run($callback = null)
+    public function run()
     {
         // Define which method we need to handle
         $this->requestedMethod = $this->getRequestMethod();
 
-        // Handle all before middlewares
-        if (isset($this->beforeRoutes[$this->requestedMethod])) {
-            $this->handle($this->beforeRoutes[$this->requestedMethod]);
-        }
+        $callbacks = array();
 
         // Végigfut az útvonalakon
-        $numHandled = 0;
         if (isset($this->afterRoutes[$this->requestedMethod])) {
-            $numHandled = $this->handle($this->afterRoutes[$this->requestedMethod], true);
+            $callbacks = $this->handle($this->afterRoutes[$this->requestedMethod], true);
         }
 
-        // Ha nincs egyezés egyik útvonallal sem
-        if ($numHandled === 0) {
+        // ha nincs találat
+        if (empty($callbacks)) {
 
-            if (is_string($this->notFoundCallback) && stripos($this->notFoundCallback, '@') !== false) {
-                // explode segments of given route
-                list($controller, $method) = explode('@', $this->notFoundCallback);
-                $controller_class = $this->controller_namespace . $controller;
+            if ($this->notFoundCallback && is_callable($this->notFoundCallback)) {
+                $callbacks[] = array(
+                    'closure' => $this->notFoundCallback,
+                    'params' => array(),
+                    );
 
-                // check if class exists, if not just ignore.
-                if (class_exists($controller_class)) {
-                    // first check if is a static method, directly trying to invoke it. if isn't a valid static method, we will try as a normal method invocation.
-                    if (call_user_func_array(array(new $controller_class, $method), array()) === false) {
-                        // try call the method as an non-static method. (the if does nothing, only avoids the notice)
-                        if (forward_static_call_array(array($controller_class, $method), array()) === false) ;
-                    }
-                }
-            }
-            elseif ($this->notFoundCallback && is_callable($this->notFoundCallback)) {
-                call_user_func($this->notFoundCallback);
-            }
-            else {
-                header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
+            } elseif (is_string($this->notFoundCallback) && stripos($this->notFoundCallback, '@') !== false) {
+                list($controller, $action) = explode('@', $this->notFoundCallback);
+                $callbacks[] = array(
+                    'controller' => $controller,
+                    'action' => $action,
+                    'params' => array(),
+                    'named_params' => array()
+                    );                
             }
 
-
-
-        } // If a route was handled, perform the finish callback (if any)
-        else {
-            if ($callback) {
-                $callback();
-            }
         }
 
-        // If it originally was a HEAD request, clean up after ourselves by emptying the output buffer
-        if ($_SERVER['REQUEST_METHOD'] == 'HEAD') {
-            ob_end_clean();
-        }
-
-        // Return true if a route was handled, false otherwise
-        if ($numHandled === 0) {
-            return false;
-        }
-
-        return true;
+        return $callbacks;
     }
 
     /**
@@ -393,19 +383,15 @@ class Router
     }
 
     /**
-     * Handle a a set of routes: if a match is found, execute the relating handling function
+     * Végigfut a kapott útvonalakon, és egyezés esetén berakja a $callbacks tömbbe az útvonalhoz tartozó elemeket 
      *
      * @param array $routes Collection of route patterns and their handling functions
      * @param boolean $quitAfterRun Does the handle function need to quit after one route was matched?
-     * @return int The number of routes handled
+     * @return array
      */
     private function handle($routes, $quitAfterRun = false)
     {
-        // Counter to keep track of the number of routes we've handled
-        $numHandled = 0;
-
-        // The current page URL
-        //$uri = $this->getCurrentUri();
+        $callbacks = array();
         
         // Loop all routes
         foreach ($routes as $route) {
@@ -413,13 +399,13 @@ class Router
             // Kicseréli a jelöléseket (pl.: :action) reguláris kifejezésekké ($shorthand tömb alapján)
             $route['pattern'] = str_replace(array_keys($this->shorthand), array_values($this->shorthand), $route['pattern']);
 
-            // we have a match!
+            // egyezés keresése
             if (preg_match_all('#^' . $route['pattern'] . '$#', $this->current_uri, $matches, PREG_OFFSET_CAPTURE)) {
                 // Rework matches to only contain the matches, not the orig string
                 $matches = array_slice($matches, 1);
 
                 // Extract the matched URL parameters (and only the parameters)
-                $params = array_map(function ($match, $index) use ($matches) {
+                $this->params = array_map(function ($match, $index) use ($matches) {
 
                     // We have a following parameter: take the substring from the current param position until the next one's position (thank you PREG_OFFSET_CAPTURE)
                     if (isset($matches[$index + 1]) && isset($matches[$index + 1][0]) && is_array($matches[$index + 1][0])) {
@@ -430,40 +416,26 @@ class Router
                     }
                 }, $matches, array_keys($matches));
 
+  
+            // névvel ellátott paraméterek beállítása
+            if(isset($this->params[0]) && $this->params[0] != null && !empty($route['param_names'])) {
+                $this->named_params = array_combine($route['param_names'], $this->params);
+            }
 
-
-    // névvel ellátott paraméterek beállítása
-    if(isset($params[0]) && $params[0] != null && !empty($route['param_names'])) {
-        $this->params = array_combine($route['param_names'], $params);
-    }
-
-
-                // Call the handling function with the URL parameters if the desired input is callable
+                // closure függvény esetén
                 if (is_callable($route['fn'])) {
-                    call_user_func_array($route['fn'], $params);
-                } // if not, check the existence of special parameters
+                    $callbacks[] = array('closure' => $route['fn'], 'params' => $this->params);
+                }
+                // controller & action megadásakor
                 elseif (stripos($route['fn'], '@') !== false) {
                     // explode segments of given route
-                    list($controller, $method) = explode('@', $route['fn']);
-    
+                    list($controller, $action) = explode('@', $route['fn']);
+                    // controller es action tulajdonság beállítása                    
+                    $this->controller = $controller;
+                    $this->action = $action;
 
-    // controller es action tulajdonság beállítása                    
-    $this->controller = $controller;
-    $this->action = $method;
-    $controller_class = $this->controller_namespace . $controller;
-
-
-                    // check if class exists, if not just ignore.
-                    if (class_exists($controller_class)) {
-                        // first check if is a static method, directly trying to invoke it. if isn't a valid static method, we will try as a normal method invocation.
-                        if (call_user_func_array(array(new $controller_class, $method), $params) === false) {
-                            // try call the method as an non-static method. (the if does nothing, only avoids the notice)
-                            if (forward_static_call_array(array($controller_class, $method), $params) === false) ;
-                        }
-                    }
+                    $callbacks[] = array('controller' => $this->controller, 'action' => $this->action, 'params' => $this->params, 'named_params' => $this->named_params);
                 }
-
-                $numHandled++;
 
                 // If we need to quit, then quit
                 if ($quitAfterRun) {
@@ -472,47 +444,7 @@ class Router
             }
         }
 
-        // Return the number of routes handled
-        return $numHandled;
+        return $callbacks;
     }
-
-
-
-                        /**
-                         * Define the current relative URI
-                         *
-                         * @return string
-                         */
-/*                        
-                        public function getCurrentUri()
-                        {
-                            // Get the current Request URI and remove rewrite base path from it (= allows one to run the router in a sub folder)
-                            $uri = substr($_SERVER['REQUEST_URI'], strlen($this->getBasePath()));
-
-                            // Don't take query params into account on the URL
-                            if (strstr($uri, '?')) {
-                                $uri = substr($uri, 0, strpos($uri, '?'));
-                            }
-
-                            // Remove trailing slash + enforce a slash at the start
-                            return '/' . trim($uri, '/');
-                        }
-*/                        
-
-                        /**
-                         * Return server base Path, and define it if isn't defined.
-                         *
-                         * @return string
-                         */
-/*                        
-                        public function getBasePath()
-                        {
-                            // Check if server base path is defined, if not define it.
-                            if (null === $this->serverBasePath) {
-                                $this->serverBasePath = implode('/', array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, -1)) . '/';
-                            }
-
-                            return $this->serverBasePath;
-                        }
-*/                        
+     
 }
