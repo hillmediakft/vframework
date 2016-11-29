@@ -11,7 +11,7 @@ class Application {
 	
 	public function __construct() 
 	{
-		// request objektum visszaadása
+		// request objektum visszaadása (itt már létrejön az uri és router objektum is!)
 		$this->request = DI::get('request');
 
 		// area állandó létrehozása
@@ -37,8 +37,6 @@ class Application {
 		/* **************************************************** */
 		if (AREA == 'site') {
 
-			$router->setNamespace('System\Site\Controller\\');
-			
 			$router->get('/', 'home@index');	
 
 			$router->set404('error@index');		
@@ -54,16 +52,15 @@ class Application {
 		/* **************************************************** */
 		elseif (AREA == 'admin') {
 
-			$router->setNamespace('System\Admin\Controller\\');
-			
 			$router->mount('/admin', function() use ($router) {
 				
 				$router->before('GET|POST', '/?((?!login).)*', function() {
-					$response = DI::get('response');
 				    if (!Auth::check()) {
+						$response = DI::get('response');
 						$response->redirect('admin/login');	
 					} 
 				});
+
 
 				$router->get('/', 'home@index');
 				$router->get('/home', 'home@index');
@@ -80,16 +77,16 @@ class Application {
 				$router->get('/content', 'content@index');	
 				$router->match('GET|POST', '/content/edit/:id', 'content@edit', array('id'));	
 			
-			// users	
-				$router->get('/users', 'users@index');
-				$router->match('GET|POST', '/users/insert', 'users@insert');
-				$router->match('GET|POST', '/users/profile/:id', 'users@profile', array('id'));
-				$router->post('/users/delete', 'users@delete');
-				$router->post('/users/change_status', 'users@change_status');
-				$router->post('/users/user_img_upload/(upload)', 'users@user_img_upload', array('upload'));
-				$router->post('/users/user_img_upload/(crop)', 'users@user_img_upload', array('crop'));
-				$router->match('GET|POST', '/users/user_roles', 'users@user_roles');
-				$router->match('GET|POST', '/users/edit_roles/:id', 'users@edit_roles', array('id'));
+			// user	
+				$router->get('/user', 'user@index');
+				$router->match('GET|POST', '/user/insert', 'user@insert');
+				$router->match('GET|POST', '/user/profile/:id', 'user@profile', array('id'));
+				$router->post('/user/delete', 'user@delete');
+				$router->post('/user/change_status', 'user@change_status');
+				$router->post('/user/user_img_upload/(upload)', 'user@user_img_upload', array('upload'));
+				$router->post('/user/user_img_upload/(crop)', 'user@user_img_upload', array('crop'));
+				$router->match('GET|POST', '/user/user_roles', 'user@user_roles');
+				$router->match('GET|POST', '/user/edit_roles/:id', 'user@edit_roles', array('id'));
 			
 			// photo gallery	
 				$router->get('/photo-gallery', 'photo_gallery@index');
@@ -157,46 +154,22 @@ class Application {
 
 		}
 
-		// útkeresés elindítása és controller betöltése		
-		$router->run();	
+
+		$dispatcher = new \System\Libs\Dispatcher();
+		$dispatcher->setControllerNamespace('System\\' . ucfirst(AREA) . '\Controller\\');
+
+		// before útvonalak bejárása, a megadott elemek futtatása
+		$before_callbacks = $router->runBefore();
+		$dispatcher->dispatch($before_callbacks);
+
+		// útvonalak bejárása, controller példányosítása, action indítása
+		$callback = $router->run();
+
+		//Auth::hasAccess( $callback[0]['controller'] . '.' .  $callback[0]['action'], $this->request->get_httpreferer() );
+
+		$dispatcher->dispatch($callback);
+
 	}
-
-
-
-
-	
-	/**
-	 * Controller betöltése
-	 */
-/*	
-	private function _loadController_OLD()
-	{
-		$controller_name = ucfirst($this->request->get_controller());
-		$action_name = $this->request->get_action();
-		$parameters = $this->request->get_params();
-		$area = ucfirst($this->request->get_uri('area'));
-
-		$controller_class = '\System\\' . $area . '\Controller\\' . $controller_name;
-		// ha az osztály létezik
-		if (class_exists($controller_class)) {
-			// Példányosítjuk a controllert
-			$controller = new $controller_class();
-			// meghívjuk az action metódust, ha nincs, akkor az index metódust hívjuk meg
-			if(method_exists($controller, $action_name)) {
-				//$controller->{$action_name}();
-				call_user_func_array(array($controller, $action_name), $parameters);
-			} else {
-				$controller->index();
-			}
-		}
-		else {
-			$error_class = '\System\\' . $area . '\Controller\Error';
-			$error = new $error_class();
-			$error->index();
-		}
-	}
-*/	
-
 
 } // osztály vége
 ?>
