@@ -13,7 +13,7 @@ class Slider extends Admin_controller {
     function __construct()
     {
         parent::__construct();
-        Auth::hasAccess('slider_menu', $this->request->get_httpreferer());
+        Auth::hasAccess('slider.index', $this->request->get_httpreferer());
         $this->loadModel('slider_model');
     }
 

@@ -86,7 +86,7 @@ class Clients extends Admin_controller {
     public function delete()
     {
         if($this->request->is_ajax()){
-            if(Auth::hasAccess('client_delete')){
+            if(Auth::hasAccess('client.delete')){
                 // a POST-ban kapott item_id egy tömb
                 $id_arr = $this->request->get_post('item_id');
                 // a sikeres törlések számát tárolja
@@ -237,9 +237,6 @@ class Clients extends Admin_controller {
      * 	Meghívásakor kap egy id nevű paramétert melynek értékei upload vagy crop
      * 		upload paraméterrel meghívva: feltölti a kiválasztott képet
      * 		crop paraméterrel meghívva: megvágja az eredeti képet és feltölti	
-     * 	(a paraméterek megadása a new_user.js fájlban található: admin/users/user_img_upload/upload vagy admin/user_img_upload/crop)
-     *
-     * 	Az user_img_upload() model metódus JSON adatot ad vissza (ezt "echo-za" vissza ez a metódus a kérelmező javascriptnek). 
      */
     public function client_img_upload()
     {
