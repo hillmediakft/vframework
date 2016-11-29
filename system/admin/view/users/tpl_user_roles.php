@@ -70,7 +70,7 @@
                                     <td><?php echo $counter; ?></td>			
                                     <td>
                                         <?php if($role['id'] != 1) { ?>
-                                        <a class="btn btn-sm grey-steel" href="admin/users/edit_roles/<?php echo $role['id'];?>" ><i class="fa fa-pencil"></i> Szerkeszt</a>
+                                        <a class="btn btn-sm grey-steel" href="admin/user/edit_roles/<?php echo $role['id'];?>" ><i class="fa fa-pencil"></i> Szerkeszt</a>
                                         <?php } ?>
                                     </td>
                                 </tr>

@@ -106,11 +106,11 @@ var Users = function () {
 
             vframework.deleteItems({
                 table_id: "users",
-                url: "admin/users/delete"
+                url: "admin/user/delete"
             });
 
             vframework.changeStatus({
-                url: "admin/users/change_status",
+                url: "admin/user/change_status",
             });
 
             vframework.printTable({

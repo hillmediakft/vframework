@@ -70,7 +70,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-default">
                             <li>
-                                <a href="admin/users/profile/<?php echo Auth::getUser('id'); ?>">
+                                <a href="admin/user/profile/<?php echo Auth::getUser('id'); ?>">
                                     <i class="fa fa-user"></i> Profilom </a>
                             </li>
                             <li class="divider"> </li>

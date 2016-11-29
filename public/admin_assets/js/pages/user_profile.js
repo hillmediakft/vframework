@@ -136,9 +136,9 @@ var userProfile = function () {
 		
 		var cropperOptions = {
 				//kérés a user_img_upload metódusnak "upload" paraméterrel
-				uploadUrl:'admin/users/user_img_upload/upload',
+				uploadUrl:'admin/user/user_img_upload/upload',
 				//kérés a user_img_upload metódusnak "crop" paraméterrel
-				cropUrl:'admin/users/user_img_upload/crop',
+				cropUrl:'admin/user/user_img_upload/crop',
 				outputUrlId:'OutputId',
 				modal:false,
 				doubleZoomControls:false,

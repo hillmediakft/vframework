@@ -69,7 +69,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-default">
                             <li>
-                                <a href="admin/users/profile/<?php echo Session::get('user_id'); ?>">
+                                <a href="admin/user/profile/<?php echo Session::get('user_id'); ?>">
                                     <i class="fa fa-user"></i> Profilom </a>
                             </li>
                             <li class="divider"> </li>
@@ -153,24 +153,24 @@
                         </a>
                         <ul class="sub-menu">
                             <li class="nav-item <?php $this->menu_active('users', 'index'); ?> ">
-                                <a href="admin/users" class="nav-link ">
+                                <a href="admin/user" class="nav-link ">
                                     <span class="title">Felhasználók listája</span>
                                 </a>
                             </li>
                             <?php if (1) { ?>
                             <li class="nav-item <?php $this->menu_active('users', 'insert'); ?> ">
-                                <a href="admin/users/insert" class="nav-link ">
+                                <a href="admin/user/insert" class="nav-link ">
                                     <span class="title">Új felhasználó</span>
                                 </a>
                             </li>
                             <?php } ?>
                             <li class="nav-item <?php $this->menu_active('users', 'profile'); ?> ">
-                                <a href="admin/users/profile/<?php echo Session::get('user_id'); ?>" class="nav-link ">
+                                <a href="admin/user/profile/<?php echo Session::get('user_id'); ?>" class="nav-link ">
                                     <span class="title">Profilom</span>
                                 </a>
                             </li>
                             <li class="nav-item <?php $this->menu_active('users', 'user_roles|edit_roles'); ?> ">
-                                <a href="admin/users/user_roles" class="nav-link ">
+                                <a href="admin/user/user_roles" class="nav-link ">
                                     <span class="title">Csoportok</span>
                                 </a>
                             </li>

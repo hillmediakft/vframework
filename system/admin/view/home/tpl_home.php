@@ -31,7 +31,7 @@
                             Felhasználók
                         </div>
                     </div>
-                    <a href="admin/users" class="more">
+                    <a href="admin/user" class="more">
                         Tovább <i class="fa fa-arrow-right"></i>
                     </a>
                 </div>

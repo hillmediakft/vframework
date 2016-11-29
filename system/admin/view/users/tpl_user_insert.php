@@ -35,9 +35,8 @@
 							Új felhasználó létrehozása
 						</div>
 						<div class="actions">
-							<!-- <a href="admin/users/new_user" class="btn blue btn-sm"><i class="fa fa-plus"></i> Mentés</a> -->
 							<button class="btn green btn-sm" type="submit" name="submit_new_user"><i class="fa fa-check"></i> Mentés</button>
-							<a class="btn default btn-sm" href="admin/users"><i class="fa fa-close"></i> Mégsem</a>
+							<a class="btn default btn-sm" href="admin/user"><i class="fa fa-close"></i> Mégsem</a>
 						</div>
 					</div>
 				</div> <!-- portlet end -->

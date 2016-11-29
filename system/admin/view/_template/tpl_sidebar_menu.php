@@ -61,33 +61,33 @@
         </li>
 
         <!-- ADMIN USERS -->
-        <li class="nav-item <?php $this->menu_active('users'); ?> ">
+        <li class="nav-item <?php $this->menu_active('user'); ?> ">
             <a href="javascript:;" class="nav-link nav-toggle">
                 <i class="fa fa-users"></i>
                 <span class="title">Felhasználók</span>
                 <span class="arrow"></span>
             </a>
             <ul class="sub-menu">
-                <li class="nav-item <?php $this->menu_active('users', 'index'); ?> ">
-                    <a href="admin/users" class="nav-link ">
+                <li class="nav-item <?php $this->menu_active('user', 'index'); ?> ">
+                    <a href="admin/user" class="nav-link ">
                         <span class="title">Felhasználók listája</span>
                     </a>
                 </li>
-                <?php if (Auth::hasAccess('user_insert')) { ?>
-                <li class="nav-item <?php $this->menu_active('users', 'insert'); ?> ">
-                    <a href="admin/users/insert" class="nav-link ">
+                <?php if (Auth::hasAccess('user.insert')) { ?>
+                <li class="nav-item <?php $this->menu_active('user', 'insert'); ?> ">
+                    <a href="admin/user/insert" class="nav-link ">
                         <span class="title">Új felhasználó</span>
                     </a>
                 </li>
                 <?php } ?>
-                <li class="nav-item <?php $this->menu_active('users', 'profile'); ?> ">
-                    <a href="admin/users/profile/<?php echo Auth::getUser('id'); ?>" class="nav-link ">
+                <li class="nav-item <?php $this->menu_active('user', 'profile'); ?> ">
+                    <a href="admin/user/profile/<?php echo Auth::getUser('id'); ?>" class="nav-link ">
                         <span class="title">Profilom</span>
                     </a>
                 </li>
                 <?php if (Auth::isSuperadmin()) { ?>
-                <li class="nav-item <?php $this->menu_active('users', 'user_roles|edit_roles'); ?> ">
-                    <a href="admin/users/user_roles" class="nav-link ">
+                <li class="nav-item <?php $this->menu_active('user', 'user_roles|edit_roles'); ?> ">
+                    <a href="admin/user/user_roles" class="nav-link ">
                         <span class="title">Csoportok</span>
                     </a>
                 </li>

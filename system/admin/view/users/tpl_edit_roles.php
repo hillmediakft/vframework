@@ -24,14 +24,14 @@
             <!-- echo out the system feedback (error and success messages) -->
             <?php $this->renderFeedbackMessages(); ?>
  
-            <form action="admin/users/edit_roles/<?Php echo $role['id']; ?>" method="POST" id="edit_roles">				
+            <form action="admin/user/edit_roles/<?Php echo $role['id']; ?>" method="POST" id="edit_roles">				
             
                 <div class="portlet">
                     <div class="portlet-title">
                         <div class="caption"><i class="fa fa-cog"></i>Jogosultságok szerkesztése</div>
                         <div class="actions">
                             <button class="btn green submit" type="submit" name="submit_edit_roles"><i class="fa fa-check"></i> Mentés</button>
-                            <a class="btn default btn-sm" href="admin/users/user_roles"><i class="fa fa-close"></i> Mégsem</a>
+                            <a class="btn default btn-sm" href="admin/user/user_roles"><i class="fa fa-close"></i> Mégsem</a>
                         </div>
 
                     </div>
