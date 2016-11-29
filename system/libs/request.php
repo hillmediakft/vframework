@@ -56,10 +56,10 @@ class Request {
 	public function get_params($index = null)
 	{
 		if(is_null($index)){
-			return $this->router->params;
+			return $this->router->named_params;
 		}
-		if(array_key_exists($index, $this->router->params)){
-			return $this->router->params[$index];
+		if(array_key_exists($index, $this->router->named_params)){
+			return $this->router->named_params[$index];
 		} else {
 			throw new \Exception('Nincs ' . $index . ' nevu elem a parameterek kozott!');
 			exit();
