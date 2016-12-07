@@ -154,8 +154,9 @@ class Application {
 
 		}
 
-
+		// dispatcher objektum példányosítása
 		$dispatcher = new \System\Libs\Dispatcher();
+		// controller névtérének beállítása
 		$dispatcher->setControllerNamespace('System\\' . ucfirst(AREA) . '\Controller\\');
 
 		// before útvonalak bejárása, a megadott elemek futtatása
@@ -164,11 +165,7 @@ class Application {
 
 		// útvonalak bejárása, controller példányosítása, action indítása
 		$callback = $router->run();
-
-		//Auth::hasAccess( $callback[0]['controller'] . '.' .  $callback[0]['action'], $this->request->get_httpreferer() );
-
 		$dispatcher->dispatch($callback);
-
 	}
 
 } // osztály vége
