@@ -1,9 +1,11 @@
 <div class="page-content">
     <!-- BEGIN PAGE HEADER-->
     <!-- BEGIN PAGE TITLE & BREADCRUMB-->
+    <!--
     <h3 class="page-title">
         CMS <small>dokumentáció</small>
     </h3>
+    -->
     <div class="page-bar">
         <ul class="page-breadcrumb">
             <li>
@@ -17,14 +19,14 @@
     <!-- END PAGE TITLE & BREADCRUMB-->
     <!-- END PAGE HEADER-->
 
+    <div class="margin-bottom-20"></div>
+
     <!-- BEGIN PAGE CONTENT-->
     <div class="row">
         <div class="col-md-12">
 
 
-            <h3><legend>Multijob CMS dokumentáció</legend></h3>
-
-
+            <h3><legend>CMS dokumentáció</legend></h3>
 
             <div class="tab-pane" id="tab_1_3">
                 <div class="row profile-account documentation">
