@@ -13,12 +13,12 @@ class Slider extends Admin_controller {
     function __construct()
     {
         parent::__construct();
-        Auth::hasAccess('slider.index', $this->request->get_httpreferer());
         $this->loadModel('slider_model');
     }
 
     public function index()
     {
+        Auth::hasAccess('slider.index', $this->request->get_httpreferer());
         $view = new View();
 
         $data['title'] = 'Slider oldal';
@@ -76,6 +76,7 @@ class Slider extends Admin_controller {
                 }
             }
 
+        Auth::hasAccess('slider.insert', $this->request->get_httpreferer());    
         $view = new View();
         
         $data['title'] = 'Új slide oldal';
@@ -142,6 +143,7 @@ class Slider extends Admin_controller {
                 $this->response->redirect('admin/slider');
             }
 
+        Auth::hasAccess('slider.update', $this->request->get_httpreferer()); 
         $view = new View();
         
         $data['title'] = 'Slider szerkesztése oldal';
@@ -158,7 +160,7 @@ class Slider extends Admin_controller {
     public function delete()
     {
         if($this->request->is_ajax()){
-            if(1){
+            if(Auth::hasAccess('slider.delete')){
                 // a POST-ban kapott item_id egy tömb
                 $id_arr = $this->request->get_post('item_id');
                 // a sikeres törlések számát tárolja
