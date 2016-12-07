@@ -1,9 +1,11 @@
 <div class="page-content">
     <!-- BEGIN PAGE HEADER-->
     <!-- BEGIN PAGE TITLE & BREADCRUMB-->
+    <!--
     <h3 class="page-title">
         Fájlok <small>kezelése</small>
     </h3>
+    -->
     <div class="page-bar">
         <ul class="page-breadcrumb">
             <li>
@@ -16,6 +18,8 @@
     </div>
     <!-- END PAGE TITLE & BREADCRUMB-->
     <!-- END PAGE HEADER-->
+
+    <div class="margin-bottom-20"></div>
 
     <!-- BEGIN PAGE CONTENT-->
     <div class="row">
