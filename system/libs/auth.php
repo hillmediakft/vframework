@@ -35,6 +35,7 @@ use PDO;
 *       Auth::getRolePerms($role_id); - Visszaadja a paraméterben megadott felhasználói csoport engedélyezett permission kulcsait
 *       Auth::getAllPerms(); - Visszaadja az összes permissions-t (a permissions tábla `id`, `key`, `desc` oszlopát)
 *       Auth::savePerms(); - Engedélyek mentése
+*       Auth::checkPermission(); - Megvizsgálja, hogy létezik-e a megadott permission a permissions táblában
 *
 */
 class Auth {
@@ -218,7 +219,7 @@ class Auth {
      */
     public static function isSuperadmin()
     {
-        return (self::getUser('id') == 1) ? true : false;
+        return (self::getUser('role_id') == 1) ? true : false;
     }
 
 
@@ -612,6 +613,13 @@ class Auth {
         //$instance = self::instance();   
         $instance = DI::get('auth');
 
+            // !!!! ha nincs a permissions táblában a megadott permission, akkor automatikusan engedélyezve lesz
+            /*
+            if (!$instance->checkPermission($permission)) {
+               return true;
+            }
+            */
+
         // ha még nincsenek lekérdezve a felhasználó permission-jai
         if (is_null($instance->permissions)) {
             
@@ -717,6 +725,18 @@ class Auth {
         return $sth->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
+    /**
+     * Megvizsgálja, hogy létezik-e a megadott permission a permissions táblában
+     * @return bool
+     */
+    public function checkPermission($permission)
+    {
+        $sth = $this->connect->prepare("SELECT `id` FROM `permissions` WHERE `key` = :permission_key");
+        $sth->execute(array(":permission_key" => $permission));
+        return ($sth->fetch(PDO::FETCH_ASSOC) === false) ? false : true;
+    }
+
     /**
      * Megvizsgálja, hogy a permissions tömben szerepel e a megadott permission száma
      * @param integer $permission
@@ -761,6 +781,7 @@ class Auth {
         $result = $sth->fetch(PDO::FETCH_ASSOC);
 
         if($result){
+            $result['message'] = ($result['message'] === '') ? 'A művelet nem engedélyezett!' : $result['message'];
             Message::set('error', $result['message']);
         } else {
             //Message::set('error', 'Hozzáférés megtagadva!');
