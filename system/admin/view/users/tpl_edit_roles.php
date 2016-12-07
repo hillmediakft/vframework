@@ -46,8 +46,7 @@
                         <table class="table table-striped table-bordered table-hover">
                             <thead>
                                 <tr class="info">
-                                    <th>Jogosultság</th>
-                                    <th>Leírás</th>
+                                    <th>Jogosultság leírás</th>
                                     <th>Engedélyezés</th>
                                 </tr>
                             </thead>
@@ -56,11 +55,10 @@
                                     $selected = (in_array($permission['key'], $allowed_permissions));
                                 ?>
                                 <tr class="odd gradeX">
-                                    <td><?php echo $permission['key']; ?></td>
                                     <td><?php echo $permission['desc']; ?></td>
                                     <td>
                                         <div class="form-group">
-                                            <select name="<?php echo $permission['id']; ?>" class="form-control small" <?php echo($permission['key'] == 'home_menu') ? 'disabled' : '';?>>
+                                            <select name="<?php echo $permission['id']; ?>" class="form-control small" <?php echo($permission['key'] == 'home.index') ? 'disabled' : '';?>>
                                                 <option value="0" <?php echo (!$selected) ? 'selected' : '';?>>Tiltott</option>
                                                 <option value="1" <?php echo ($selected) ? 'selected' : '';?>>Engedélyezett</option>
                                             </select>
