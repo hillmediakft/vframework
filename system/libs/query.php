@@ -300,9 +300,11 @@ class Query {
 		if(strpos($string, '.') !== false){
 			//felbontjuk a stringet tömbelemekre
 			$temp_arr = explode('.', $string); 
-				//a bömbelemekt backtickeljük
+				//a bömbelemeket backtickeljük
 				foreach($temp_arr as &$v) {
-					$v = '`' . $v . '`'; 
+					if ($v !== '*') {
+						$v = '`' . $v . '`'; 
+					} 
 				}
 			//összefőzzük a backtickelt ideiglenes tömbelemeket string-gé . karakterrel	
 			$string = implode('.', $temp_arr); 			
