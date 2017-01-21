@@ -33,14 +33,10 @@ class Pages extends AdminController {
 
 			if($this->request->is_post()) {
 				
-				$data['body_hu'] = $this->request->get_post('page_body_hu', 'strip_danger_tags');
-				$data['body_en'] = $this->request->get_post('page_body_en', 'strip_danger_tags');
-				$data['metatitle_hu'] = $this->request->get_post('page_metatitle_hu');
-				$data['metatitle_en'] = $this->request->get_post('page_metatitle_en');
-				$data['metadescription_hu'] = $this->request->get_post('page_metadescription_hu');
-				$data['metadescription_en'] = $this->request->get_post('page_metadescription_en');
-				$data['metakeywords_hu'] = $this->request->get_post('page_metakeywords_hu');
-				$data['metakeywords_en'] = $this->request->get_post('page_metakeywords_en');
+				$data['body'] = $this->request->get_post('page_body', 'strip_danger_tags');
+				$data['metatitle'] = $this->request->get_post('page_metatitle');
+				$data['metadescription'] = $this->request->get_post('page_metadescription');
+				$data['metakeywords'] = $this->request->get_post('page_metakeywords');
 
 				// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
 				$result = $this->pages_model->update($id, $data);

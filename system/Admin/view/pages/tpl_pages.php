@@ -46,8 +46,8 @@
 							<tr class="odd gradeX">
 								<td><?php echo $page['id'];?></td>
 								<td><?php echo $page['title'];?></td>
-								<td><?php echo $page['metatitle_hu'];?></td>
-								<td><?php echo $page['metadescription_hu'];?></td>
+								<td><?php echo $page['metatitle'];?></td>
+								<td><?php echo $page['metadescription'];?></td>
 								<td>									
 									<a class="btn btn-sm grey-steel" href="admin/pages/update/<?php echo $page['id'];?>"><i class="fa fa-pencil"></i></a>
 								</td>

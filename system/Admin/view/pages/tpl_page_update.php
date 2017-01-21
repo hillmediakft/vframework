@@ -43,64 +43,25 @@
                                 <input type='text' name='page_title' class='form-control' value="<?php echo $page['title'] ?>" disabled=''>
                             </div>
 
+                            <div class="form-group">
+                                <label for="page_metatitle">Az oldal címe</label>	
+                                <input type='text' name='page_metatitle' class='form-control' value="<?php echo $page['metatitle'] ?>"/>
+                            </div>
 
-                            <ul class="nav nav-tabs">
-                                <li class="active">
-                                    <a href="#tab_1_1" data-toggle="tab"> Magyar </a>
-                                </li>
-                                <li>
-                                    <a href="#tab_1_2" data-toggle="tab"> Angol </a>
-                                </li>
+                            <div class="form-group">
+                                <label for="page_metadescription">Az oldal leírása</label>	
+                                <input type='text' name='page_metadescription' class='form-control' value="<?php echo $page['metadescription'] ?>">
+                            </div>
 
-                            </ul>
-                            <div class="tab-content">
-                                <div class="tab-pane fade active in" id="tab_1_1">
+                            <div class="form-group">
+                                <label for="page_metakeywords">Kulcsszavak</label>
+                                <input type='text' name='page_metakeywords' class='form-control' value="<?php echo $page['metakeywords'] ?>">
+                            </div>
 
-                                    <div class="form-group">
-                                        <label for="page_metatitle_hu">Az oldal címe</label>   
-                                        <input type='text' name='page_metatitle_hu' class='form-control' value="<?php echo $page['metatitle_hu'] ?>"/>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="page_metadescription_hu">Az oldal leírása</label>  
-                                        <input type='text' name='page_metadescription_hu' class='form-control' value="<?php echo $page['metadescription_hu'] ?>">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="page_metakeywords_hu">Kulcsszavak</label>
-                                        <input type='text' name='page_metakeywords_hu' class='form-control' value="<?php echo $page['metakeywords_hu'] ?>">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="page_body_hu">Tartalom</label>
-                                        <textarea type="text" name="page_body_hu" class="form-control"><?php echo $page['body_hu'] ?></textarea>
-                                    </div>
-
-                                </div>
-                                <div class="tab-pane fade" id="tab_1_2">
-                        
-                                    <div class="form-group">
-                                        <label for="page_metatitle_en">Az oldal címe</label>   
-                                        <input type='text' name='page_metatitle_en' class='form-control' value="<?php echo $page['metatitle_en'] ?>"/>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="page_metadescription_en">Az oldal leírása</label>  
-                                        <input type='text' name='page_metadescription_en' class='form-control' value="<?php echo $page['metadescription_en'] ?>">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="page_metakeywords_en">Kulcsszavak</label>
-                                        <input type='text' name='page_metakeywords_en' class='form-control' value="<?php echo $page['metakeywords_en'] ?>">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="page_body_en">Tartalom</label>
-                                        <textarea type="text" name="page_body_en" class="form-control"><?php echo $page['body_en'] ?></textarea>
-                                    </div>
-
-                                </div>
-                            </div> <!-- TAB-CONTENT END-->
+                            <div class="form-group">
+                                <label for="page_body">Tartalom</label>
+                                <textarea type="text" name="page_body" class="form-control"><?php echo $page['body'] ?></textarea>
+                            </div>
 
 					    </div> <!-- END USER GROUPS PORTLET BODY-->
 				</div> <!-- END USER GROUPS PORTLET-->
