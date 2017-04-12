@@ -71,6 +71,7 @@ class Uri {
 		$this->_area();
 		$this->_pathFull();
 		$this->_path();
+		//$this->_path_widt_langcode();
 		$this->_query_string();
 		$this->_query_arr();
 		$this->_site_url();
@@ -152,7 +153,7 @@ class Uri {
 	{
 		if(in_array('admin', $this->path_arr)){
 			$index_admin = array_search('admin', $this->path_arr);
-			if($index_admin <= 1){
+			if($index_admin == 0){
 					$this->index_admin = $index_admin;
 
 					// eltávolítjuk az admin elemet
@@ -245,6 +246,22 @@ class Uri {
 		
 		$this->set('path', $this->path);
 	}
+
+	/**
+	 * Beállítja az uri path_with_langcode-t (request uri a query string, a modul neve (admin) nélkül!)
+	 * Ha 
+	 */
+	/*
+	private function _path_widt_langcode()
+	{
+		$langcode = '';
+		if ($this->get('is_langcode') && $this->get('langcode') != 'hu') {
+			$langcode = $this->get('langcode') . '/';
+		}
+		$path_with_langcode = $langcode . $this->get('path');
+		$this->set('path_with_langcode', $path_with_langcode);
+	}
+	*/
 
 	/**
 	 * Beállítja a query stringet

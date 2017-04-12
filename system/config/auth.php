@@ -31,15 +31,11 @@ $config['auth'] = array(
 	 * A user tábla password oszlop neve
 	 */
 	'password_colname' => 'password_hash',
-	/**
-	 * Átirányítás helye: pl.: login (ilyenkor a site_url/login oldalra fog irányítani)
-	 * Ez lesz az alapbeállítás, ha a handleExpire(), vagy handleLogin() metódust paraméter nélkül hívjuk meg
-	 */
-	'target_url' => 'login',
 
 	/**
 	 * Munkamenet lejárati ideje
+	 * 18000 = 5 óra, 14400 = 4 óra, 10800 = 3 óra, 7200 = 2 óra, 3600 = 1 óra
 	 */
-	'session_expire_time' => 3600,
+	'session_expire_time' => 18000,
 );
 ?>

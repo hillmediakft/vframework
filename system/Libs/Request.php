@@ -75,7 +75,7 @@ class Request {
 	public function has_params($index)
 	{
 		//return empty($this->router->params[$index]);
-		return isset($this->router->params[$index]);
+		return (isset($this->router->params[$index]) || isset($this->router->named_params[$index]));
 	}
 
 	/**

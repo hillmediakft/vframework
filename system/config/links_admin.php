@@ -9,10 +9,28 @@ $link['bootstrap-fileupload'] = array(
 	'css' => ADMIN_ASSETS . 'plugins/bootstrap-fileupload/bootstrap-fileupload.css',
 	'js' => ADMIN_ASSETS . 'plugins/bootstrap-fileupload/bootstrap-fileupload.js'
 );
-
+/*
+$link['kartik-bootstrap-fileinput'] = array(
+	'css' => ADMIN_ASSETS . 'plugins/kartik-bootstrap-fileinput/css/fileinput.css',
+	'js' => array(
+		ADMIN_ASSETS . 'plugins/kartik-bootstrap-fileinput/js/fileinput.js',
+		ADMIN_ASSETS . 'plugins/kartik-bootstrap-fileinput/js/fileinput_locale_hu.js'
+	) 
+);
+*/
 $link['bootstrap-editable'] = array(
 	'css' => ADMIN_ASSETS . 'plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css',
 	'js' => ADMIN_ASSETS . 'plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js'
+);
+
+$link['bootstrap-toastr'] = array(
+	'css' => ADMIN_ASSETS . 'plugins/bootstrap-toastr/toastr.min.css',
+	'js' => ADMIN_ASSETS . 'plugins/bootstrap-toastr/toastr.min.js'
+);
+
+$link['bootstrap-sessiontimeout'] = array(
+	'js' => ADMIN_ASSETS . 'plugins/bootstrap-sessiontimeout/bootstrap-session-timeout.min.js',
+	'js' => ADMIN_ASSETS . 'plugins/bootstrap-sessiontimeout/ui-session-timeout.js',
 );
 
 $link['ckeditor'] = array(
@@ -52,6 +70,14 @@ $link['elfinder'] = array(
 	'js' => array(
 		ADMIN_ASSETS . 'plugins/elfinder/js/elfinder.min.js',
 		ADMIN_ASSETS . 'plugins/elfinder/js/i18n/elfinder.hu.js'
+	)
+);
+$link['jquery-ui-elfinder'] = array(
+	'css' => array(
+		ADMIN_ASSETS . 'plugins/jquery-ui-elfinder/jquery-ui-theme-smoothness.css'
+	),
+	'js' => array(
+		ADMIN_ASSETS . 'plugins/jquery-ui-elfinder/jquery-ui.min.js'
 	)
 );
 

@@ -34,5 +34,12 @@ $link['ckeditor'] = array(
 	'js' => ADMIN_ASSETS . 'plugins/ckeditor/ckeditor.js'
 );
 
+// Google Maps
+$link['google-maps-site'] = array(
+	'js' => array(
+		'https://maps.googleapis.com/maps/api/js?key=AIzaSyDsyHr_ERbn8TBSwHRB1mWk28VDByR-oL0'
+	) 
+);
+
 return $link;
 ?>

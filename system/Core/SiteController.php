@@ -1,5 +1,6 @@
 <?php
 namespace System\Core;
+use System\Libs\Auth;
 
 class SiteController extends Controller {
 
@@ -19,6 +20,14 @@ class SiteController extends Controller {
     public function __construct()
     {
         parent::__construct();
+
+        // megnézzük, hogy be van-e jelentkezve a user 
+        if (Auth::isUserLoggedIn()) {
+            // megnézzük, hogy lejárt-e a session időkorlát 
+            if (!Auth::checkExpire()) {
+                $this->response->redirect($this->request->get_uri('current_url'));
+            }
+        }
 
         // settings betöltése és hozzárendelése a controllereken belül elérhető a global_data változóhoz
         $this->loadModel('settings_model');

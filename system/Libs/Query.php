@@ -351,7 +351,7 @@ class Query {
 			$this->table = $tablename;
 		}
 		else {
-			throw new Exception('Nem megfelelo tipusu parameter lett atadva a query osztaly set_table() metodusanak!');
+			throw new \Exception('Nem megfelelo tipusu parameter lett atadva a query osztaly set_table() metodusanak!');
 			exit;		
 		}
 	}
@@ -377,7 +377,7 @@ class Query {
 			$this->columns = $columns;
 		}
 		else {
-			throw new Exception('Nem megfelelo tipusu parameter lett atadva a query osztaly set_columns() metodusanak!');
+			throw new \Exception('Nem megfelelo tipusu parameter lett atadva a query osztaly set_columns() metodusanak!');
 			exit;
 		}
 	}	
@@ -576,7 +576,7 @@ class Query {
 			}
 		}
 		else {
-			throw new Exception('Nem megfelelo tipusu parameter lett atadva a query osztaly set_orderby() metodusanak!');
+			throw new \Exception('Nem megfelelo tipusu parameter lett atadva a query osztaly set_orderby() metodusanak!');
 			exit;		
 		}
 	}
@@ -593,7 +593,7 @@ class Query {
 	public function select()
 	{
 		if(is_null($this->table) && is_null($this->default_table)){
-			throw new Exception('Nincs beallitva tabla a lekerdezeshez!');
+			throw new \Exception('Nincs beallitva tabla a lekerdezeshez!');
 			exit;
 		}
 		
@@ -644,7 +644,7 @@ class Query {
 	public function insert($attributes = array())
 	{
 		if(is_null($this->table) && is_null($this->default_table)){
-			throw new Exception('Nincs beallitva tabla a lekerdezeshez!');
+			throw new \Exception('Nincs beallitva tabla a lekerdezeshez!');
 			exit;
 		}
 				
@@ -689,7 +689,7 @@ class Query {
 	{
 		// megvizsálja, hogy van-e beállítva tábla vagy where feltétel
 		if((is_null($this->table) && is_null($this->default_table)) || empty($this->where)){
-			throw new Exception('Nincs beallitva tabla, vagy WHERE feltetel az UPDATE lekerdezeshez!!');
+			throw new \Exception('Nincs beallitva tabla, vagy WHERE feltetel az UPDATE lekerdezeshez!!');
 			exit;
 		}
 
@@ -736,7 +736,7 @@ class Query {
 	{
 		// megvizsálja, hogy van-e beállítva tábla
 		if(is_null($this->table) && is_null($this->default_table)){
-			throw new Exception('Nincs beallitva tabla a lekerdezeshez!');
+			throw new \Exception('Nincs beallitva tabla a lekerdezeshez!');
 			exit;
 		}
 		
@@ -808,7 +808,7 @@ class Query {
 			return $sth->rowCount();
 		}
 		else {
-			throw new Exception('Rossz parameterezes, vagy beallitas a query class delete() metodusanak meghivasakor!');
+			throw new \Exception('Rossz parameterezes, vagy beallitas a query class delete() metodusanak meghivasakor!');
 			exit;			
 		}
 	}

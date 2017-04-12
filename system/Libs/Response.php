@@ -378,7 +378,8 @@ class Response {
 	public function redirectBack($url = '', $method = 'location', $code = 302)
 	{
 		// ha van referrer
-		if ($referrer = $_SERVER['HTTP_REFERER']) {
+		if (isset($_SERVER['HTTP_REFERER'])) {
+			$referrer = $_SERVER['HTTP_REFERER'];
 			// ha benne van a BASE URL a $referer-ben és a $referer != a current url-el
 			if (strpos($referrer, $this->_base_url === 0) && $referrer != $this->_current_url) {
 				// redirect back to where we came from

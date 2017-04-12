@@ -35,7 +35,14 @@ class Session
      */
     public static function has($key)
     {
-    	return isset($_SESSION[$key]);
+    	//return isset($_SESSION[$key]);
+
+    	if (strpos($key, '.') === false) {
+	    	return isset($_SESSION[$key]);
+    	} else {
+			$result = self::_get_array_value($_SESSION, $key);
+			return ($result === false) ? false : true;
+    	}
     }
 
 
@@ -100,7 +107,7 @@ class Session
 	 *
 	 *	@param   array   $array    Ebből a tömbből adjuk vissza az adatot
 	 *	@param   mixed   $key      A kulcs, amit keresünk
-	 *	@return  mixed
+	 *	@return  mixed || false
 	 */
 	private static function _get_array_value($array, $key)
 	{

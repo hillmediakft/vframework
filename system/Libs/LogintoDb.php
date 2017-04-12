@@ -2,6 +2,7 @@
 namespace System\Libs;
 use System\Libs\DI;
 use System\Libs\Query;
+use System\Libs\Session;
 
 /**
  * Az adatbázis logs táblájába létrehoz egy új rekordot
@@ -38,6 +39,44 @@ class LogIntoDb {
         );
         $this->query->set_table(array('logs'));
         $this->query->insert($data);
+    }
+
+    /**
+     * Új rekordok létrehozása a logs táblában
+     */
+    public function addLog($type, $message, $id_arr)
+    {
+        $user_id = Session::get('user_data.id');
+
+        foreach ($id_arr as $id) {
+            $data = array(
+                'user_id' => $user_id,
+                'action' => $type,
+                'message' => '#' . $id . ' - ' . $message,
+                'date' => date("Y-m-d H:i:s")
+            );
+            $this->query->set_table(array('logs'));
+            $this->query->insert($data);
+        } 
+    }
+
+    /**
+     * Új rekordok létrehozása a logs táblában
+     */
+    public function changePropertyStatus($type, $message, $id_arr)
+    {
+        $user_id = Session::get('user_data.id');
+
+        foreach ($id_arr as $id) {
+            $data = array(
+                'user_id' => $user_id,
+                'action' => $type,
+                'message' => '#' . $id . ' - ' . $message,
+                'date' => date("Y-m-d H:i:s")
+            );
+            $this->query->set_table(array('logs'));
+            $this->query->insert($data);
+        } 
     }
 
 }

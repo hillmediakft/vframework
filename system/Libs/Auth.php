@@ -118,7 +118,7 @@ class Auth {
     public static function init($auth_config)
     {
         Config::load($auth_config);
-        self::$session_expire_time = Config::get('auth.expire_time', 3600);
+        self::$session_expire_time = Config::get('auth.session_expire_time', 3600);
         self::$area = AREA;
     }
 
@@ -136,9 +136,10 @@ class Auth {
     /**
      *  Ellenőrzi, hogy be van-e jelentkezve a felhasználó és lejárt e a munkamenet időkorlát
      *
-     *  @return bool
+     * @param bool $destroy - ha false, akkor nem lesz session destroy, csak a login, és user elemekt törli 
+     * @return bool
      */
-    public static function check()
+    public static function check($destroy = true)
     {
         //$instance = self::instance();
 
@@ -180,10 +181,37 @@ class Auth {
             } 
         
         } else {
-            // ha nincs bejelentkezve a felhasználó    
-            Session::destroy();
-            return false;
+            // ha nincs bejelentkezve a felhasználó
+            if ($destroy) {
+                Session::destroy();
+                return false;
+            } else {
+                // töröljük a logged_in elemet és a user adatait    
+                Session::delete(self::$logged_in);
+                // töröljük a user adatokat    
+                Session::delete('user_data');
+                return false;
+            }    
         }
+    }
+
+    /**
+     * Munkamenet időkorlát lejáratának ellenőrzése
+     */
+    public static function checkExpire()
+    {
+        // ha lejárt az időkorlát
+        if(Session::get(self::$last_activity) < (time() - self::$session_expire_time)){
+            // töröljük a logged_in elemet és a user adatait    
+            Session::delete(self::$logged_in);
+            // töröljük a user adatokat    
+            Session::delete('user_data');
+            return false;
+
+        } else {
+            Session::set(self::$last_activity, time());
+            return true;
+        }                
     }
 
     /**
@@ -290,6 +318,8 @@ class Auth {
         $user_data = array(
             'id' => $this->user->id,
             'name' => $this->user->name,
+            'first_name' => $this->user->first_name,
+            'last_name' => $this->user->last_name,
             'email' => $this->user->email,
             'role_id' => $this->user->role_id,
             'photo' => $this->user->photo,
@@ -376,6 +406,8 @@ class Auth {
         $user_data = array(
             'id' => $this->user->id,
             'name' => $this->user->name,
+            'first_name' => $this->user->first_name,
+            'last_name' => $this->user->last_name,
             'email' => $this->user->email,
             'role_id' => $this->user->role_id,
             'photo' => $this->user->photo,
@@ -521,7 +553,7 @@ class Auth {
     private function _isActive($user_active)
     {
         if ($user_active != 1) {
-            $this->setError('Az ön belépési engedélye fel van függesztve!');
+            //$this->setError('Az ön belépési engedélye fel van függesztve!');
             return false;
         }
         return true;
@@ -608,7 +640,7 @@ class Auth {
      * @param string $target_url    egy átirányítási hely, ha nincs engedély 
      * @return void
      */
-    public static function hasAccess($permission, $target_url = null)
+    public static function hasAccess($permission, $target_url = false)
     {
         //$instance = self::instance();   
         $instance = DI::get('auth');
@@ -632,14 +664,26 @@ class Auth {
             }
         }
 
+    // ha van engedély
         if($instance->_checkAccess($permission)){
             return true;
         }
+    // ha nincs engedély
         else {
+            if ($target_url === false) {
+                return false;
+            }
             if(!is_null($target_url)) {
                 $instance->_accessDenied($permission, $target_url);
             }
-            return false;
+            // ha null a target url, például ha a http referer értéke null
+            else {
+                $target_url = BASE_URL;
+                if (AREA == 'admin') {
+                    $target_url .= '/admin'; 
+                }
+                $instance->_accessDenied($permission, $target_url);
+            }
         }
     } 
 

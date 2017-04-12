@@ -63,7 +63,12 @@ class Emailer {
     /**
      * site vagy admin
      */
-    private $area = 'site';
+    private $area = 'Site';
+
+    /**
+     * debug
+     */
+    private $debug = false;
 
     /**
      * CONSTRUCTOR
@@ -106,6 +111,15 @@ class Emailer {
     public function setArea($area)
     {
         $this->area = $area;
+    }
+
+    /**
+     * Debug tulajdonság értékének beállítása (ha true ... akkor echo template)
+     * @param bool
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
     }
 
     /**
@@ -158,6 +172,11 @@ class Emailer {
 // levél tartalom beállítása
         $mail->Body = $this->_load_template_with_data($this->template, $this->template_data);
         //$mail->AltBody = '';
+
+if ($this->debug) {
+    echo $this->_load_template_with_data($this->template, $this->template_data);
+    return false;
+}
 
         $mail->addAddress($this->to_email, $this->to_name);     // Add a recipient (Name is optional)
         // $mail->addAddress($admin_email);
@@ -212,7 +231,7 @@ class Emailer {
      */
     private function _load_template_with_data($template, $template_data)
     {
-        $body = file_get_contents('system/' . $this->area . '/view/email/tpl_' . $template . '.php');
+        $body = file_get_contents('system/' . ucfirst($this->area) . '/view/email/tpl_' . $template . '.php');
         foreach ($template_data as $key => $value) {
             $body = str_replace('{' . $key . '}', $value, $body);
         }

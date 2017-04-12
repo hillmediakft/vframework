@@ -7,17 +7,89 @@ class Str
 {
 	
     /**
-     * 	Ékezetes karaktereket és a szóközt cseréli le ékezet nélkülire és alulvonásra
+     * 	Ékezetes karaktereket és a szóközt cseréli le ékezet nélkülire és kötőjelre
      * 	minden karaktert kisbetűre cserél
      */
     public function stringToSlug($string)
     {
-        $accent = array("?", "!", ".", ":", "&", " ", "_", "á", "é", "í", "ó", "ö", "ő", "ú", "ü", "ű", "Á", "É", "Í", "Ó", "Ö", "Ő", "Ú", "Ü", "Ű");
-        $no_accent = array('', '', '', '', '-', '-', '-', 'a', 'e', 'i', 'o', 'o', 'o', 'u', 'u', 'u', 'A', 'E', 'I', 'O', 'O', 'O', 'U', 'U', 'U');
+        $accent = array(")", "(", "#", "@", ",", "?", "!", ".", ":", "&", " ", "_", "á", "é", "í", "ó", "ö", "ő", "ú", "ü", "ű", "Á", "É", "Í", "Ó", "Ö", "Ő", "Ú", "Ü", "Ű");
+        $no_accent = array('-', '-', '-', '', '', '', '', '', '', '-', '-', '-', 'a', 'e', 'i', 'o', 'o', 'o', 'u', 'u', 'u', 'A', 'E', 'I', 'O', 'O', 'O', 'U', 'U', 'U');
         $string = str_replace($accent, $no_accent, $string);
         $string = strtolower($string);
         return $string;
     }
+
+    /**
+     *  Ékezetes karaktereket és a szóközt cseréli le ékezet nélkülire és kötőjelre
+     *  minden karaktert kisbetűre cserél
+     */
+    public function stringToSlugAdvanced($name)
+    {
+        $_abc = array(
+            '/À|Á|Â|Ã|Ä|Å|Ǻ|Ā|Ă|Ą|Ǎ/' => 'A',
+            '/à|á|â|ã|å|ǻ|ā|ă|ą|ǎ|ª|ä|æ|ǽ/' => 'a',
+            '/Ç|Ć|Ĉ|Ċ|Č/' => 'C',
+            '/ç|ć|ĉ|ċ|č/' => 'c',
+            '/Ð|Ď|Đ/' => 'D',
+            '/ð|ď|đ/' => 'd',
+            '/È|É|Ê|Ë|Ē|Ĕ|Ė|Ę|Ě/' => 'E',
+            '/è|é|ê|ë|ē|ĕ|ė|ę|ě/' => 'e',
+            '/Ĝ|Ğ|Ġ|Ģ/' => 'G',
+            '/ĝ|ğ|ġ|ģ/' => 'g',
+            '/Ĥ|Ħ/' => 'H',
+            '/ĥ|ħ/' => 'h',
+            '/Ì|Í|Î|Ï|Ĩ|Ī|Ĭ|Ǐ|Į|İ/' => 'I',
+            '/ì|í|î|ï|ĩ|ī|ĭ|ǐ|į|ı/' => 'i',
+            '/Ĵ/' => 'J',
+            '/ĵ/' => 'j',
+            '/Ķ/' => 'K',
+            '/ķ/' => 'k',
+            '/Ĺ|Ļ|Ľ|Ŀ|Ł/' => 'L',
+            '/ĺ|ļ|ľ|ŀ|ł/' => 'l',
+            '/Ñ|Ń|Ņ|Ň/' => 'N',
+            '/ñ|ń|ņ|ň|ŉ/' => 'n',
+            '/Ò|Ó|Ô|Õ|Ō|Ŏ|Ǒ|Ő|Ơ|Ø|Ǿ|Ö/' => 'O',
+            '/ò|ó|ô|õ|ō|ŏ|ǒ|ő|ơ|ø|ǿ|º|ö|œ/' => 'o',
+            '/Ŕ|Ŗ|Ř/' => 'R',
+            '/ŕ|ŗ|ř/' => 'r',
+            '/Ś|Ŝ|Ş|Š/' => 'S',
+            '/ś|ŝ|ş|š|ſ/' => 's',
+            '/Ţ|Ť|Ŧ/' => 'T',
+            '/ţ|ť|ŧ/' => 't',
+            '/Ù|Ú|Û|Ũ|Ū|Ŭ|Ů|Ű|Ų|Ư|Ǔ|Ǖ|Ǘ|Ǚ|Ǜ|Ü/' => 'U',
+            '/ù|ú|û|ũ|ū|ŭ|ů|ű|ų|ư|ǔ|ǖ|ǘ|ǚ|ǜ|ü/' => 'u',
+            '/Ý|Ÿ|Ŷ/' => 'Y',
+            '/ý|ÿ|ŷ/' => 'y',
+            '/Ŵ/' => 'W',
+            '/ŵ/' => 'w',
+            '/Ź|Ż|Ž/' => 'Z',
+            '/ź|ż|ž/' => 'z',
+            '/Æ|Ǽ/' => 'AE',
+            '/ß/'=> 'ss',
+            '/Ĳ/' => 'IJ',
+            '/ĳ/' => 'ij',
+            '/Œ/' => 'OE',
+            '/ƒ/' => 'f',
+            '/\<|\>|\#|\@|\{|\}|\(|\)|\[|\]|\$|\_|\?|\.|\,|\:|\;|\%|\!|\~|\"|\'|\^|\ˇ|\=|\/|\+|\-|\*|\`|\§|\|/' => ''
+        );
+
+        $_defaultReplacement = '-';
+
+        $replacement = preg_quote($_defaultReplacement, '/');
+
+        $merge = array(
+            '/[^\s\w\d]/mu' => ' ',
+            '/\\s+/' => $_defaultReplacement,
+            sprintf('/^[%s]+|[%s]+$/', $replacement, $replacement) => '',
+        );
+
+        $map = $_abc + $merge;
+        
+        $newname = preg_replace(array_keys($map), array_values($map), $name);
+        $newname = mb_strtolower($newname);
+        return $newname;
+    }
+
 
     /**
      * Egy szövegből az elejétől kezdődően adott karakterszámú rész ad vissza szóra kerekítve

@@ -59,7 +59,7 @@ class Dispatcher {
                         if (forward_static_call_array(array($controller_class, $value['action']), $value['params']) === false) ;
                     }
                 } else {
-                	throw new \Exception("Error Processing Request");
+                	throw new \Exception("Nem toltheto be a: " . $controller_class . " nevu osztaly");
                 }
             } else {
             	throw new \Exception("Error Processing Request");

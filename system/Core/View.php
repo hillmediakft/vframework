@@ -356,8 +356,8 @@ HTML;
 	 */		
 	public function menu_active($controller, $action = null, $attribute_name = 'active')
 	{
-		$active_controller = $this->request->get_controller();
-		$active_action = $this->request->get_action();
+		$active_controller = strtolower( $this->request->get_controller() );
+		$active_action = strtolower( $this->request->get_action() );
 
 		// ha csak controller van megadva paraméterként
 		if (!is_null($controller) && is_null($action)) {

@@ -81,7 +81,8 @@ class Paginator {
      *
      * @return integer
      */
-    public function get_offset() {
+    public function get_offset()
+    {
         return ($this->page_id * $this->limit) - $this->limit;
     }
 
@@ -90,41 +91,74 @@ class Paginator {
      *
      * @return integer
      */
-    public function get_limit() {
+    public function get_limit()
+    {
         return $this->limit;
     }
 
     /**
      * Beállítja a page_id tulajdonság értékét (az oldal számát)
      */
-    private function _set_page_id() {
+    private function _set_page_id()
+    {
         $this->page_id = (int) (!isset($_GET[$this->pagename]) ? 1 : $_GET[$this->pagename]);
         $this->page_id = ($this->page_id == 0 ? 1 : $this->page_id);
     }
+
+/**
+ * Az oldal számát adja vissza
+ */
+public function getPageId()
+{
+    return $this->page_id;
+}
+
+/**
+ * Az összes elem és a limit alapján visszaadja az oldalak számát
+ */
+public function getNumberOfPages($total_record, $limit)
+{
+    return (int)ceil($total_record / $limit);
+}
 
     /**
      * A tábla összes rekordjának a számát adja meg a $total_pages tulajdonságnak 
      *
      * @param integer	$total_pages
      */
-    public function set_total($total_pages) {
+    public function set_total($total_pages)
+    {
         $this->total_pages = $total_pages;
     }
 
     /**
      * 	Link létrehozása, amihez kapcsolódik az oldalszámláló paraméter (page=2)
      */
-    private function _get_path($uri_path) {
+    private function _get_path($uri_path)
+    {
         $this->querystring = '?';
         // ha van query string
-        if ($_GET) {
+        if (!empty($_GET)) {
             $params = $_GET;
             if (isset($params[$this->pagename])) {
                 unset($params[$this->pagename]);
             }
+
+            // query string összeállítása 
+            //$this->querystring .= http_build_query($params);
+            //$this->querystring .= '&';
+
             foreach ($params as $k => $v) {
-                $this->querystring .= $k . '=' . $v . '&';
+                if (is_array($v)) {
+                    foreach ($v as $key => $value) {
+                        $this->querystring .= $k . '[]=' . $value . '&';
+                    }
+                } else {
+                    $this->querystring .= $k . '=' . $v . '&';
+                }
             }
+
+
             unset($params);
             return $uri_path . $this->querystring;
         } else {
@@ -139,14 +173,15 @@ class Paginator {
      * @param string $uri_path 		elérési út megadása ehhez fog csatlakozni az oldalszám paraméter
      * @return string 				a html menu
      */
-    public function page_links($uri_path) {
+    public function page_links($uri_path)
+    {
         // útvonal létrehozása, ehhez fog csatlakozni a pl.: pagename=23	
         $path = $this->_get_path($uri_path);
 
         // Initial page num setup
         $prev = $this->page_id - 1;
         $next = $this->page_id + 1;
-        $lastpage = ceil($this->total_pages / $this->limit);
+        $lastpage = $this->getNumberOfPages($this->total_pages, $this->limit);
         $LastPagem1 = $lastpage - 1;
 
         $paginate = '';
