@@ -180,7 +180,7 @@ class User extends AdminController {
 			$data['title'] = 'Új felhasználó oldal';
 			$data['description'] = 'Új felhasználó description';
 
-			$view->add_links(array('bootstrap-fileupload','croppic','validation','user_insert'));
+			$view->add_links(array('croppic','validation','user_insert'));
 			$view->render('users/tpl_user_insert', $data);
 		} else {
 	        Message::set('error', 'Nincs engedélye felhasználót létrehozni.');
@@ -339,7 +339,7 @@ class User extends AdminController {
 		$data['description'] = 'Profilom description';
 		$data['user'] = $this->user_model->selectUser($id);
 
-		$view->add_links(array('bootstrap-fileupload', 'croppic', 'validation', 'user_profile'));
+		$view->add_links(array('croppic', 'validation', 'user_profile'));
 		$view->render('users/tpl_profile', $data);
 	}
 	
@@ -480,6 +480,25 @@ class User extends AdminController {
 	            ));
 	        }
         }
+	}
+
+	/**
+	 * Törli a megadott képet
+	 */
+	public function deleteImage()
+	{
+		if ($this->request->is_ajax()) {
+			$file_path = $this->request->get_post('file');
+			DI::get('file_helper')->delete($file_path);
+
+			$this->response->json(array(
+				'status' => 'success',
+				'message' => 'ok'
+				));
+
+		} else {
+			$this->response->redirect('admin/error');
+		}
 	}
 
     /**

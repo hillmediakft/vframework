@@ -143,9 +143,44 @@ var User_insert = function () {
                 modal:false,
                 doubleZoomControls:false,
                 rotateControls: false,
-                loaderHtml:'<div class="loader bubblingG"><span id="bubblingG_1"></span><span id="bubblingG_2"></span><span id="bubblingG_3"></span></div> '
+                loaderHtml:'<div class="loader bubblingG"><span id="bubblingG_1"></span><span id="bubblingG_2"></span><span id="bubblingG_3"></span></div> ',
+                onReset: function(){
+                	deleteTempPhoto(cropperHeader.imgUrl);
+                },
         }
+
         var cropperHeader = new Croppic('user_image', cropperOptions);
+    }
+
+    /**
+     * Kép törlése
+     */
+    var deleteTempPhoto = function(image_path){
+    	
+    	$.ajax({
+    	    url: 'admin/user/deleteimage',
+    	    type: 'POST',
+    	    dataType: 'json',
+    	    data: {file: image_path},
+    	    beforeSend: function() {
+    	        App.blockUI({
+    	            boxed: true,
+    	            message: 'Feldolgozás...'
+    	        });
+    	    },
+    	    complete: function(){
+    	        App.unblockUI();
+    	    },
+    	    success: function(result){
+    	        if(result.status == 'success'){
+    	        	console.log(result.message);
+    	        }
+    	    },
+    	    error: function(result, status, e){
+    	        console.log(e);
+    	    } 
+    	});
+
     }
 
 	

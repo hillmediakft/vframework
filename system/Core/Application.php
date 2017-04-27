@@ -84,6 +84,7 @@ class Application {
                 $router->match('GET|POST', '/user/insert', 'user@insert');
                 $router->match('GET|POST', '/user/profile/:id', 'user@profile', array('id'));
                 $router->post('/user/delete', 'user@delete');
+                $router->post('/user/deleteimage', 'User@deleteImage');
                 $router->post('/user/change_status', 'user@change_status');
                 $router->post('/user/user_img_upload/(upload)', 'user@user_img_upload', array('upload'));
                 $router->post('/user/user_img_upload/(crop)', 'user@user_img_upload', array('crop'));
