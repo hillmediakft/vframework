@@ -1,8 +1,8 @@
-var Blog = function () {
+var Document = function () {
 
-    var blogTable = function () {
+    var documentTable = function () {
 
-        var table = $('#blog');
+        var table = $('#documents');
 	
 		table.dataTable({
 
@@ -41,10 +41,11 @@ var Blog = function () {
             "columnDefs": [
                 {"orderable": false, "searchable": false, "targets": 0},
                 {"orderable": true, "searchable": true, "targets": 1},
-                {"orderable": true, "searchable": false, "targets": 2},
+                {"orderable": true, "searchable": true, "targets": 2},
                 {"orderable": true, "searchable": true, "targets": 3},
                 {"orderable": true, "searchable": false, "targets": 4},
-                {"orderable": false, "searchable": false, "targets": 5}
+                {"orderable": true, "searchable": true, "targets": 5},
+                {"orderable": false, "searchable": false, "targets": 6}
             ],
 
             // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
@@ -52,11 +53,11 @@ var Blog = function () {
             // So when dropdowns used the scrollable div should be removed. 
             // "dom": "<'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
 
-            "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
+      //      "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
 
             "lengthMenu": [
                 [5, 15, 20, -1],
-                [5, 15, 20, "Összes"] // change per page values here
+                [5, 15, 20, "All"] // change per page values here
             ],
             // set the initial value
             "pageLength": 20,
@@ -90,21 +91,22 @@ var Blog = function () {
                 return;
             }
 
-            blogTable();
+            documentTable();
 
             vframework.deleteItems({
-                table_id: "blog",
-                url: "admin/blog/delete"
+                table_id: "documents",
+                url: "admin/documents/delete_document_AJAX"
             });
 
+/*
             vframework.changeStatus({
-                url: "admin/blog/change_status",
+                url: "admin/document/change_status",
             });
-
+*/
             vframework.printTable({
-                print_button_id: "print_blog", // elem id-je, amivel elindítjuk a nyomtatást 
-                table_id: "blog",
-                title: "Blogok listája"
+                print_button_id: "print_documents", // elem id-je, amivel elindítjuk a nyomtatást 
+                table_id: "documents",
+                title: "Documentok listája"
             });
 
             vframework.hideAlert();
@@ -116,5 +118,5 @@ var Blog = function () {
 }();
 
 $(document).ready(function() {    
-	Blog.init();
+	Document.init();
 });

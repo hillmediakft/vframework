@@ -38,18 +38,18 @@ class BlogCategory_model extends AdminModel {
 	/**
 	 * Kategória név módosítás
 	 */
- 	public function updateCategory($id, $new_names)
+ 	public function updateCategory($id, $new_name)
  	{
 		$this->query->set_where('id', '=', $id);
-		return $this->query->update($new_names);
+		return $this->query->update(array('category_name' => $new_name));
  	}
 
  	/**
  	 * Kategória hozzáadása
  	 */
- 	public function insertCategory($new_names)
+ 	public function insertCategory($new_name)
  	{
-		return $this->query->insert($new_names); 		
+		return $this->query->insert(array('category_name' => $new_name));	
  	}	
 
 }

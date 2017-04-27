@@ -3,7 +3,6 @@ namespace System\Admin\Controller;
 use System\Core\AdminController;
 use System\Core\View;
 use System\Libs\DI;
-use System\Libs\Auth;
 use System\Libs\Message;
 use System\Libs\Config;
 use System\Libs\Uploader;
@@ -19,13 +18,11 @@ class Blog extends AdminController {
     
 	public function index()
 	{
-		Auth::hasAccess('blog.index', $this->request->get_httpreferer());
+		$view = new View();
 
 		$data['title'] = 'Admin blog oldal';
 		$data['description'] = 'Admin blog oldal description';	
 		$data['all_blog'] = $this->blog_model->selectBlog();
-		
-		$view = new View();
 		//$view->setHelper(array('str', 'arr'));
 // $view->debug(true);		
 		$view->add_links(array('datatable', 'bootbox', 'vframework', 'blog'));
@@ -37,8 +34,6 @@ class Blog extends AdminController {
      */
     public function insert()
 	{
-		Auth::hasAccess('blog.insert', $this->request->get_httpreferer());
-
 		if( $this->request->is_post() ){
 
 			// kép feltöltési hiba vizsgálata
@@ -68,8 +63,6 @@ if($this->request->checkUploadError('upload_blog_picture')){
 
 
 			// az adatbázisba kerülő adatok
-			$data['status'] = $this->request->get_post('status', 'integer');
-			
 			$data['title'] = $this->request->get_post('blog_title');
 			$data['body'] = $this->request->get_post('blog_body', 'strip_danger_tags');
 			$data['category_id'] = $this->request->get_post('blog_category');
@@ -94,7 +87,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 		$data['description'] = 'Admin blog oldal description';	
 		$data['category_list'] = $this->blogcategory_model->selectCategory();
 		
-		$view->add_links(array('bootstrap-fileinput', 'ckeditor', 'vframework', 'blog_insert'));
+		$view->add_links(array('bootstrap-fileupload', 'ckeditor', 'vframework', 'blog_insert'));
 		$view->render('blog/tpl_blog_insert', $data);
 	}
     
@@ -103,8 +96,6 @@ if($this->request->checkUploadError('upload_blog_picture')){
      */
 	public function update($id)
 	{
-		Auth::hasAccess('blog.update', $this->request->get_httpreferer());
-
 		$id = (int)$id;
 
 		if( $this->request->has_post() ){
@@ -112,21 +103,20 @@ if($this->request->checkUploadError('upload_blog_picture')){
 			// fájl feltöltési hiba ellenőrzése
 			if($this->request->checkUploadError('upload_blog_picture')){
 				Message::set('error', $this->request->getFilesError('upload_blog_picture'));
-				$this->response->redirect('admin/blog/update/' . $id);				
+				$this->response->redirect('admin/blog/insert');				
 			}
 			// kép feltöltése (ellenőrizzük, hogy van-e feltöltött kép)
 			if($this->request->hasFiles('upload_blog_picture')) {
 				$dest_image = $this->_uploadPicture($this->request->getFiles('upload_blog_picture'));
 				if($dest_image === false) {
-					$this->response->redirect('admin/blog/update/' . $id);
+					$this->response->redirect('admin/blog/update');
 				}
 			}
 
 		// az adatbázisba kerülő adatok
-			$data['status'] = $this->request->get_post('status', 'integer');
 			$data['title'] = $this->request->get_post('blog_title');
 			$data['body'] = $this->request->get_post('blog_body', 'strip_danger_tags');
-
+			
 			// ha van új feltöltött kép
 			if(isset($dest_image)) {
 				$url_helper = DI::get('url_helper');
@@ -166,7 +156,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 		$data['category_list'] = $this->blogcategory_model->selectCategory();
 		$data['blog'] = $this->blog_model->selectBlog($id);
 // $view->debug(true);		
-		$view->add_links(array('bootstrap-fileinput', 'ckeditor', 'vframework', 'blog_update'));
+		$view->add_links(array('bootstrap-fileupload', 'ckeditor', 'vframework', 'blog_update'));
 		$view->render('blog/tpl_blog_update', $data);
 	}  
 
@@ -176,14 +166,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 	public function delete()
 	{
         if($this->request->is_ajax()){
-		        
-		        if(!Auth::hasAccess('blog.delete')){
-		            $this->response->json(array(
-		            	'status' => 'error',
-		            	'message' => 'Nincs engedélye a művelet végrehajtásához!'
-		            ));
-				}	            
-
+	        if(1){
 	        	// a POST-ban kapott item_id egy tömb
 	        	$id_arr = $this->request->get_post('item_id');
 				// a sikeres törlések számát tárolja
@@ -249,7 +232,14 @@ if($this->request->checkUploadError('upload_blog_picture')){
 
 		        // respond tömb visszaadása
 		        $this->response->json($respond);
+		   		
 
+	        } else {
+	            $this->response->json(array(
+	            	'status' => 'error',
+	            	'message' => 'Nincs engedélye a művelet végrehajtásához!'
+	            ));
+	        }
         }
 	}
 
@@ -276,7 +266,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 	{
 		if ($this->request->is_ajax()) {
 			// az id értéke lehet null is!
-			$id = $this->request->get_post('id', 'integer');
+			$id = $this->request->get_post('id');
 			$new_name = $this->request->get_post('data');
 			
 			if ($new_name == '') {
@@ -299,7 +289,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 			} 
 
 		//insert (ha az $id értéke null)
-			if (is_null($id)) {
+			if ($id == null) {
 				$result = $this->blogcategory_model->insertCategory($new_name);
 				
 				if ($result) {
@@ -318,7 +308,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 			}
 		// update
 			else {
-				$result = $this->blogcategory_model->updateCategory($id, $new_name);
+				$result = $this->blogcategory_model->updateCategory((int)$id, $new_name);
 
 				if ($result !== false) {
 					$this->response->json(array(
@@ -341,7 +331,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 	public function category_delete()
 	{
         if($this->request->is_ajax()){
-	        if(Auth::hasAccess('blog.category_delete')){
+	        if(1){
 	        	$id = $this->request->get_post('item_id', 'integer');
 
 			// a sikeres törlések számát tárolja
@@ -459,68 +449,6 @@ if($this->request->checkUploadError('upload_blog_picture')){
 		// kép neve
 		return $filename;		
 	}
-
-    /**
-     * (AJAX) A blog táblában módosítja a status mező értékét
-     *
-     * @return void
-     */
-    public function change_status()
-    {
-        if ( $this->request->is_ajax() ) {
-        	// jogosultság vizsgálat
-        	if (!Auth::hasAccess('blog.change_status')) {
-				$this->response->json(array(
-					"status" => 'error',
-					"message" => 'Nincs engedélye a művelet végrehajtásához.'
-				));			
-			}        		
-        	
-            if ( $this->request->has_post('action') && $this->request->has_post('id') ) {
-			
-				$id = $this->request->get_post('id', 'integer');
-				$action = $this->request->get_post('action');
-
-				if($action == 'make_active') {
-					$result = $this->blog_model->changeStatus($id, 1);
-					if($result !== false){
-						$this->response->json(array(
-							"status" => 'success',
-							"message" => 'Az aktiválás megtörtént!'
-						)); 	
-					} else {
-						$this->response->json(array(
-							"status" => 'error',
-							"message" => 'Adatbázis hiba! A hír státusza nem változott meg!'
-						));
-					}
-				}
-				if($action == 'make_inactive') {
-					$result = $this->blog_model->changeStatus($id, 0);
-					if($result !== false){
-						$this->response->json(array(
-							"status" => 'success',
-							"message" => 'A blokkolás megtörtént!'
-						)); 	
-					} else {
-						$this->response->json(array(
-							"status" => 'error',
-							"message" => 'Adatbázis hiba! A státusz nem változott meg!'
-						));
-					}
-					
-				}
-			} else {
-				$this->response->json(array(
-					"status" => 'error',
-					"message" => 'unknown_error'
-				));
-			}
-
-		} else {
-			$this->response->redirect('admin/error');
-		}
-    }	
 
 
 }

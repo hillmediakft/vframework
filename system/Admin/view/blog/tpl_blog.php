@@ -1,3 +1,6 @@
+<?php 
+use System\Libs\Auth;
+?>
 <div class="page-content">
 	<!-- BEGIN PAGE HEADER-->
 		<!-- BEGIN PAGE TITLE & BREADCRUMB-->
@@ -61,6 +64,7 @@
 									<th>Cím</th>
 									<th>Dátum</th>
 									<th>Kategória</th>
+									<th style="width:0px;">Státusz</th>
 									<th style="width:0px;"></th>
 								</tr>
 							</thead>
@@ -77,17 +81,34 @@
 									<td><?php echo $blog['title'];?></td>
 									<td><?php echo $blog['add_date'];?></td>
 									<td><?php echo $blog['category_name'];?></td>
+									
+                                    <?php if ($blog['status'] == 1) { ?>
+                                        <td><span class="label label-sm label-success">Aktív</span></td>
+                                    <?php } ?>
+                                    <?php if ($blog['status'] == 0) { ?>
+                                        <td><span class="label label-sm label-danger">Inaktív</span></td>
+                                    <?php } ?>
+
 									<td>									
 										<div class="actions">
 											<div class="btn-group">
 												<a class="btn btn-sm grey-steel" href="#" data-toggle="dropdown"><i class="fa fa-cogs"></i></a>
 												<ul class="dropdown-menu pull-right">
-													<?php if (1) { ?>	
+													<?php if (Auth::hasAccess('blog.update')) { ?>	
 														<li><a href="admin/blog/update/<?php echo $blog['id'];?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
 													<?php } ?>
-													<?php if (1) { ?>
+													<?php if (Auth::hasAccess('blog.delete')) { ?>
 														<li><a class="delete_item" data-id="<?php echo $blog['id']; ?>"><i class="fa fa-trash"></i> Töröl</a></li>
 													<?php } ?>
+                                                    <?php if (Auth::hasAccess('blog.change_status')) { ?>	
+                                                        <?php if ($blog['status'] == 1) { ?>
+                                                            <li><a class="change_status" data-id="<?php echo $blog['id']; ?>" data-action="make_inactive"><i class="fa fa-ban"></i> Blokkol</a></li>
+                                                        <?php } ?>
+                                                        <?php if ($blog['status'] == 0) { ?>
+                                                            <li><a class="change_status" data-id="<?php echo $blog['id']; ?>" data-action="make_active"><i class="fa fa-check"></i> Aktivál</a></li>
+                                                        <?php } ?>
+                                                    <?php } ?>	
+
 												</ul>
 											</div>
 										</div>

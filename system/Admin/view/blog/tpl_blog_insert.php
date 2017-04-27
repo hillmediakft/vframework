@@ -49,33 +49,43 @@
 							<div class="col-md-12">						
 							
 								<!-- bootstrap file upload -->
-								<div class="form-group">
-									<label class="control-label">Kép</label>
-									<div class="fileupload fileupload-new" data-provides="fileupload">
-										<div class="fileupload-new thumbnail" style="width: 200px; height: 150px;"><img src="<?php echo ADMIN_IMAGE . 'no_user_image.jpg';?>" alt=""/></div>
-										<div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
-										<div>
-											<span class="btn default btn-file"><span class="fileupload-new">Kiválasztás</span><span class="fileupload-exists">Módosít</span><input id="uploadprofile" class="img" type="file" name="upload_blog_picture"></span>
-											<a href="#" class="btn btn-warning fileupload-exists" data-dismiss="fileupload">Töröl</a>
-										</div>
-									</div>
-								</div>
+                                <label for="upload_blog_picture" class="control-label">Kép</label>
+                                <div class="form-group ">
+                                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                                        <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                                            <img src="<?php echo ADMIN_IMAGE . 'no_user_image.jpg';?>" alt=""/>
+                                        </div>
+                                        <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
+                                        <div>
+                                            <span class="btn default btn-file">
+                                                <span class="fileinput-new">Kiválasztás</span>
+                                                <span class="fileinput-exists">Módosít</span>
+                                                <input id="uploadprofile" class="img" type="file" name="upload_blog_picture">
+                                            </span>
+                                            <a href="javascript:;" class="btn btn-warning fileinput-exists" data-dismiss="fileinput">Töröl</a>
+                                        </div>
+                                    </div>
+                                </div>
 								<!-- bootstrap file upload END -->
+
 								<div class="clearfix"></div>
 
 								<div class="note note-info">
 									Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!
 								</div>
-								
-								<div class="form-group">
-									<label for="blog_title" class="control-label">Cím</label>
-									<input type="text" name="blog_title" id="blog_title" placeholder="" class="form-control input-xlarge" />
-								</div>
-								<div class="form-group">
-									<label for="blog_text" class="control-label">Szöveg</label>
-									<textarea name="blog_body" id="blog_body" placeholder="" class="form-control input-xlarge"></textarea>
-								</div>
-								
+
+<div class="margin-bottom-30"></div>
+	
+								<!-- STÁTUSZ -->
+                                <div class="form-group">
+                                    <label for="status">Státusz</label>
+                                    <select name="status" class="form-control input-xlarge">
+                                        <option value="0">Inaktív</option>
+                                        <option value="1">Aktív</option>
+                                    </select>
+                                </div>
+
+                                <!-- KATEGÓRIA -->
 								<div class="form-group">
 									<label for="blog_category">Kategória</label>
 									<select name="blog_category" class="form-control input-xlarge">
@@ -84,6 +94,15 @@
 										<option value="<?php echo $category['id']?>"><?php echo $category['category_name']?></option>
 									<?php } ?>
 									</select>
+								</div>
+
+								<div class="form-group">
+									<label for="blog_title" class="control-label">Cím</label>
+									<input type="text" name="blog_title" id="blog_title" placeholder="" class="form-control input-xlarge" />
+								</div>
+								<div class="form-group">
+									<label for="blog_text" class="control-label">Szöveg</label>
+									<textarea name="blog_body" id="blog_body" placeholder="" class="form-control input-xlarge"></textarea>
 								</div>
 
 							</div>

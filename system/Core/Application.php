@@ -91,12 +91,12 @@ class Application {
                 $router->match('GET|POST', '/user/edit_roles/:id', 'user@edit_roles', array('id'));
 
                 // photo gallery	
-                $router->get('/photo-gallery', 'photo_gallery@index');
-                $router->post('/photo-gallery/delete_photo', 'photo_gallery@delete_photo');
-                $router->post('/photo-gallery/delete_category', 'photo_gallery@delete_category');
-                $router->match('GET|POST', '/photo-gallery/insert', 'photo_gallery@insert');
-                $router->match('GET|POST', '/photo-gallery/update/:id', 'photo_gallery@update', array('id'));
-                $router->get('/photo-gallery/category', 'photo_gallery@category');
+                $router->get('/photo-gallery', 'PhotoGallery@index');
+                $router->post('/photo-gallery/delete_photo', 'PhotoGallery@delete_photo');
+                $router->post('/photo-gallery/delete_category', 'PhotoGallery@delete_category');
+                $router->match('GET|POST', '/photo-gallery/insert', 'PhotoGallery@insert');
+                $router->match('GET|POST', '/photo-gallery/update/:id', 'PhotoGallery@update', array('id'));
+                $router->get('/photo-gallery/category', 'PhotoGallery@category');
 
                 // slider	
                 $router->get('/slider', 'slider@index');
@@ -121,13 +121,13 @@ class Application {
                 $router->post('/clients/order', 'clients@order');
 
                 // file manager	
-                $router->get('/file_manager', 'file_manager@index');
+                $router->get('/file_manager', 'FileManager@index');
 
                 // settings	
                 $router->match('GET|POST', '/settings', 'settings@index');
 
                 // user manual	
-                $router->get('/user-manual', 'user_manual@index');
+                $router->get('/user-manual', 'UserManual@index');
 
                 // translations	
                 $router->get('/translations', 'translations@index');
@@ -148,6 +148,21 @@ class Application {
                 $router->get('/blog/category', 'blog@category');
                 $router->post('/blog/category_insert_update', 'blog@category_insert_update');
                 $router->post('/blog/category_delete', 'blog@category_delete');
+                $router->post('/blog/change_status', 'blog@change_status');
+
+                //documents
+                $router->get('/documents', 'documents@index');
+                $router->match('GET|POST', '/documents/insert', 'documents@insert');
+                $router->match('GET|POST', '/documents/update/:id', 'documents@update', array('id'));
+                $router->post('/documents/delete_document_AJAX', 'documents@delete_document_AJAX');
+                $router->post('/documents/insert_update_data_ajax', 'documents@insert_update_data_ajax');
+                $router->get('/documents/category', 'documents@category');
+                $router->post('/documents/category_insert_update', 'documents@category_insert_update');
+                $router->post('/documents/category_delete', 'documents@category_delete');
+                $router->post('/documents/show_file_list', 'documents@show_file_list');
+                $router->post('/documents/doc_upload_ajax', 'documents@doc_upload_ajax');
+                $router->post('/documents/file_delete', 'documents@file_delete');
+                $router->get('/documents/download/:filename', 'documents@download', array('file'));
 
                 // error	
                 $router->set404('error@index');

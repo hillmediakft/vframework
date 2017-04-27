@@ -20,7 +20,10 @@ class Blog_model extends AdminModel {
 	 */
 	public function selectBlog($id = null)
 	{
-		$this->query->set_columns(array('blog.id','blog.title','blog.body','blog.picture','blog.add_date', 'blog_category.category_name')); 
+		$this->query->set_columns(array(
+			'blog.*',
+			'blog_category.category_name',
+			)); 
 		$this->query->set_join('left', 'blog_category', 'blog.category_id', '=', 'blog_category.id'); 
 		
 		if(!is_null($id)){
@@ -96,6 +99,20 @@ class Blog_model extends AdminModel {
 		$this->query->set_where('category_id', '=', $category);
 		return $this->query->select();
 	}
+
+    /**
+     * 	Status mező értékét módosítja
+     * 	
+     * 	@param	integer	$id	
+     * 	@param	integer	$data (0 vagy 1)	
+     * 	@return integer
+     */
+    public function changeStatus($id, $data)
+    {
+        $this->query->set_where('id', '=', $id);
+        return $this->query->update(array('status' => $data));
+    }
+
 
 }
 ?>
