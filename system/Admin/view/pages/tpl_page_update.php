@@ -58,10 +58,12 @@
                                 <input type='text' name='page_metakeywords' class='form-control' value="<?php echo $page['metakeywords'] ?>">
                             </div>
 
+                            <?php if ($page['body_edit'] == 1) { ?>
                             <div class="form-group">
                                 <label for="page_body">Tartalom</label>
                                 <textarea type="text" name="page_body" class="form-control"><?php echo $page['body'] ?></textarea>
                             </div>
+                            <?php } ?>
 
 					    </div> <!-- END USER GROUPS PORTLET BODY-->
 				</div> <!-- END USER GROUPS PORTLET-->
