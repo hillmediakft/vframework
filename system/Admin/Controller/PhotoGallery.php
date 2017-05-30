@@ -301,86 +301,66 @@ class PhotoGallery extends AdminController {
 	 */
 	public function delete_category()
 	{
-        if($this->request->is_ajax()){
-	        if(1){
-	        	// a POST-ban kapott user_id egy tömb
-	        	$id = $this->request->get_post('item_id', 'integer');
-				// a sikeres törlések számát tárolja
-				$success_counter = 0;
-				// a sikertelen törlések számát tárolja
-				$fail_counter = 0; 
-
-				// lekérdezzük a törlendő képek nevét
-				$photo_names_temp = $this->photo_gallery_model->selectFilenameWhereCategory($id);			
-
-				$photo_names = array();
-				foreach ($photo_names_temp as $key => $value) {
-					$photo_names[] = $value['photo_filename'];
-				}
-				unset($photo_names_temp);
-
-				// képekhez tartozó rekordok törlése
-				$result = $this->photo_gallery_model->deleteWhereCategory($id);
-
-				// képek törlése
-				if($result !== false) {
-					if($result > 0){
-
-						$file_helper = DI::get('file_helper');
-						$url_helper = DI::get('url_helper');
-						$upload_path = Config::get('photogallery.upload_path');
-
-						foreach($photo_names as $value)
-						{
-							$picture_path = $upload_path . $value;
-							$thumb_picture_path = $url_helper->thumbPath($picture_path);
-							$file_helper->delete(array($picture_path, $thumb_picture_path));
-						}				
-					}
-				}
-
-				// kategória törlése
-				$result = $this->photocategory_model->deleteCategory($id);
-				
-				if($result !== false) {
-					// ha a törlési sql parancsban nincs hiba
-					if($result > 0){
-						$success_counter += $result;
-					}
-					else {
-						//sikertelen törlés
-						$fail_counter++;
-					}
-				}
-				else {
-					// ha a törlési sql parancsban hiba van
-	                $this->response->json(array(
-	                    'status' => 'error',
-	                    'message_error' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!',                  
-	                ));
-				}
-
-		        // üzenetek visszaadása
-		        $respond = array();
-		        $respond['status'] = 'success';
-		        
-		        if ($success_counter > 0) {
-		            $respond['message_success'] = 'Kategória törölve.';
-		        }
-		        if ($fail_counter > 0) {
-		            $respond['message_error'] = 'A kategóriát már törölték!';
-		        }
-
-		        // respond tömb visszaadása
-		   		$this->response->json($respond);
-
-	        } else {
-	            $this->response->json(array(
-	            	'status' => 'error',
-	            	'message' => 'Nincs engedélye a művelet végrehajtásához!'
-	            ));
-	        }
+        if(!$this->request->is_ajax()){
+        	$this->response->redirect('admin/error');
         }
+
+        if(!Auth::hasAccess('photo_category.delete_category')){
+            $this->response->json(array(
+            	'status' => 'error',
+            	'message' => 'Nincs engedélye a művelet végrehajtásához!'
+            ));
+        }
+
+    	// a POST-ban kapott user_id egy tömb
+    	$id = $this->request->get_post('item_id', 'integer');
+
+		// lekérdezzük a törlendő képek nevét
+		$photo_names_temp = $this->photo_gallery_model->selectFilenameWhereCategory($id);			
+
+		$photo_names = array();
+		foreach ($photo_names_temp as $key => $value) {
+			$photo_names[] = $value['photo_filename'];
+		}
+		unset($photo_names_temp);
+
+		// képekhez tartozó rekordok törlése
+		$result = $this->photo_gallery_model->deleteWhereCategory($id);
+
+		// képek törlése
+		if($result !== false) {
+			if($result > 0){
+
+				$file_helper = DI::get('file_helper');
+				$url_helper = DI::get('url_helper');
+				$upload_path = Config::get('photogallery.upload_path');
+
+				foreach($photo_names as $value)
+				{
+					$picture_path = $upload_path . $value;
+					$thumb_picture_path = $url_helper->thumbPath($picture_path);
+					$file_helper->delete(array($picture_path, $thumb_picture_path));
+				}				
+			}
+		}
+
+		// kategória törlése
+		$result = $this->photocategory_model->deleteCategory($id);
+		
+		if($result !== false) {
+	        $this->response->json(array(
+	            'status' => 'success',
+	            'message' => 'Kategória törölve.'                  
+	        ));
+		}
+		else {
+            $this->response->json(array(
+                'status' => 'error',
+                'message_error' => 'Adatbázis lekérdezési hiba!'
+            ));
+		}
+
+       
 	}
 
 	/**
