@@ -66,10 +66,10 @@
                                     <td><?php echo $slider['title']; ?></td>
                                     <td><?php echo $slider['text']; ?></td>
 
-                                    <?php if ($slider['active'] == 1) { ?>
+                                    <?php if ($slider['status'] == 1) { ?>
                                         <td><span class="label label-sm label-success"><?php echo 'Aktív'; ?></span></td>
                                     <?php } ?>
-                                    <?php if ($slider['active'] == 0) { ?>
+                                    <?php if ($slider['status'] == 0) { ?>
                                         <td><span class="label label-sm label-danger"><?php echo 'Inaktív'; ?></span></td>
                                     <?php } ?>
                                     <td>									

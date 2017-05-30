@@ -6,56 +6,67 @@ use System\Libs\Config;
 class PhotoCategory_model extends AdminModel {
 
 	protected $table = 'photo_category';
-	protected $id = 'category_id';
+	//protected $id = 'id';
 
 	function __construct()
 	{
 		parent::__construct();
 	}
 	
+
 	/**
-	 *	Visszaadja a photo_category tábla tartalmát
+	 *	Visszaadja a photo_category kategóriákat
+	 *	Ha kap egy id paramétert (integer), akkor csak egy sort ad vissza a táblából
 	 *
-	 *	@param $id Integer 
+	 *	@param integer 	$id  
+	 *	@param string 	$lang  - csak a megadott nyelvű elemet adja vissza
 	 */
-	public function selectOne($id)
+	public function findCategory($id = null, $lang = null)
 	{
-		$this->query->set_where('category_id', '=', $id); 
+		$this->query->set_columns(
+			"photo_category_translation.category_id AS id,
+			photo_category_translation.category_name,
+			photo_category_translation.language_code AS language_code"
+			);
+
+		$this->query->set_join('inner', 'photo_category_translation', 'photo_category.id', '=', 'photo_category_translation.category_id'); 
+
+		if (!is_null($lang)) {
+			$this->query->set_where('photo_category_translation.language_code', '=', $lang); 
+		}
+		
+		if(!is_null($id)){
+			$this->query->set_where('photo_category.id', '=', $id); 
+		}
+		
 		return $this->query->select(); 
 	}
 
-	/**
-	 *	Visszaadja a photo_category tábla tartalmát
-	 */
-	public function selectAll()
-	{
-		return $this->query->select(); 
-	}
+ 	/**
+ 	 * Kategória hozzáadása
+ 	 */
+ 	public function insertCategory()
+ 	{
+		return $this->query->insert(array('id' => null));
+ 	}
 
 	/**
-	 * INSERT kategória
-	 */
-	public function insertCategory($data)
-	{
-		return $this->query->insert($data);		
-	}
-
-	/**
-	 * UPDATE kategória
-	 */
-	public function updateCategory($id, $new_name)
-	{
-		$this->query->set_where('category_id', '=', $id);
-		return $this->query->update(array('category_name' => $new_name));		
-	}
-
-	/**
-	 * DELETE kategória
+	 * Kategória törlése
 	 */
 	public function deleteCategory($id)
 	{
-		return $this->query->delete('category_id', '=', $id);		
+		return $this->query->delete('id', '=', $id);		
 	}
+
+
+		/**
+		 * Kategória id módosítás
+		 */
+	 	public function updateCategory($id)
+	 	{
+			$this->query->set_where('id', '=', $id);
+			return $this->query->update(array('id' => $id));
+	 	}
 
 }
 ?>

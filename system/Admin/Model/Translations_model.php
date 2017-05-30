@@ -13,32 +13,68 @@ class Translations_model extends AdminModel {
 	{
 		parent::__construct();
 	}
-	
-	public function get_translations()
-	{
-        $this->query->set_orderby(array('code'));
-        $result = $this->query->select();
 
-        $grouped_result = $this->group_array_by_field($result);
-        return $grouped_result;
-	}
-	
-
-	public function updateTrans($id, $column, $text)
+    /**
+     * Translation adatok viszzaadása 
+     */            
+	public function findTranslations()
 	{
-		$this->query->set_where('id', '=', $id);
-		return $this->query->update(array($column => $text));
+        $this->query->set_columns(
+            "translations.*,
+            translations_content.language_code,
+            translations_content.text"
+            );
+
+        $this->query->set_join('inner', 'translations_content', 'translations.id = translations_content.translation_id');
+
+        $this->query->set_orderby(array('translations.code'));
+        return $this->query->select();
 	}
-        
-    public function group_array_by_field($old_arr)
+    
+    /**
+     * INSERT - translations táblában
+     */
+    public function insert($data)
     {
-        $arr = array();
-        foreach ($old_arr as $key => $item) {
-            if (array_key_exists('category', $item))
-                $arr[$item['category']][$key] = $item;
-        }
-        return $arr;
-    }        
+    	return $this->query->insert($data);
+    }
+
+    /**
+     * INSERT - translations_content táblában
+     */
+    public function insertContent($data)
+    {
+        $this->query->set_table('translations_content');
+        return $this->query->insert($data);
+    }
+
+    /**
+     * UPDATE - translations_content táblában
+     */
+    public function updateContent($translation_id, $language_code, $text)
+    {
+        $this->query->set_table('translations_content');    
+        $this->query->set_where('translation_id', '=', $translation_id);
+        $this->query->set_where('language_code', '=', $language_code);
+        return $this->query->update(array('text' => $text));
+    }
+
+    /**
+     * Megadott nyelvi kódú elem létezését vizsgálja
+     *
+     * @param integer $translation_id
+     * @param string $langcode
+     * @return bool
+     */
+    public function checkLangVersion($translation_id, $langcode)
+    {
+    	$this->query->set_table('translations_content');
+        $this->query->set_columns('COUNT(id) AS counter');
+        $this->query->set_where('translation_id', '=', $translation_id);
+        $this->query->set_where('language_code', '=', $langcode);
+        $result = $this->query->select();
+        return ($result[0]['counter'] == 1) ? true : false;
+    }
 
 }
 ?>

@@ -50,44 +50,60 @@
                             <div class="col-md-12">						
 
                                 <!-- bootstrap file upload -->
-                                <div class="form-group">
-                                    <label class="control-label">Slide kép</label>
-                                    <div class="fileupload fileupload-new" data-provides="fileupload">
-                                        <div class="fileupload-new thumbnail" style="width: 585px; height: 210px;"><img src="<?php echo ADMIN_IMAGE . 'slide_placeholder_585x210.jpg'; ?>" alt=""/></div>
-                                        <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 585px; max-height: 210px; line-height: 20px;"></div>
-                                        <div>
-                                            <span class="btn default btn-file"><span class="fileupload-new">Kiválasztás</span><span class="fileupload-exists">Módosít</span><input id="uploadprofile" class="img" type="file" name="upload_slide_picture"></span>
-                                            <a href="#" class="btn btn-warning fileupload-exists" data-dismiss="fileupload">Töröl</a>
-                                        </div>
-                                    </div>
-                                </div>
+                                <?php 
+                                    echo $this->html_admin_helper->photoUpload(array(
+                                        //'label' => 'Kép',
+                                        'width' => 585,
+                                        'height' => 210,
+                                        'placeholder' => ADMIN_IMAGE . 'slide_placeholder_585x210.jpg',
+                                        'input_name' => 'upload_slider_picture',
+                                        // 'info_content' => 'Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a megjelenő módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!'
+                                        ));
+                                ?>
                                 <!-- bootstrap file upload END -->
-                                
-                                <div class="clearfix"></div>
-                                <div class="note note-info">
-                                    Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a megjelenő módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!
-                                </div>
 
                                 <div class="form-group">
-                                    <label for="slider_title" class="control-label">Slide cím</label>
-                                    <input type="text" name="slider_title" id="slider_title" placeholder="" class="form-control input-xlarge" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="slider_text" class="control-label">Slide szöveg</label>
-                                    <textarea name="slider_text" id="slider_text" placeholder="" class="form-control input-xlarge"></textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="slider_link" class="control-label">Slide link</label>
-                                    <input type="text" name="slider_link" id="slider_link" placeholder="" class="form-control input-xlarge" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="slider_status">Slide státusz</label>
-                                    <select name="slider_status" class="form-control input-xlarge">
+                                    <label for="status">Státusz</label>
+                                    <select name="status" class="form-control input-xlarge">
                                         <option value="0">Inaktív</option>
                                         <option value="1">Aktív</option>
                                     </select>
                                 </div>
+
+
+                                <div class="portlet">
+                                    <!--<div class="portlet-title"></div>-->
+                                    <div class="portlet-body">
+                                        <ul class="nav nav-tabs">
+                                        <?php foreach ($langs as $key => $lang) { ?>
+                                            <li class="<?php echo ($key == 0) ? 'active' : ''; ?>">
+                                                <a href="#tab_1_<?php echo $key+1; ?>" data-toggle="tab"> <?php echo $lang; ?> </a>
+                                            </li>
+                                        <?php } ?>
+                                        </ul>
+                                        <div class="tab-content">
+                                            <?php foreach ($langs as $key => $lang) { ?>
+                                            <div class="tab-pane fade <?php echo ($key == 0) ? 'active in' : ''; ?>" id="tab_1_<?php echo $key+1; ?>">
+                                                <div class="form-group">
+                                                    <label for="title_<?php echo $lang; ?>" class="control-label">Cím / <?php echo $lang; ?></label>
+                                                    <input type="text" name="title_<?php echo $lang; ?>" id="title_<?php echo $lang; ?>" placeholder="" class="form-control input-xlarge" />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="target_url_<?php echo $lang; ?>" class="control-label">Link / <?php echo $lang; ?></label>
+                                                    <input type="text" name="target_url_<?php echo $lang; ?>" id="target_url_<?php echo $lang; ?>" placeholder="" class="form-control input-xlarge" />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="text_<?php echo $lang; ?>" class="control-label">Szöveg / <?php echo $lang; ?></label>
+                                                    <textarea name="text_<?php echo $lang; ?>" id="text_<?php echo $lang; ?>" placeholder="" class="form-control input-xlarge"></textarea>
+                                                </div>
+                                            </div>
+                                            <?php } ?>
+                                        </div>
+                                    </div>
+                                </div>
+
 
                             </div>
 

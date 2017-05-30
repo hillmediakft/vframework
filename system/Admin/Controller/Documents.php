@@ -96,81 +96,62 @@ class Documents extends AdminController {
     }
 
     /**
-     * 	Törlése AJAX-al
+     * 	Dokumentum törlése
      */
-    public function delete_document_AJAX()
+    public function delete()
     {
         if ($this->request->is_ajax()) {
-            //if (Auth::hasAccess('documents.delete_document_AJAX')) {
-            if (1) {
-                // a POST-ban kapott item_id egy tömb 
-                $id_arr = $this->request->get_post('item_id');
-
-                // a sikeres törlések számát tárolja
-                $success_counter = 0;
-                // a sikeresen törölt id-ket tartalmazó tömb
-                $success_id = array();
-                // a sikertelen törlések számát tárolja
-                $fail_counter = 0;
-
-                $file_helper = DI::get('file_helper');
-                // dokumentumok feltöltési helye
-                $upload_path = Config::get('documents.upload_path');
-
-                // bejárjuk a $data_arr tömböt és minden elemen végrehajtjuk a törlést
-                foreach ($id_arr as $id) {
-                    //átalakítjuk a integer-ré a kapott adatot
-                    $id = (int)$id;
-                    //lekérdezzük a törlendő document képének a nevét, hogy törölhessük a szerverről
-                    $documents_to_delete = $this->document_model->getDocumentFiles($id);
-                    //document törlése  
-                    $result = $this->document_model->delete($id);
-
-                    if ($result !== false) {
-                        // ha a törlési sql parancsban nincs hiba
-                        if ($result > 0) {
-                            if (!empty($documents_to_delete)) {
-                                foreach ($documents_to_delete as $file_name) {
-                                    $file_helper->delete(array($upload_path . $file_name));
-                                }
-                            }
-                            //sikeres törlés
-                            $success_counter += $result;
-                            $success_id[] = $id;
-                        } else {
-                            //sikertelen törlés
-                            $fail_counter += 1;
-                        }
-                    } else {
-                        // ha a törlési sql parancsban hiba van
-                        $this->response->json(array(
-                            'status' => 'error',
-                            'message_error' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!'
-                        ));
-                    }
-                }
-
-                // üzenetek visszaadása
-                $respond = array();
-                $respond['status'] = 'success';
-
-                if ($success_counter > 0) {
-                    $respond['message_success'] = $success_counter . ' dokumentum törölve.';
-                }
-                if ($fail_counter > 0) {
-                    $respond['message_error'] = $fail_counter . ' dokumentot már töröltek!';
-                }
-
-                // válasz visszaadása
-                $this->response->json($respond);
-
-
-            } else {
+            
+            if (!Auth::hasAccess('documents.delete')) {
                 $this->response->json(array(
                     'status' => 'error',
                     'message' => 'Nincs engedélye a művelet végrehajtásához!'
                 ));
+            }    
+
+            // a POST-ban kapott item_id egy tömb 
+            $id_arr = $this->request->get_post('item_id');
+
+            // a sikeres törlések számát tárolja
+            $success_counter = 0;
+
+            $file_helper = DI::get('file_helper');
+            // dokumentumok feltöltési helye
+            $upload_path = Config::get('documents.upload_path');
+
+            // bejárjuk a $data_arr tömböt és minden elemen végrehajtjuk a törlést
+            foreach ($id_arr as $id) {
+                //átalakítjuk a integer-ré a kapott adatot
+                $id = (int)$id;
+                //lekérdezzük a törlendő document képének a nevét, hogy törölhessük a szerverről
+                $documents_to_delete = $this->document_model->getDocumentFiles($id);
+                //document törlése  
+                $result = $this->document_model->delete($id);
+
+                if ($result !== false) {
+                    if (!empty($documents_to_delete)) {
+                        foreach ($documents_to_delete as $file_name) {
+                            $file_helper->delete(array($upload_path . $file_name));
+                        }
+                    }
+                    //sikeres törlés
+                    $success_counter += $result;
+                } else {
+                    // ha a törlési sql parancsban hiba van
+                    $this->response->json(array(
+                        'status' => 'error',
+                        'message' => 'Adatbázis lekérdezési hiba!'
+                    ));
+                }
             }
+
+            $this->response->json(array(
+                'status' => 'success',
+                'message' => $success_counter . ' dokumentum törölve.'
+            ));
+
+        } else {
+            $this->response->redirect('admin/error');
         }
     }
 

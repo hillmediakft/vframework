@@ -51,9 +51,11 @@ class Uri {
 	
 //-----------------------------------------------------------------	
 
-	public function __construct($default_lang, $allowed_languages)
+	/**
+	 * Engedélyezett nyelvek megadása, hogy tudjuk, hogy mi minősül nyelvi kódnak
+	 */
+	public function __construct($allowed_languages)
 	{
-		$this->lang = $default_lang;
 		$this->allowed_languages = $allowed_languages;
 
 		//$this->port = $_SERVER['SERVER_PORT'];
@@ -67,7 +69,7 @@ class Uri {
 
 		$this->_base();
 		$this->_is_langcode();
-		$this->_langcode();
+		$this->set_langcode($this->lang);
 		$this->_area();
 		$this->_pathFull();
 		$this->_path();
@@ -199,6 +201,7 @@ class Uri {
 
 	/**
 	 * Beállítja, megadja, hogy tartalmaz-e az url nyelvi kódot
+	 * Ha a _check_lang_code() metodus talál nyelvi kódot, akkor true értéket állít be, egyébként false-ot
 	 */
 	private function _is_langcode()
 	{
@@ -208,9 +211,9 @@ class Uri {
 	/**
 	 * Beállítja a nyelvi kódot
 	 */
-	private function _langcode()
+	public function set_langcode($langcode)
 	{
-		$this->set('langcode', $this->lang);
+		$this->set('langcode', $langcode);
 	}
 
 	/**

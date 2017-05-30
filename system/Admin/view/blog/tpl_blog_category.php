@@ -62,31 +62,34 @@
 						<table class="table table-striped table-bordered table-hover" id="blog_category">
 							<thead>
 								<tr>
-									<th>Név</th>
+									<?php foreach ($langs as $lang) { ?>
+										<th>Név / <?php echo $lang; ?></th>
+									<?php } ?>
+
 									<th>Bejegyzések száma</th>
 									<th style="max-width: 100px"></th>
 									<th style="max-width: 100px"></th>
 								</tr>
 							</thead>
 							<tbody>
-							<?php foreach($all_blog_category as $category) { ?>
+							<?php foreach($all_blog_category as $key => $category) { ?>
+																			
 								<tr data-id="<?php echo $category['id'];?>">
 									
-									<td><?php echo $category['category_name'];?></td>
-										<?php
-										// megszámoljuk, hogy az éppen aktuális kategóriának mennyi eleme van a blog tábla blog_category oszlopában
-										$counter = 0;
-										foreach($category_counter as $blog) {
-											if($category['id'] == $blog['category_id']) {
-												$counter++;
-											}
-										}
-										?>
-									<td><?php echo $counter;?></td>
+									<!-- kategóriák -->
+									<?php foreach ($langs as $lang) { ?>
+										<td data-lang="<?php echo $lang ?>"><?php echo $category['category_name_' . $lang];?></td>
+									<?php } ?>
+									
+									<!-- bejegyzések száma -->
+									<td><?php echo isset($category_counter[$category['id']]) ? $category_counter[$category['id']] : 0;?></td>
 
+									<!-- Szerkesztés -->
 									<td>
                                         <a class="edit" href="javascript:;"><i class="fa fa-edit"></i> Szerkeszt </a>
                                     </td>
+
+                                    <!-- Törlés -->
                                     <td>
                                         <a class="delete" href="javascript:;"><i class="fa fa-trash"></i> Töröl </a>
                                     </td>

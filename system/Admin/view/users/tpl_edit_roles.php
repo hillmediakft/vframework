@@ -46,25 +46,32 @@
                         <table class="table table-striped table-bordered table-hover">
                             <thead>
                                 <tr class="info">
+                                    <th style="width:1%;">Engedély</th>
                                     <th>Jogosultság leírás</th>
-                                    <th>Engedélyezés</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($permissions as $permission) { 
-                                    $selected = (in_array($permission['key'], $allowed_permissions));
-                                ?>
-                                <tr class="odd gradeX">
-                                    <td><?php echo $permission['desc']; ?></td>
-                                    <td>
-                                        <div class="form-group">
-                                            <select name="<?php echo $permission['id']; ?>" class="form-control small" <?php echo($permission['key'] == 'home.index') ? 'disabled' : '';?>>
-                                                <option value="0" <?php echo (!$selected) ? 'selected' : '';?>>Tiltott</option>
-                                                <option value="1" <?php echo ($selected) ? 'selected' : '';?>>Engedélyezett</option>
-                                            </select>
-                                        </div>
+                                <?php foreach ($permissions as $category => $permission_item) { ?>
+                                <tr class="warning">
+                                    <td colspan="3">
+                                        Kategória:  <?php echo '<strong>' . $category . '</strong>'; ?>
                                     </td>
                                 </tr>
+                                <?php foreach ($permission_item as $key => $value) {
+                                    $selected = (in_array($value['key'], $allowed_permissions));
+                                ?>
+                                    <tr class="odd gradeX">
+                                        <td>
+                                            <div class="form-group">
+                                                <!-- ha nem jelöljük be a checkboxot a hidden mező értékét küld el -->
+                                                <input type="hidden" name="<?php echo $value['id']; ?>" value="0" />
+                                                <input type="checkbox" name="<?php echo $value['id']; ?>" value="1" <?php echo ($selected) ? 'checked' : '';?> />
+                                            </div>
+                                        </td>
+                                        <td><?php echo $value['desc']; ?></td>
+                                    </tr>
+
+                                <?php } ?>
                                 <?php } ?>
                             </tbody>
                         </table>

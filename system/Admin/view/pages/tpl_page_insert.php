@@ -8,7 +8,7 @@
                 <a href="admin/home">Kezdőoldal</a> 
                 <i class="fa fa-angle-right"></i>
             </li>
-            <li><span>Oldal szerkesztése</span></li>
+            <li><span>Oldal hozzáadása</span></li>
         </ul>
     </div>
     <!-- END PAGE TITLE & BREADCRUMB-->
@@ -19,7 +19,7 @@
 	<!-- BEGIN PAGE CONTENT-->
 	<div class="row">
 		<div class="col-md-12">
-            <form action="" id="page_update_form" name="update_page_form" method='POST'>
+            <form action="" name="insert_page_form" method='POST'>
 
 				<!-- BEGIN EXAMPLE TABLE PORTLET-->
 				<div class="portlet">
@@ -27,20 +27,32 @@
                         <div class="portlet-title">
                             <div class="caption">
                                 <i class="fa fa-cogs"></i> 
-                                <?php echo $page['title'];?> oldal szerkesztése
+                                Oldal hozzáadása
                             </div>
                             <div class="actions">
-                                <button class="btn green btn-sm" type="submit" name="submit_update_page"><i class="fa fa-check"></i> Mentés</button>
+                                <button class="btn green btn-sm" type="submit" name="submit_insert_page"><i class="fa fa-check"></i> Mentés</button>
                                 <a class="btn default btn-sm" href="admin/pages"><i class="fa fa-close"></i> Mégsem</a>
                             </div>							
                         </div>                        
-                                        
-					    <div class="portlet-body">
-                            <input type="hidden" name="page_id" id="page_id" value="<?php echo $page['id'] ?>">
+                               
+<div class="margin-bottom-20"></div>
+
+                        <div class="portlet-body">
+
+                            <!-- OLDAL NEVE -->
+                            <div class="form-group">
+                                <label for="title">Az oldal neve*</label>   
+                                <input type="text" name="title" class="form-control input-xlarge" required />
+                            </div>
+                            <!-- EDITOR -->
+                            <div class="form-group">
+                                <label for="body_edit" class="control-label">Body edit</label>
+                                <input type="checkbox" value="1" name="body_edit">         
+                            </div>
 
                             <div class="form-group">
-                                <label for="page_title">Az oldal neve</label>	
-                                <input type='text' name='page_title' class='form-control' value="<?php echo $page['title'] ?>" disabled=''>
+                                <label for="friendlyurl">Friendly url (Ékezet nélküli kis- és nagybetű, "_" és "-" karakter)</label>   
+                                <input type="text" name="friendlyurl" class="form-control input-xlarge" pattern="[A-Za-z\_\-]" required/>
                             </div>
 
 <div class="margin-bottom-30"></div>
@@ -60,39 +72,25 @@
                                         <div class="tab-pane fade <?php echo ($key == 0) ? 'active in' : ''; ?>" id="tab_1_<?php echo $key+1; ?>">
 
                                             <div class="form-group">
-                                                <label for="metatitle_<?php echo $lang; ?>">Az oldal címe</label>   
-                                                <input type='text' name='metatitle_<?php echo $lang; ?>' class='form-control' value="<?php echo $page['metatitle_' . $lang] ?>"/>
+                                                <label for="metatitle_<?php echo $lang; ?>">Metatitle / <?php echo $lang; ?></label>   
+                                                <input type='text' name='metatitle_<?php echo $lang; ?>' class='form-control input-xlarge' />
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="metadescription_<?php echo $lang; ?>">Az oldal leírása</label>  
-                                                <input type='text' name='metadescription_<?php echo $lang; ?>' class='form-control' value="<?php echo $page['metadescription_' . $lang] ?>">
+                                                <label for="metadescription_<?php echo $lang; ?>">Metadescription / <?php echo $lang; ?></label>  
+                                                <input type='text' name='metadescription_<?php echo $lang; ?>' class='form-control input-xlarge' />
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="metakeywords_<?php echo $lang; ?>">Kulcsszavak</label>
-                                                <input type='text' name='metakeywords_<?php echo $lang; ?>' class='form-control' value="<?php echo $page['metakeywords_' . $lang] ?>">
+                                                <label for="metakeywords_<?php echo $lang; ?>">Metakeywords / <?php echo $lang; ?></label>
+                                                <input type='text' name='metakeywords_<?php echo $lang; ?>' class='form-control input-xlarge' />
                                             </div>
-
-                                            <?php if ($page['body_edit'] == 1) { ?>
-                                            <div class="form-group">
-                                                <label for="body_<?php echo $lang; ?>">Tartalom</label>
-                                                <textarea type="text" name="body_<?php echo $lang; ?>" class="form-control"><?php echo $page['body_' . $lang] ?></textarea>
-                                            </div>
-                                            <?php } ?>
 
                                         </div>
                                         <?php } ?>
                                     </div>
                                 </div>
                             </div>
-
-
-
-
-
-
-
 
 					    </div> <!-- END USER GROUPS PORTLET BODY-->
 				</div> <!-- END USER GROUPS PORTLET-->

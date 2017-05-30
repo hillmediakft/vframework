@@ -2,6 +2,7 @@
 namespace System\Admin\Controller;
 use System\Core\AdminController;
 use System\Core\View;
+use System\Libs\Auth;
 use System\Libs\Message;
 use System\Libs\Config;
 
@@ -111,63 +112,44 @@ class Newsletter extends AdminController {
 	public function delete()
 	{
         if($this->request->is_ajax()){
-	        if(1){
-	        	// a POST-ban kapott item_id egy tömb
-	        	$id_arr = $this->request->get_post('item_id');
-				// a sikeres törlések számát tárolja
-				$success_counter = 0;
-		        // a sikeresen törölt id-ket tartalmazó tömb
-		        $success_id = array();		
-				// a sikertelen törlések számát tárolja
-				$fail_counter = 0; 
+	       
+            if(!Auth::hasAccess('newsletter.delete')){
+                $this->response->json(array(
+                    'status' => 'error',
+                    'message' => 'Nincs engedélye a művelet végrehajtásához!'
+                ));
+            }
+	        
+        	// a POST-ban kapott item_id egy tömb
+        	$id_arr = $this->request->get_post('item_id');
+			// a sikeres törlések számát tárolja
+			$success_counter = 0;
+			
+			// bejárjuk a $id_arr tömböt és minden elemen végrehajtjuk a törlést
+			foreach($id_arr as $id) {
+				//átalakítjuk a integer-ré a kapott adatot
+				$id = (int)$id;
+				//rekord törlése	
+				$result = $this->newsletter_model->delete($id);
 				
-				// bejárjuk a $id_arr tömböt és minden elemen végrehajtjuk a törlést
-				foreach($id_arr as $id) {
-					//átalakítjuk a integer-ré a kapott adatot
-					$id = (int)$id;
-					//rekord törlése	
-					$result = $this->newsletter_model->delete($id);
-					
-					if($result !== false) {
-						// ha a törlési sql parancsban nincs hiba
-						if($result > 0){
-							//sikeres törlés
-							$success_counter += $result;
-							$success_id[] = $id;
-						}
-						else {
-							//sikertelen törlés
-							$fail_counter++;
-						}
-					}
-					else {
-						// ha a törlési sql parancsban hiba van
-		                $this->response->json(array(
-		                    'status' => 'error',
-		                    'message_error' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!',                  
-		                ));
-					}
+				if($result !== false) {
+					$success_counter += $result;
+				} else {
+					// ha a törlési sql parancsban hiba van
+	                $this->response->json(array(
+	                    'status' => 'error',
+	                    'message' => 'Adatbázis lekérdezési hiba!',                  
+	                ));
 				}
+			}
 
-		        // üzenetek visszaadása
-		        $respond = array();
-		        $respond['status'] = 'success';
-		        
-		        if ($success_counter > 0) {
-		            $respond['message_success'] = $success_counter . ' hírlevél törölve.';
-		        }
-		        if ($fail_counter > 0) {
-		            $respond['message_error'] = $fail_counter . ' hírlevelet már töröltek!';
-		        }
-		        // respond tömb visszaadása
-				$this->response->json($respond);
+            $this->response->json(array(
+                'status' => 'success',
+                'message' => $success_counter . ' hírlevél törölve.',                  
+            ));
 
-	        } else {
-	            $this->response->json(array(
-	            	'status' => 'error',
-	            	'message' => 'Nincs engedélye a művelet végrehajtásához!'
-	            ));
-	        }
+        } else {
+        	$this->response->redirect('admin/error');
         }
 	}
 

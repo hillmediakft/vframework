@@ -1,6 +1,5 @@
 <?php
 namespace System\Admin\Model;
-
 use System\Core\AdminModel;
 
 class Slider_model extends AdminModel {
@@ -10,7 +9,8 @@ class Slider_model extends AdminModel {
     /**
      * Constructor, létrehozza az adatbáziskapcsolatot
      */
-    function __construct() {
+    function __construct()
+    {
         parent::__construct();
     }
 
@@ -26,16 +26,36 @@ class Slider_model extends AdminModel {
     }
 
     /**
-     * 	Egy slide adatait kérdezi le az adatbázisból
+     * 	Slide-ok adatainak lekérdezése
      *
-     * 	@param	$id  Int (egy id szám)
-     * 	@return	Array
+     *  @param  integer    $id
+     * 	@param	string     $langcode
+     * 	@return	array
      */
-    public function oneSlide($id)
+    public function findSlider($id = null, $langcode = null)
     {
-        $this->query->set_where('id', '=', $id);
-        $result = $this->query->select();
-        return $result[0];
+        $this->query->set_columns(
+            "slider.*,
+            slider_translation.target_url,
+            slider_translation.title,
+            slider_translation.text,
+            slider_translation.language_code"
+            );    
+
+        $this->query->set_join('inner', 'slider_translation', 'slider.id', '=', 'slider_translation.slider_id');
+
+        if (!is_null($langcode)) {
+            $this->query->set_where('slider_translation.language_code', '=', $langcode);
+        }
+        
+        if(!is_null($id)){
+            $this->query->set_where('slider.id', '=', $id);
+        } else {
+            // az összes slide visszaadásakor sorrendben adja vissza
+            $this->query->set_orderby(array('slider_order'));
+        }
+
+        return $this->query->select();
     }
 
     /**
@@ -79,7 +99,7 @@ class Slider_model extends AdminModel {
     /**
      * Egy rekordhoz tartozó Kép nevének lekérdezése
      */
-    public function selectPicture($id)
+    public function findPicture($id)
     {
         $this->query->set_columns(array('picture'));
         $this->query->set_where('id', '=', $id);

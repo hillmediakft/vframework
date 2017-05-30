@@ -1,8 +1,8 @@
 <?php
 namespace System\Admin\Controller;
-
 use System\Core\AdminController;
 use System\Core\View;
+use System\Libs\Auth;
 use System\Libs\Session;
 use System\Libs\Message;
 use System\Libs\Validate;

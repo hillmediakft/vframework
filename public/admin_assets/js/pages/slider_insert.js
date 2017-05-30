@@ -19,7 +19,12 @@ var Slider_insert = function () {
     };
 
     var ckeditorInit = function () {
-        CKEDITOR.replace('slider_text', {customConfig: 'config_minimal1.js'});
+        var langs = $('html').attr('data-langs');
+        var langs_array = langs.split(",");
+        // bejárjuk a checkboxokat tartalmazó objektumot
+        $.each(langs_array, function(index, val) {
+            CKEDITOR.replace('text_' + val, {customConfig: 'config_minimal1.js'});
+        });
     };
 
     return {

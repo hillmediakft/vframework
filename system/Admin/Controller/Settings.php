@@ -2,6 +2,7 @@
 namespace System\Admin\Controller;
 use System\Core\AdminController;
 use System\Core\View;
+use System\Libs\Auth;
 use System\Libs\Message;
 
 class Settings extends AdminController {
@@ -11,8 +12,11 @@ class Settings extends AdminController {
         $this->loadModel('settings_model');
     }
 
-    public function index() {
-        if ($this->request->has_post('submit_settings')) {
+    public function index()
+    {
+        Auth::hasAccess('settings.index', $this->request->get_httpreferer());
+
+        if ($this->request->is_post()) {
 
             $data = $this->request->get_post();
             unset($data['submit_settings']);

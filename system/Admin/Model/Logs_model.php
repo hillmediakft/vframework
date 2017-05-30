@@ -12,16 +12,16 @@ class Logs_model extends AdminModel {
     }
 
     /**
-     *  Felhasználók adatainak lekérdezése
+     *  Napló adatok lekérdezése
      *
-     *  @param  string|integer    $user_id (csak ennek a felhasználónak az adatait adja vissza
+     *  @param  integer    $user_id (csak ennek a felhasználóhoz tartozó napló bejegyzéseket adja visssz
      *  @return array|false
      */
-    public function get_logs($user_id = null)
+    public function findLogs($user_id = null)
     {
-        $this->query->set_join('left', 'users', 'users.id', '=', 'logs.user_id');
         if(!is_null($user_id)){
-            $this->query->set_where('user_id', '=', $user_id);
+            $this->query->set_join('left', 'users', 'users.id', '=', 'logs.user_id');
+            $this->query->set_where('logs.user_id', '=', $user_id);
         }
         return $this->query->select();
     }

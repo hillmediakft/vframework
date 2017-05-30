@@ -48,31 +48,19 @@
 						<div class="row">	
 							<div class="col-md-12">						
 							
-								<!-- bootstrap file upload -->
-                                <label for="upload_blog_picture" class="control-label">Kép</label>
-                                <div class="form-group ">
-                                    <div class="fileinput fileinput-new" data-provides="fileinput">
-                                        <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
-                                            <img src="<?php echo ADMIN_IMAGE . 'no_user_image.jpg';?>" alt=""/>
-                                        </div>
-                                        <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
-                                        <div>
-                                            <span class="btn default btn-file">
-                                                <span class="fileinput-new">Kiválasztás</span>
-                                                <span class="fileinput-exists">Módosít</span>
-                                                <input id="uploadprofile" class="img" type="file" name="upload_blog_picture">
-                                            </span>
-                                            <a href="javascript:;" class="btn btn-warning fileinput-exists" data-dismiss="fileinput">Töröl</a>
-                                        </div>
-                                    </div>
-                                </div>
-								<!-- bootstrap file upload END -->
+                                <!-- bootstrap file upload -->
+                                <?php 
+                                    echo $this->html_admin_helper->photoUpload(array(
+                                        //'label' => 'Kép',
+                                        'width' => 200,
+                                        'height' => 150,
+                                        'placeholder' => ADMIN_IMAGE . 'no_user_image.jpg',
+                                        'input_name' => 'upload_blog_picture',
+                                        // 'info_content' => 'Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a megjelenő módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!'
+                                        ));
+                                ?>
+                                <!-- bootstrap file upload END -->
 
-								<div class="clearfix"></div>
-
-								<div class="note note-info">
-									Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!
-								</div>
 
 <div class="margin-bottom-30"></div>
 	
@@ -89,21 +77,39 @@
 								<div class="form-group">
 									<label for="blog_category">Kategória</label>
 									<select name="blog_category" class="form-control input-xlarge">
-										<option value="0">Válasszon kategóriát</option>
+										<option value="">Válasszon kategóriát</option>
 									<?php foreach($category_list as $category) { ?>
 										<option value="<?php echo $category['id']?>"><?php echo $category['category_name']?></option>
 									<?php } ?>
 									</select>
 								</div>
 
-								<div class="form-group">
-									<label for="blog_title" class="control-label">Cím</label>
-									<input type="text" name="blog_title" id="blog_title" placeholder="" class="form-control input-xlarge" />
-								</div>
-								<div class="form-group">
-									<label for="blog_text" class="control-label">Szöveg</label>
-									<textarea name="blog_body" id="blog_body" placeholder="" class="form-control input-xlarge"></textarea>
-								</div>
+                                <div class="portlet">
+                                    <!--<div class="portlet-title"></div>-->
+                                    <div class="portlet-body">
+                                        <ul class="nav nav-tabs">
+                                        <?php foreach ($langs as $key => $lang) { ?>
+                                            <li class="<?php echo ($key == 0) ? 'active' : ''; ?>">
+                                                <a href="#tab_1_<?php echo $key+1; ?>" data-toggle="tab"> <?php echo $lang; ?> </a>
+                                            </li>
+                                        <?php } ?>
+                                        </ul>
+                                        <div class="tab-content">
+                                            <?php foreach ($langs as $key => $lang) { ?>
+                                            <div class="tab-pane fade <?php echo ($key == 0) ? 'active in' : ''; ?>" id="tab_1_<?php echo $key+1; ?>">
+												<div class="form-group">
+													<label for="blog_title_<?php echo $lang; ?>" class="control-label">Cím / <?php echo $lang; ?></label>
+													<input type="text" name="blog_title_<?php echo $lang; ?>" id="blog_title_<?php echo $lang; ?>"  class="form-control input-xlarge" />
+												</div>
+												<div class="form-group">
+													<label for="blog_body_<?php echo $lang; ?>" class="control-label">Szöveg / <?php echo $lang; ?></label>
+													<textarea name="blog_body_<?php echo $lang; ?>" id="blog_body_<?php echo $lang; ?>" class="form-control input-xlarge"></textarea>
+												</div>
+                                            </div>
+                                            <?php } ?>
+                                        </div>
+                                    </div>
+                                </div>
 
 							</div>
 						</div>	

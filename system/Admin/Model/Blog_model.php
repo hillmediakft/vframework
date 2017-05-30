@@ -17,35 +17,65 @@ class Blog_model extends AdminModel {
 	 *	Ha kap egy id paramétert (integer), akkor csak egy sort ad vissza a táblából
 	 *
 	 *	@param $id Integer 
+	 *	@param $langcode string 
 	 */
-	public function selectBlog($id = null)
+	public function selectBlog($id = null, $langcode = null)
 	{
-		$this->query->set_columns(array(
-			'blog.*',
-			'blog_category.category_name',
-			)); 
-		$this->query->set_join('left', 'blog_category', 'blog.category_id', '=', 'blog_category.id'); 
+		$this->query->set_table('blog');
+		$this->query->set_columns(
+			"blog.*,
+			 blog_translation.title,
+			 blog_translation.body,
+			 blog_translation.language_code,
+			 blog_category_translation.category_name"
+			);
+
+		$this->query->set_join('inner', 'blog_translation', 'blog.id', '=', 'blog_translation.blog_id'); 
+		$this->query->set_join('left', 'blog_category_translation', '(blog.category_id = blog_category_translation.category_id AND blog_category_translation.language_code = blog_translation.language_code)'); 
+		$this->query->set_orderby('blog.id');
+		
+		if (!is_null($langcode)) {
+			$this->query->set_where('blog_translation.language_code', '=', $langcode);
+		}
 		
 		if(!is_null($id)){
-			$id = (int)$id;
 			$this->query->set_where('blog.id', '=', $id); 
-			$result = $this->query->select(); 
-			return $result[0];
-
-		} else {
-			return $this->query->select(); 
 		}
+		
+//$this->query->debug();
+		return $this->query->select();
+
+
 	}
 
 	/**
 	 *	Visszaadja a blog táblából a blog_category oszlopot
 	 */
-	public function categoryCounter()
+	public function categoryCounter_OLD()
 	{
 		$this->query->set_columns('category_id');
 		return $this->query->select(); 
 	}
    
+
+	/**
+	 *	Visszaadja a blog táblából hogy egy blog kategóriához hány elem tartozik
+	 */
+	public function categoryCounter()
+	{
+		$this->query->set_columns('category_id, COUNT(category_id) AS item_numbers');
+		$this->query->set_groupby('category_id');
+		$result = $this->query->select();
+
+		$temp = array();
+		foreach ($result as $key => $value) {
+			$temp[$value['category_id']] = $value['item_numbers']; 
+		}
+
+		return $temp;
+	}
+
+
     /**
      * Rekord INSERT
      */
@@ -112,7 +142,6 @@ class Blog_model extends AdminModel {
         $this->query->set_where('id', '=', $id);
         return $this->query->update(array('status' => $data));
     }
-
 
 }
 ?>

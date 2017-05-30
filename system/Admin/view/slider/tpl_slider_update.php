@@ -51,46 +51,59 @@
                             <div class="col-md-12">						
 
                                 <!-- bootstrap file upload -->
-                                <div class="form-group">
-                                    <label class="control-label">Slide kép</label>
-                                    <div class="fileupload fileupload-new" data-provides="fileupload">
-                                        <div class="fileupload-new thumbnail" style="width: 585px"><img src="<?php echo $this->getConfig('slider.upload_path') . $slider['picture']; ?>" alt=""/></div>
-                                        <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 585px; max-height: 210px; line-height: 20px;"></div>
-                                        <div>
-                                            <span class="btn default btn-file"><span class="fileupload-new">Kiválasztás</span><span class="fileupload-exists">Módosít</span><input id="uploadprofile" class="img" type="file" name="update_slide_picture"></span>
-                                            <a href="#" class="btn btn-warning fileupload-exists" data-dismiss="fileupload">Töröl</a>
-                                        </div>
-                                    </div>
-
-                                </div>
+                                <?php 
+                                    $placeholder = $this->getConfig('slider.upload_path') . $slider['picture'];
+                                    echo $this->html_admin_helper->photoUpload(array(
+                                        //'label' => 'Kép',
+                                        'width' => 585,
+                                        'height' => 210,
+                                        'placeholder' => $placeholder,
+                                        'input_name' => 'upload_slider_picture',
+                                        // 'info_content' => 'Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a megjelenő módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!'
+                                        ));
+                                ?>
                                 <!-- bootstrap file upload END -->
-
-                                <div class="clearfix"></div>
-                                <div class="note note-info">
-                                    Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a megjelenő módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="slider_title" class="control-label">Slide cím</label>
-                                    <input type="text" name="slider_title" id="slider_title" placeholder="A slide címe" class="form-control input-xlarge" value="<?php echo $slider['title']; ?>"/>
-                                </div>
-                                <div class="form-group">
-                                    <label for="slider_text" class="control-label">Slide szöveg</label>
-                                    <input type="text" name="slider_text" id="slider_text" placeholder="A slide szövege" class="form-control input-xlarge" value="<?php echo $slider['text']; ?>"/>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="slider_link" class="control-label">Slide link</label>
-                                    <input type="text" name="slider_link" id="slider_link" placeholder="A slide linkje" class="form-control input-xlarge" value="<?php echo $slider['target_url']; ?>"/>
-                                </div>											
 
                                 <!--Státusz beállítása-->
                                 <div class="form-group">
-                                    <label for="slider_status">Slide státusz</label>
-                                    <select name='slider_status' class="form-control input-xlarge">
-                                        <option value="1" <?php echo ($slider['active'] == 1) ? 'selected' : ''; ?>>Aktív</option>
-                                        <option value="0" <?php echo ($slider['active'] == 0) ? 'selected' : ''; ?>>Inaktív</option>
+                                    <label for="status">Slide státusz</label>
+                                    <select name="status" class="form-control input-xlarge">
+                                        <option value="1" <?php echo ($slider['status'] == 1) ? 'selected' : ''; ?>>Aktív</option>
+                                        <option value="0" <?php echo ($slider['status'] == 0) ? 'selected' : ''; ?>>Inaktív</option>
                                     </select>
+                                </div>
+
+                                <div class="portlet">
+                                    <!--<div class="portlet-title"></div>-->
+                                    <div class="portlet-body">
+                                        <ul class="nav nav-tabs">
+                                        <?php foreach ($langs as $key => $lang) { ?>
+                                            <li class="<?php echo ($key == 0) ? 'active' : ''; ?>">
+                                                <a href="#tab_1_<?php echo $key+1; ?>" data-toggle="tab"> <?php echo $lang; ?> </a>
+                                            </li>
+                                        <?php } ?>
+                                        </ul>
+                                        <div class="tab-content">
+                                            <?php foreach ($langs as $key => $lang) { ?>
+                                            <div class="tab-pane fade <?php echo ($key == 0) ? 'active in' : ''; ?>" id="tab_1_<?php echo $key+1; ?>">
+                                                <div class="form-group">
+                                                    <label for="title_<?php echo $lang; ?>" class="control-label">Cím / <?php echo $lang; ?></label>
+                                                    <input type="text" name="title_<?php echo $lang; ?>" id="title_<?php echo $lang; ?>" placeholder="" class="form-control input-xlarge" value="<?php echo (isset($slider['title_' . $lang])) ? $slider['title_' . $lang] : ''; ?>"/>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="target_url_<?php echo $lang; ?>" class="control-label">Link / <?php echo $lang; ?></label>
+                                                    <input type="text" name="target_url_<?php echo $lang; ?>" id="target_url_<?php echo $lang; ?>" placeholder="" class="form-control input-xlarge" value="<?php echo (isset($slider['target_url_' . $lang])) ? $slider['target_url_' . $lang] : ''; ?>"/>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="text_<?php echo $lang; ?>" class="control-label">Szöveg / <?php echo $lang; ?></label>
+                                                    <textarea name="text_<?php echo $lang; ?>" id="text_<?php echo $lang; ?>" placeholder="" class="form-control input-xlarge"><?php echo (isset($slider['text_' . $lang])) ? $slider['text_' . $lang] : ''; ?></textarea>
+                                                </div>
+                                            </div>
+                                            <?php } ?>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- régi kép elérési útja-->

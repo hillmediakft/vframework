@@ -28,7 +28,7 @@
 			<div id="ajax_message"></div>
 			<?php $this->renderFeedbackMessages(); ?>	
 
-			<form action="" method="POST" enctype="multipart/form-data" id="photo_form">	
+			<form action="admin/photo-gallery/store" method="POST" enctype="multipart/form-data" id="photo_form">	
 				<!-- BEGIN EXAMPLE TABLE PORTLET-->
 				<div class="portlet">
 
@@ -48,36 +48,55 @@
 								<div class="row">
 									
 									<div class="col-md-6">
-										<label class="control-label">Kép feltöltése</label>					
-										<div class="fileupload fileupload-new" data-provides="fileupload">
-											<div class="fileupload-new thumbnail" style="width: 400px; height: 300px;"><img src="<?php echo ADMIN_IMAGE . 'placeholder-400x300.jpg';?>" /></div>
-											<div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 400px; max-height: 300px; line-height: 20px;"></div>
-											<div>
-												<span class="btn btn-file green"><span class="fileupload-new">Kiválasztás</span><span class="fileupload-exists">Módosít</span><input id="uploadprofile" class="img" type="file" name="upload_gallery_photo"></span>
-												<a href="#" class="btn btn-warning" data-dismiss="fileupload">Töröl</a>
-											</div>
-										</div>
-										<div class="clearfix"></div>
 										
-										<div class="note note-info">
-											Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!
-										</div>
-									
+
+	                                <!-- bootstrap file upload -->
+	                                <?php 
+	                                    echo $this->html_admin_helper->photoUpload(array(
+	                                        //'label' => 'Kép',
+	                                        'width' => 400,
+	                                        'height' => 300,
+	                                        'placeholder' => ADMIN_IMAGE . 'placeholder-400x300.jpg',
+	                                        'input_name' => 'upload_gallery_photo',
+	                                        // 'info_content' => 'Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a megjelenő módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!'
+	                                        ));
+	                                ?>
+	                                <!-- bootstrap file upload END -->
+
 									</div>				
 
 									<div class="col-md-6">						
-										
-										<div class="form-group">
-											<label for="photo_caption" class="control-label">Fotó felirat</label>
-											<input type="text" name="photo_caption" id="photo_caption" placeholder="A fotóhoz tartozó szöveges információ" class="form-control input-xlarge" />
-										</div>
-										
+
+		                                <div class="portlet">
+		                                    <!--<div class="portlet-title"></div>-->
+		                                    <div class="portlet-body">
+		                                        <ul class="nav nav-tabs">
+		                                        <?php foreach ($langs as $key => $lang) { ?>
+		                                            <li class="<?php echo ($key == 0) ? 'active' : ''; ?>">
+		                                                <a href="#tab_1_<?php echo $key+1; ?>" data-toggle="tab"> <?php echo $lang; ?> </a>
+		                                            </li>
+		                                        <?php } ?>
+		                                        </ul>
+		                                        <div class="tab-content">
+		                                            <?php foreach ($langs as $key => $lang) { ?>
+		                                            <div class="tab-pane fade <?php echo ($key == 0) ? 'active in' : ''; ?>" id="tab_1_<?php echo $key+1; ?>">
+														<div class="form-group">
+															<label for="photo_caption_<?php echo $lang; ?>" class="control-label">Fotó felirat / <?php echo $lang; ?></label>
+															<input type="text" name="photo_caption_<?php echo $lang; ?>" id="photo_caption_<?php echo $lang; ?>" placeholder="A fotóhoz tartozó szöveges információ" class="form-control input-xlarge" />
+														</div>
+		                                            </div>
+		                                            <?php } ?>
+		                                        </div>
+		                                    </div>
+		                                </div>
+
+
 										<div class="form-group">
 											<label for="photo_category" class="control-label">Fotó kategória</label>
 											<select class="form-control input-xlarge" name="photo_category" aria-controls="category">
-												<option value="0">Válasszon kategóriát</option>
+												<option value="">Válasszon kategóriát</option>
 												<?php foreach ($categorys as $value) {
-													echo '<option value="' . $value['category_id'] . '">' . $value['category_name'] . '</option>' . "\r\n";
+													echo '<option value="' . $value['id'] . '">' . $value['category_name'] . '</option>' . "\r\n";
 												} ?>	
 											</select>
 										</div>

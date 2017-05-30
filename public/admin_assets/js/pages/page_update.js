@@ -25,18 +25,25 @@ var Page_update = function () {
         });	 		
 	};
 
+    var ckeditorInit = function () {
+
+    	var langs = $('html').attr('data-langs');
+		var langs_array = langs.split(",");
+
+		// bejárjuk a checkboxokat tartalmazó objektumot
+		$.each(langs_array, function(index, val) {
+    		CKEDITOR.replace('body_' + val, {customConfig: 'config_minimal2.js'});
+		});
+    };
+
+
     return {
 
         //main function to initiate the module
         init: function () {
 			updatePageConfirm();
-
+			ckeditorInit();
 			vframework.hideAlert();
-			
-			vframework.ckeditorInit({
-				page_body: "config_minimal2"
-			});
-			
         }
 
     };

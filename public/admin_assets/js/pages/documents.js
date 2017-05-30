@@ -95,7 +95,7 @@ var Document = function () {
 
             vframework.deleteItems({
                 table_id: "documents",
-                url: "admin/documents/delete_document_AJAX"
+                url: "admin/documents/delete"
             });
 
 /*

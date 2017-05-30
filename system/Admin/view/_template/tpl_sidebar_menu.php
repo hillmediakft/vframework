@@ -123,24 +123,24 @@
         </li>
 
         <!--  GALÉRIÁK -->
-        <li class="nav-item <?php $this->menu_active('photo_gallery|video_gallery'); ?> ">
+        <li class="nav-item <?php $this->menu_active('photogallery|videogallery'); ?> ">
             <a href="javascript:;" class="nav-link nav-toggle">
                 <i class="fa fa-picture-o"></i>
                 <span class="title">Galériák</span>
                 <span class="arrow"></span>
             </a>
             <ul class="sub-menu">
-                <li class="nav-item <?php $this->menu_active('photo_gallery', 'index'); ?> ">
+                <li class="nav-item <?php $this->menu_active('photogallery', 'index'); ?> ">
                     <a href="admin/photo-gallery" class="nav-link ">
                         <span class="title">Képgaléria</span>
                     </a>
                 </li>
-                <li class="nav-item <?php $this->menu_active('photo_gallery', 'category'); ?> ">
+                <li class="nav-item <?php $this->menu_active('photogallery', 'category'); ?> ">
                     <a href="admin/photo-gallery/category" class="nav-link ">
                         <span class="title">Képgaléria kategóriák</span>
                     </a>
                 </li>
-                <li class="nav-item <?php $this->menu_active('video_gallery'); ?> ">
+                <li class="nav-item <?php $this->menu_active('videogallery'); ?> ">
                     <a href="admin/video_gallery" class="nav-link ">
                         <span class="title">Videógaléra</span>
                     </a>

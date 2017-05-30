@@ -14,14 +14,18 @@ class Home extends SiteController {
 
     public function index()
     {
-        $data['title'] = 'page_metatitle';
-        $data['description'] = 'page_metadescription';
-        $data['keywords'] = 'page_metakeywords';
+        $page_data = $this->home_model->getPageData('home_oldal');
+        $data = $this->addGlobalData();
+
+        $data['title'] = $page_data['metatitle'];
+        $data['description'] = $page_data['metadescription'];
+        $data['keywords'] = $page_data['metakeywords'];
+
 
         $view = new View();
-        //$view->setLazyRender();
+//$view->setLazyRender();
 //$this->view->debug(true); 
-        $view->add_link('js', SITE_ASSETS . 'pages/home.js');
+        //$view->add_link('js', SITE_ASSETS . 'pages/home.js');
         $view->set_layout(null);
         $view->render('home/tpl_home', $data);
     }

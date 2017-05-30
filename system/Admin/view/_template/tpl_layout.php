@@ -1,9 +1,13 @@
-<?php use System\Libs\Auth; ?>
+<?php 
+use System\Libs\Auth;
+use System\Libs\Config;
+$langs = Config::get('allowed_languages');
+?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
 <!--[if !IE]><!-->
-<html lang="hu">
+<html lang="hu" data-langs="<?php echo implode(',', $langs); ?>">
 <!--<![endif]-->
 
 <!-- BEGIN HEAD -->

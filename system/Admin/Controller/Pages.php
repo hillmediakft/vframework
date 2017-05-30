@@ -2,6 +2,9 @@
 namespace System\Admin\Controller;
 use System\Core\AdminController;
 use System\Core\View;
+use System\Libs\Auth;
+use System\Libs\Config;
+use System\Libs\DI;
 use System\Libs\Message;
 
 class Pages extends AdminController {
@@ -14,49 +17,98 @@ class Pages extends AdminController {
 
 	public function index()
 	{
-		$view = new View();
+		Auth::hasAccess('pages.index', $this->request->get_httpreferer());
 
 		$data['title'] = 'Admin pages oldal';
 		$data['description'] = 'Admin pages oldal description';
-		$data['all_pages'] = $this->pages_model->allPages();
-		
-		$view->add_links(array('vframework', 'pages'));
+		$data['all_pages'] = $this->pages_model->findPage(null, LANG);
+
+		$view = new View();
+		$view->add_links(array('vframework'));
+		$view->add_link('js', ADMIN_JS . 'pages/pages.js');
 		$view->render('pages/tpl_pages', $data);
 	}
 	
+
+	/**
+	 *	Oldal hozzáadása
+	 */
+	public function insert()
+	{
+			if($this->request->is_post()) {
+
+				$data['title'] = $this->request->get_post('title');
+            	$data['body_edit'] = $this->request->has_post('body_edit') ? $this->request->get_post('body_edit', 'integer') : 0;
+				$data['friendlyurl'] = $this->request->get_post('friendlyurl');
+            	// insert a pages táblába
+				$last_insert_id = $this->pages_model->insert($data);
+
+				if ($last_insert_id !== false) {
+				// insert a pages_translation táblába
+					$translation_data['page_id'] = (int)$last_insert_id;
+
+					$langcodes = Config::get('allowed_languages');
+					foreach ($langcodes as $lang) {
+						$translation_data['language_code'] = $lang;
+						$translation_data['metatitle'] = $this->request->get_post('metatitle_' . $lang);
+						$translation_data['metadescription'] = $this->request->get_post('metadescription_' . $lang);
+						$translation_data['metakeywords'] = $this->request->get_post('metakeywords_' . $lang);
+						$this->pages_model->insertContent($translation_data);
+					}					
+
+		            Message::set('success', 'Oldal hozzáadva.');
+					$this->response->redirect('admin/pages');
+
+				} else {
+		            Message::set('error', 'unknown_error');
+					$this->response->redirect('admin/pages/insert');
+				}
+			}	
+		
+		$data['title'] = 'Oldal hozzáadása';
+		$data['description'] = 'Oldal hozzáadása description';
+		
+		$view = new View();
+		$view->render('pages/tpl_page_insert', $data);
+	}
+
+
 	/**
 	 *	Oldal adatainak módosítása
 	 */
 	public function update($id)
 	{
+		Auth::hasAccess('pages.update', $this->request->get_httpreferer());
+
 		$id = (int) $id;
 
 			if($this->request->is_post()) {
 				
-				$data['body'] = $this->request->get_post('page_body', 'strip_danger_tags');
-				$data['metatitle'] = $this->request->get_post('page_metatitle');
-				$data['metadescription'] = $this->request->get_post('page_metadescription');
-				$data['metakeywords'] = $this->request->get_post('page_metakeywords');
-
-				// új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
-				$result = $this->pages_model->update($id, $data);
-				
-				if($result !== false) {
-		            Message::set('success', 'page_update_success');
-					$this->response->redirect('admin/pages');
-				} else {
-		            Message::set('error', 'unknown_error');
-					$this->response->redirect('admin/pages/update/' . $id);
+				$langcodes = Config::get('allowed_languages');
+				foreach ($langcodes as $lang) {
+					if ($this->request->has_post('body_' . $lang)) {
+						$translation_data['body'] = $this->request->get_post('body_' . $lang, 'strip_danger_tags');
+					}
+					$translation_data['metatitle'] = $this->request->get_post('metatitle_' . $lang);
+					$translation_data['metadescription'] = $this->request->get_post('metadescription_' . $lang);
+					$translation_data['metakeywords'] = $this->request->get_post('metakeywords_' . $lang);
+					$this->pages_model->updateContent($id, $lang, $translation_data);
 				}
+				
+	            Message::set('success', 'page_update_success');
+				$this->response->redirect('admin/pages');
 			}	
 		
 		$view = new View();
 		
 		$data['title'] = 'Oldal szerkesztése';
 		$data['description'] = 'Oldal szerkesztése description';
-		$data['page'] = $this->pages_model->onePage($id);
-		
-		$view->add_links(array('bootbox', 'ckeditor', 'vframework', 'page_update'));
+		$page = $this->pages_model->findPage($id);
+		$page = DI::get('arr_helper')->convertMultilanguage($page, array('body', 'metatitle' , 'metadescription', 'metakeywords'), 'id', 'language_code');
+		$data['page'] = $page[0];
+
+		$view->add_links(array('bootbox', 'ckeditor', 'vframework'));
+		$view->add_link('js', ADMIN_JS . 'pages/page_update.js');
 		$view->render('pages/tpl_page_update', $data);
 	}
 

@@ -130,14 +130,6 @@ $link['autocomplete'] = array(
 
 /*----------------- OLDALSPECIFIKUS LINKEK --------------------*/
 
-// blog
-$link['blog'] = array('js' => ADMIN_JS . 'pages/blog.js');
-$link['blog_insert'] = array('js' => ADMIN_JS . 'pages/blog_insert.js');
-$link['blog_update'] = array('js' => ADMIN_JS . 'pages/blog_update.js');
-$link['blog_category'] = array('js' => ADMIN_JS . 'pages/blog_category.js');
-$link['blog_category_insert'] = array('js' => ADMIN_JS . 'pages/blog_category_insert.js');
-$link['blog_category_update'] = array('js' => ADMIN_JS . 'pages/blog_category_update.js');
-
 // content (pl. lábléc stb.)
 $link['content'] = array('js' => ADMIN_JS . 'pages/content.js');
 $link['edit_content'] = array('js' => ADMIN_JS . 'pages/edit_content.js');
@@ -152,23 +144,6 @@ $link['newsletter_eventsource'] = array('js' => ADMIN_JS . 'pages/newsletter_eve
 $link['newsletter_insert'] = array('js' => ADMIN_JS . 'pages/newsletter_insert.js');
 $link['newsletter_update'] = array('js' => ADMIN_JS . 'pages/newsletter_update.js');
 $link['newsletter_stats'] = array('js' => ADMIN_JS . 'pages/newsletter_stats.js');
-
-// oldalak
-$link['pages'] = array('js' => ADMIN_JS . 'pages/pages.js');
-$link['page_update'] = array('js' => ADMIN_JS . 'pages/page_update.js');
-
-// users
-$link['users'] = array('js' => ADMIN_JS . 'pages/users.js');
-$link['user_insert'] = array('js' => ADMIN_JS . 'pages/user_insert.js');
-$link['user_profile'] = array('js' => ADMIN_JS . 'pages/user_profile.js');
-
-// slider
-$link['slider'] = array('js' => ADMIN_JS . 'pages/slider.js');
-$link['slider_insert'] = array('js' => ADMIN_JS . 'pages/slider_insert.js');
-$link['slider_update'] = array('js' => ADMIN_JS . 'pages/slider_update.js');
-
-// filemanager
-$link['filemanager'] = array('js' => ADMIN_JS . 'pages/file_manager.js');
 
 // fotó galéria
 $link['photo_gallery'] = array('js' => ADMIN_JS . 'pages/photo_gallery.js');
@@ -189,9 +164,6 @@ $link['google-maps'] = array(
 		ADMIN_ASSETS . 'plugins/gmaps/gmaps.min.js'
 	) 
 );
-
-// logs
-$link['logs'] = array('js' => ADMIN_JS . 'pages/logs.js');
 
 // documents
 $link['documents'] = array('js' => ADMIN_JS . 'pages/documents.js');

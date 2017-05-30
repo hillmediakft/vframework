@@ -1,4 +1,3 @@
-<?php use System\Libs\Session; ?>
 <div class="page-content">
 	<!-- BEGIN PAGE HEADER-->
 	<!-- BEGIN PAGE TITLE & BREADCRUMB-->
@@ -97,9 +96,7 @@
 
 							<tr class="odd gradeX">
 								<td>
-									<?php if (Session::get('user_data.user_role_id') > 0 && empty($value['newsletter_lastsent_date'])) { ?>
 									<input type="checkbox" class="checkboxes" name="newsletter_id_<?php echo $value['newsletter_id'];?>" value="<?php echo $value['newsletter_id'];?>"/>
-									<?php } ?>	
 								</td>
 								<td><?php echo $value['newsletter_name'];?></td>
 								<td><?php echo $value['newsletter_subject'];?></td>
@@ -123,11 +120,9 @@
 												<li>
 													<a href="admin/newsletter/update/<?php echo $value['newsletter_id'];?>"><i class="fa fa-pencil"></i> Szerkeszt</a>
 												</li>
-												<?php if (empty($value['newsletter_lastsent_date'])) { ?>
 												<li>
 													<a class="delete_item" data-id="<?php echo $value['newsletter_id'];?>"><i class="fa fa-trash"></i> Töröl</a>
 												</li>
-												<?php } ?>
 											</ul>
 										</div>
 									</div>

@@ -13,6 +13,7 @@ class Slider extends AdminController {
     {
         parent::__construct();
         $this->loadModel('slider_model');
+        $this->loadModel('slider_translation_model');
     }
 
     public function index()
@@ -22,10 +23,11 @@ class Slider extends AdminController {
 
         $data['title'] = 'Slider oldal';
         $data['description'] = 'Slider oldal description';
-        $data['sliders'] = $this->slider_model->allSlides();
+        $data['sliders'] = $this->slider_model->findSlider(null, LANG);
 
         $view->setHelper(array('url_helper'));
-        $view->add_links(array('datatable', 'bootbox', 'vframework', 'slider'));     
+        $view->add_links(array('datatable', 'bootbox', 'vframework'));
+        $view->add_link('js', ADMIN_JS . 'pages/slider.js');
         $view->render('slider/tpl_slider', $data);
     }
 
@@ -37,14 +39,14 @@ class Slider extends AdminController {
             if ($this->request->has_post()) {
 
                 // fájl feltöltési hiba ellenőrzése
-                if($this->request->checkUploadError('upload_slide_picture')){
-                    Message::set('error', $this->request->getFilesError('upload_slide_picture'));
+                if($this->request->checkUploadError('upload_slider_picture')){
+                    Message::set('error', $this->request->getFilesError('upload_slider_picture'));
                     $this->response->redirect('admin/slider/insert');             
                 }
                 // ha volt feltöltés
-                if ($this->request->hasFiles('upload_slide_picture')) {
+                if ($this->request->hasFiles('upload_slider_picture')) {
                     // kép feltöltése, _uploadPicture() metódussal (visszatér a feltöltött kép elérési útjával, vagy false-al)
-                    $dest_image_name = $this->_uploadPicture($this->request->getFiles('upload_slide_picture'));
+                    $dest_image_name = $this->_uploadPicture($this->request->getFiles('upload_slider_picture'));
                     if ($dest_image_name === false) {
                         $this->response->redirect('admin/slider/insert');
                     }
@@ -53,35 +55,47 @@ class Slider extends AdminController {
                     $this->response->redirect('admin/slider/insert');
                 }
 
-                //adatok az adatbázisba
-                $data['active'] = $this->request->get_post('slider_status', 'integer');
+                //adatok a slider táblába
+                $data['status'] = $this->request->get_post('status', 'integer');
                 $data['slider_order'] = ($this->slider_model->slide_highest_order_number()) + 1;
                 $data['picture'] = $dest_image_name;
-                //$data['target_url'] = "";
-                $data['text'] = $this->request->get_post('slider_text');
-                $data['title'] = $this->request->get_post('slider_title');
-                $data['target_url'] = $this->request->get_post('slider_link');
+                // rekord beírása az adatbázisba
+                $last_insert_id = $this->slider_model->insert($data);
 
-                // adatbázis lekérdezés 
-                $result = $this->slider_model->insert($data);
+                // ha sikeres az insert
+                if ($last_insert_id !== false) {
+                    // insert a slider_translation táblába
+                    $translation_data['slider_id'] = (int)$last_insert_id;
 
-                // ha sikeres az insert visszatérési érték true
-                if ($result !== false) {
+                    $langcodes = Config::get('allowed_languages');
+                    foreach ($langcodes as $lang) {
+                        $translation_data['language_code'] = $lang;
+                        $translation_data['target_url'] = $this->request->get_post('target_url_' . $lang);
+                        $translation_data['title'] = $this->request->get_post('title_' . $lang, 'strip_danger_tags');
+                        $translation_data['text'] = $this->request->get_post('text_' . $lang, 'strip_danger_tags');
+                        $this->slider_translation_model->insert($translation_data);
+                    }
+
                     Message::set('success', 'new_slide_success');
                     $this->response->redirect('admin/slider');
+
                 } else {
                     Message::set('error', 'unknown_error');
                     $this->response->redirect('admin/slider/insert');
                 }
             }
 
+
         Auth::hasAccess('slider.insert', $this->request->get_httpreferer());    
         $view = new View();
         
         $data['title'] = 'Új slide oldal';
         $data['description'] = 'Új slide oldal description';
+        //$data['langs'] = Config::get('allowed_languages');
 
-        $view->add_links(array('ckeditor','bootstrap-fileupload', 'slider_insert'));
+        $view->setHelper(array('html_admin_helper'));
+        $view->add_links(array('ckeditor','bootstrap-fileinput'));
+        $view->add_link('js', ADMIN_JS . 'pages/slider_insert.js');
         $view->render('slider/tpl_slider_insert', $data);
     }
 
@@ -96,22 +110,22 @@ class Slider extends AdminController {
             if ($this->request->has_post()) {
 
                 // fájl feltöltési hiba ellenőrzése
-                if($this->request->checkUploadError('update_slide_picture')){
-                    Message::set('error', $this->request->getFilesError('update_slide_picture'));
-                    $this->response->redirect('admin/slider/update');             
+                if($this->request->checkUploadError('upload_slider_picture')){
+                    Message::set('error', $this->request->getFilesError('upload_slider_picture'));
+                    $this->response->redirect('admin/slider/update/' . $id);             
                 }
 
                 //ha van új kép feltöltve
-                if ($this->request->hasFiles('update_slide_picture')) {
+                if ($this->request->hasFiles('upload_slider_picture')) {
                     // kép feltöltése (visszatér a feltöltött kép nevével, vagy false-al)
-                    $dest_image = $this->_uploadPicture($this->request->getFiles('update_slide_picture'));
+                    $dest_image = $this->_uploadPicture($this->request->getFiles('upload_slider_picture'));
                     if ($dest_image === false) {
-                        $this->response->redirect('admin/slider/update');
+                        $this->response->redirect('admin/slider/update/' . $id);
                     }
                 }
 
-                // adatok beállítása
-                $data['active'] = $this->request->get_post('slider_status', 'integer');
+                // a slider táblába kerülő adatok
+                $data['status'] = $this->request->get_post('status', 'integer');
 
                 if (isset($dest_image)) {
                     $data['picture'] = $dest_image;
@@ -120,36 +134,60 @@ class Slider extends AdminController {
                     $old_thumb_path = DI::get('url_helper')->thumbPath($old_img_path);
                 }
 
-                $data['text'] = $this->request->get_post('slider_text');
-                $data['title'] = $this->request->get_post('slider_title');
-                $data['target_url'] = $this->request->get_post('slider_link');
-
-                // új adatok beírása az adatbázisba (update) a $data tömb tartalmazza a frissítendő adatokat 
+                // update a slider táblában
                 $result = $this->slider_model->update($id, $data);
-                // ha sikeres az adatbázisba írás
+
                 if ($result !== false) {
+                    // update a slider_translation táblában
+                    $langcodes = Config::get('allowed_languages');
+                    foreach ($langcodes as $lang) {
+                        $translation_data['target_url'] = $this->request->get_post('target_url_' . $lang);
+                        $translation_data['title'] = $this->request->get_post('title_' . $lang);
+                        $translation_data['text'] = $this->request->get_post('text_' . $lang, 'strip_danger_tags');
+                        
+                        // új nyelv hozzáadása esetén meg kell nézni, hogy van-e már $lang nyelvi kódú elem ehhez az id-hez,
+                        // mert ha nincs, akkor nem is fogja tudni update-elni, ezért update helyett insert kell                    
+                        if (!$this->slider_translation_model->checkLangVersion($id, $lang)) {
+                            $translation_data['slider_id'] = $id; 
+                            $translation_data['language_code'] = $lang; 
+                            $this->slider_translation_model->insert($translation_data);
+                        }
+                        // ha már van ilyen nyelvi kódú elem
+                        else {
+                            $this->slider_translation_model->update($id, $lang, $translation_data);
+                        }
+                    }
+
                     // megvizsgáljuk, hogy létezik-e új feltöltött kép
                     if (isset($dest_image)) {
                         //régi képek törlése
                         DI::get('file_helper')->delete(array($old_img_path, $old_thumb_path));
                     }
-                    // sikeres adatbázisba írás és kép feltöltés esetén!!!!
+
                     Message::set('success', 'slide_update_success');
+                    $this->response->redirect('admin/slider');
+
                 } else {
                     Message::set('error', 'unknown_error');
+                    $this->response->redirect('admin/slider/update/' . $id);
                 }
 
-                $this->response->redirect('admin/slider');
             }
+
 
         Auth::hasAccess('slider.update', $this->request->get_httpreferer()); 
         $view = new View();
         
         $data['title'] = 'Slider szerkesztése oldal';
         $data['description'] = 'Slider szerkesztése description';
-        $data['slider'] = $this->slider_model->oneSlide($id);
-
-        $view->add_links(array('bootbox', 'ckeditor', 'bootstrap-fileupload', 'slider_update'));
+        $slider = $this->slider_model->findSlider($id);
+        // adatok konvertálása az összes nyelv egy tömbbe kerül
+        $slider = DI::get('arr_helper')->convertMultilanguage($slider, array('target_url', 'title', 'text'), 'id', 'language_code');
+        $data['slider'] = $slider[0];
+        
+        $view->setHelper(array('html_admin_helper'));
+        $view->add_links(array('bootbox', 'ckeditor', 'bootstrap-fileinput'));
+        $view->add_link('js', ADMIN_JS . 'pages/slider_update.js');
         $view->render('slider/tpl_slider_update', $data);
     }
 
@@ -159,75 +197,54 @@ class Slider extends AdminController {
     public function delete()
     {
         if($this->request->is_ajax()){
-            if(Auth::hasAccess('slider.delete')){
-                // a POST-ban kapott item_id egy tömb
-                $id_arr = $this->request->get_post('item_id');
-                // a sikeres törlések számát tárolja
-                $success_counter = 0;
-                // a sikeresen törölt id-ket tartalmazó tömb
-                $success_id = array();      
-                // a sikertelen törlések számát tárolja
-                $fail_counter = 0; 
 
-                $file_helper = DI::get('file_helper');
-                $url_helper = DI::get('url_helper');
-
-                // bejárjuk a $id_arr tömböt és minden elemen végrehajtjuk a törlést
-                foreach($id_arr as $id) {
-                    //átalakítjuk a integer-ré a kapott adatot
-                    $id = (int)$id;
-                    //lekérdezzük a törlendő blog képének a nevét, hogy törölhessük a szerverről
-                    $photo_name = $this->slider_model->selectPicture($id);
-                    //blog törlése  
-                    $result = $this->slider_model->delete($id);
-                    
-                    if($result !== false) {
-                        // ha a törlési sql parancsban nincs hiba
-                        if($result > 0){
-                            //ha van feltöltött képe a bloghoz (az adatbázisban szerepel a file-név)
-                            if(!empty($photo_name)){
-                                $picture_path = Config::get('slider.upload_path') . $photo_name;
-                                $thumb_picture_path = $url_helper->thumbPath($picture_path);
-                                $file_helper->delete(array($picture_path, $thumb_picture_path));
-                            }               
-                            //sikeres törlés
-                            $success_counter += $result;
-                            $success_id[] = $id;
-                        }
-                        else {
-                            //sikertelen törlés
-                            $fail_counter += 1;
-                        }
-                    }
-                    else {
-                        // ha a törlési sql parancsban hiba van
-                        $this->response->json(array(
-                            'status' => 'error',
-                            'message_error' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!',                  
-                        ));
-                    }
-                }
-
-                // üzenetek visszaadása
-                $respond = array();
-                $respond['status'] = 'success';
-                
-                if ($success_counter > 0) {
-                    $respond['message_success'] = 'A slide törölve.';
-                }
-                if ($fail_counter > 0) {
-                    $respond['message_error'] = 'A slide-ot már töröltek!';
-                }
-
-                // respond tömb visszaadása
-                $this->response->json($respond);
-
-            } else {
+            if(!Auth::hasAccess('slider.delete')){
                 $this->response->json(array(
                     'status' => 'error',
                     'message' => 'Nincs engedélye a művelet végrehajtásához!'
                 ));
             }
+
+            // a POST-ban kapott item_id egy tömb
+            $id_arr = $this->request->get_post('item_id');
+            // a sikeres törlések számát tárolja
+            $success_counter = 0;
+
+            $file_helper = DI::get('file_helper');
+            $url_helper = DI::get('url_helper');
+
+            // bejárjuk a $id_arr tömböt és minden elemen végrehajtjuk a törlést
+            foreach($id_arr as $id) {
+                //átalakítjuk a integer-ré a kapott adatot
+                $id = (int)$id;
+                //lekérdezzük a törlendő slider képének a nevét, hogy törölhessük a szerverről
+                $photo_name = $this->slider_model->findPicture($id);
+                //slider törlése  
+                $result = $this->slider_model->delete($id);
+                
+                if($result !== false) {
+                    //ha van feltöltött képe a sliderhoz (az adatbázisban szerepel a file-név)
+                    if(!empty($photo_name)){
+                        $picture_path = Config::get('slider.upload_path') . $photo_name;
+                        $thumb_picture_path = $url_helper->thumbPath($picture_path);
+                        $file_helper->delete(array($picture_path, $thumb_picture_path));
+                    }               
+                    //sikeres törlés
+                    $success_counter += $result;
+                }
+                else {
+                    // ha a törlési sql parancsban hiba van
+                    $this->response->json(array(
+                        'status' => 'error',
+                        'message' => 'Adatbázis lekérdezési hiba!',                  
+                    ));
+                }
+            }
+
+            $this->response->json(array(
+                'status' => 'success',
+                'message' => 'A slide törölve.',                  
+            ));
         }
     }
 

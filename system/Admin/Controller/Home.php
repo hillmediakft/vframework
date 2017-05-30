@@ -2,6 +2,7 @@
 namespace System\Admin\Controller;
 use System\Core\AdminController;
 use System\Core\View;
+use System\Libs\DI;
 
 class Home extends AdminController {
 

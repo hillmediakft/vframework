@@ -23,13 +23,16 @@ class User extends AdminController {
 
 	public function index()
 	{
+		Auth::hasAccess('user.index', $this->request->get_httpreferer());
+
 		$view = new View();
 
 		$data['title'] = 'Users oldal';
 		$data['description'] = 'Users oldal description';
         $data['users'] = $this->user_model->selectUser();
 
-		$view->add_links(array('datatable', 'bootbox','vframework','users'));
+		$view->add_links(array('datatable', 'bootbox','vframework'));
+		$view->add_link('js', ADMIN_JS . 'pages/users.js');
 		$view->render('users/tpl_users', $data);
 	}
 
@@ -180,7 +183,8 @@ class User extends AdminController {
 			$data['title'] = 'Új felhasználó oldal';
 			$data['description'] = 'Új felhasználó description';
 
-			$view->add_links(array('croppic','validation','user_insert'));
+			$view->add_links(array('croppic','validation'));
+			$view->add_link('js', ADMIN_JS . 'pages/user_insert.js');
 			$view->render('users/tpl_user_insert', $data);
 		} else {
 	        Message::set('error', 'Nincs engedélye felhasználót létrehozni.');
@@ -339,7 +343,8 @@ class User extends AdminController {
 		$data['description'] = 'Profilom description';
 		$data['user'] = $this->user_model->selectUser($id);
 
-		$view->add_links(array('croppic', 'validation', 'user_profile'));
+		$view->add_links(array('croppic', 'validation'));
+		$view->add_link('js', ADMIN_JS . 'pages/user_profile.js');
 		$view->render('users/tpl_profile', $data);
 	}
 	
@@ -362,14 +367,13 @@ class User extends AdminController {
 	 */
  	public function edit_roles($id)
  	{
-        // $role_id = (int)$this->request->get_params('id');
         $role_id = (int)$id;
         
-        if ($this->request->has_post('submit_edit_roles')) {
+        if ($this->request->is_post()) {
 
         	$permissions = $this->request->get_post();
 			unset($permissions['submit_edit_roles']);
-
+			
 			DI::get('auth')->savePerms($role_id, $permissions);
     	   	Message::set('success', 'Módosítások elmentve!');
     	   	$this->response->redirect('admin/user/edit_roles/' . $role_id);
@@ -385,8 +389,11 @@ class User extends AdminController {
 	        $data['description'] = 'Felhasználói jogosultságok szerkesztése description';
 			
 			$auth = DI::get('auth');
-			// összes permissiont	
-			$data['permissions'] = $auth->getAllPerms();
+			// összes permission	
+			$permissions = $auth->getAllPerms();
+			// kategóriák alapján csoportosítjuk a perimission-öket
+			$data['permissions'] = DI::get('arr_helper')->groupArrayByField($permissions, 'category');
+
 			// a $role_id-hez tartozó szerep adatai
 			$data['role'] = $auth->getRoles($role_id);
 				if (empty($data['role'])) {
@@ -411,74 +418,58 @@ class User extends AdminController {
 	public function delete()
 	{
         if($this->request->is_ajax()){
-	        if(Auth::hasAccess('user.delete')){
-	        	// a POST-ban kapott item_id egy tömb
-	        	$id_arr = $this->request->get_post('item_id');
-		        // a sikeres törlések számát tárolja
-		        $success_counter = 0;
-		        // a sikeresen törölt id-ket tartalmazó tömb
-		        $success_id = array();
-		        // a sikertelen törlések számát tárolja
-		        $fail_counter = 0;
-
-		        $file_helper = DI::get('file_helper'); 
-		        $photo_path = Config::get('user.upload_path');
-		        $default_photo = Config::get('user.default_photo');
-
-		        // bejárjuk a $id_arr tömböt és minden elemen végrehajtjuk a törlést
-		        foreach ($id_arr as $id) {
-		            //átalakítjuk a integer-ré a kapott adatot
-		            $id = (int) $id;
-		            //lekérdezzük a törlendő user avatar képének a nevét, hogy törölhessük a szerverről
-		            $photo_name = $this->user_model->selectPicture($id);
-		            //felhasználó törlése 
-		            $result = $this->user_model->delete($id);
-
-		            if ($result !== false) {
-		                // ha a törlési sql parancsban nincs hiba
-		                if ($result > 0) {
-		                    //kép törlése, ha nem a default kép
-		                    if ($photo_name != $default_photo) {
-		                        //kép file törlése a szerverről
-		                        $file_helper->delete($photo_path . $photo_name);    
-		                    }
-		                    //sikeres törlés
-		                    $success_counter += $result;
-		                    $success_id[] = $id;
-		                } else {
-		                    //sikertelen törlés
-		                    $fail_counter += 1;
-		                }
-		            } else {
-		                // ha a törlési sql parancsban hiba van
-		                $this->response->json(array(
-		                    'status' => 'error',                  
-		                    'message_error' => 'unknown_error',                  
-		                ));
-		            }
-		        }
-
-		        // üzenetek visszaadása
-		        $respond = array();
-		        $respond['status'] = 'success';
-		        
-		        if ($success_counter > 0) {
-		            $respond['message_success'] = $success_counter . ' felhasználó törölve.';
-		        }
-		        if ($fail_counter > 0) {
-		            $respond['message_error'] = $fail_counter . ' felhasználót már töröltek!';
-		        }
-
-		        // respond tömb visszaadása
-		        $this->response->json($respond);
-
-
-	        } else {
+	        
+	        if(!Auth::hasAccess('user.delete')){
 	            $this->response->json(array(
 	            	'status' => 'error',
 	            	'message' => 'Nincs engedélye a művelet végrehajtásához!'
 	            ));
 	        }
+
+        	// a POST-ban kapott item_id egy tömb
+        	$id_arr = $this->request->get_post('item_id');
+	        // a sikeres törlések számát tárolja
+	        $success_counter = 0;
+
+	        $file_helper = DI::get('file_helper'); 
+	        $photo_path = Config::get('user.upload_path');
+	        $default_photo = Config::get('user.default_photo');
+
+	        // bejárjuk a $id_arr tömböt és minden elemen végrehajtjuk a törlést
+	        foreach ($id_arr as $id) {
+	            //átalakítjuk a integer-ré a kapott adatot
+	            $id = (int) $id;
+	            //lekérdezzük a törlendő user avatar képének a nevét, hogy törölhessük a szerverről
+	            $photo_name = $this->user_model->selectPicture($id);
+	            //felhasználó törlése 
+	            $result = $this->user_model->delete($id);
+
+	            // ha a törlési sql parancsban nincs hiba
+	            if ($result !== false) {
+                    //kép törlése, ha nem a default kép
+                    if ($photo_name != $default_photo) {
+                        //kép file törlése a szerverről
+                        $file_helper->delete($photo_path . $photo_name);    
+                    }
+
+                    $success_counter += $result;
+
+	            } else {
+	                // ha a törlési sql parancsban hiba van
+	                $this->response->json(array(
+	                    'status' => 'error',                  
+	                    'message' => 'Adatbázis lekérdezési hiba!'                  
+	                ));
+	            }
+	        }
+
+            $this->response->json(array(
+                'status' => 'success',                  
+                'message' => $success_counter . ' felhasználó törölve.'                  
+            ));
+
+        } else {
+        	$this->response->redirect('admin/error');
         }
 	}
 

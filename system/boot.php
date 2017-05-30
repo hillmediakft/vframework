@@ -78,7 +78,8 @@ DI::set('connect', function() {
 });
 
 DI::set('uri', function() {
-    return new \System\Libs\Uri(Config::get('language_default'), Config::get('allowed_languages'));
+    //return new \System\Libs\Uri(Config::get('language_default'), Config::get('allowed_languages'));
+    return new \System\Libs\Uri(Config::get('allowed_languages'));
 });
 
 DI::set('router', function() {
@@ -119,6 +120,9 @@ DI::set('num_helper', function() {
 });
 DI::set('html_helper', function() {
     return new \System\Helper\Html();
+});
+DI::set('html_admin_helper', function() {
+    return new \System\Helper\HtmlAdmin();
 });
 
 /*

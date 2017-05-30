@@ -174,6 +174,12 @@ class Query {
 
 	/**
 	 * @access private
+	 * @var String $groupby
+	 */
+	private $groupby = null;
+
+	/**
+	 * @access private
 	 * @var int $limit
 	 */
 	private $limit = null;
@@ -506,6 +512,11 @@ class Query {
 	 */
 	public function set_join($type, $table, $first, $oper = null, $second = null)
 	{
+		if (is_array($table)) {
+			$table = '(' . implode(',', $table) . ')';
+		}
+
+
 		if(is_null($oper) && is_null($second)){
 			$this->joins[] = strtoupper($type) . ' JOIN ' . $table . ' ON ' . $first;
 		}
@@ -580,6 +591,33 @@ class Query {
 			exit;		
 		}
 	}
+
+
+	/**
+	 * GROUP BY értékének beállítása
+	 *
+	 * @access public
+	 * @param mixed $columns (mezőnevek)
+	 * @return void
+	 */
+	public function set_groupby($columns)
+	{
+		if(is_array($columns)) {
+			foreach($columns as &$value) {
+				$value = $this->add_backtick($value); 
+			}
+
+			$this->groupby = implode(',', $columns);
+
+		}
+		elseif(is_string($columns)) {
+			$this->groupby = $columns;	
+		}
+		else {
+			throw new \Exception('Nem megfelelo tipusu parameter lett atadva a query osztaly set_groupby() metodusanak!');
+			exit;		
+		}
+	}
 	
 	
 //--------------------------------------------------------------------------------------
@@ -600,7 +638,7 @@ class Query {
 		// alaptábla a lekérdezésbe, ha nincs külön beállítva táblanév
 		$tablename = (!is_null($this->table)) ? $this->table : $this->add_backtick($this->default_table); 
 
-		$sql = "SELECT " . $this->columns . " FROM " . $tablename . $this->getJoins() . $this->getWhere() . $this->getOrderby() . $this->getLimit();
+		$sql = "SELECT " . $this->columns . " FROM " . $tablename . $this->getJoins() . $this->getWhere() . $this->getGroupby() . $this->getOrderby() . $this->getLimit();
 		
 	    // Prepare to be executed
 		$sth = $this->connect->prepare($sql);
@@ -937,6 +975,21 @@ class Query {
 		}
 		
 		return ' ORDER BY ' . $this->orderby;
+	}
+
+	/**
+	 * Visszadja az GROUP BY stringet
+	 *
+	 * @access private
+	 * @return String
+	 */
+	private function getGroupby()
+	{
+		if(is_null($this->groupby)) {
+			return '';
+		}
+		
+		return ' GROUP BY ' . $this->groupby;
 	}
 
 	/**

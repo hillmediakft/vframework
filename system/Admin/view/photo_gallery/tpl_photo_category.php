@@ -37,8 +37,9 @@
 							Fotó kategóriák
 						</div>
 						<div class="actions">
-<!-- 									<a href="admin/photo_gallery/category_insert" class="btn blue btn-sm"><i class="fa fa-plus"></i> Új kategória</a>
--->									<a href="javascript:;" class="btn blue btn-sm" id="category_insert_button"><i class="fa fa-plus"></i> Új kategória</a>
+
+							<a href="javascript:;" class="btn blue btn-sm" id="category_insert_button"><i class="fa fa-plus"></i> Új kategória</a>
+
 							<div class="btn-group">
 								<a data-toggle="dropdown" href="#" class="btn btn-sm default">
 									<i class="fa fa-wrench"></i> Eszközök <i class="fa fa-angle-down"></i>
@@ -56,81 +57,35 @@
 					</div>
 					<div class="portlet-body">
 
-<!-- 								<div class="row">
-							<div class="col-md-12">
-								<form action="" method="POST" name="" class="form-horizontal">
-									<div class="form-group">
-										<label class="col-md-3 control-label">Text</label>
-										<div class="col-md-4">
-											<input type="text" placeholder="Enter text" class="form-control">
-											<span class="help-block">
-											A block of help text. </span>
-										</div>
-									</div>
-								</form>
-							</div>
-						</div> -->
-
-<!-- 											<div class="form-group">
-										<label for="insert_category" class="control-label">Cím</label>
-										<input type="text" name="insert_category" id="insert_category" class="form-control input-xlarge" />
-									</div>	 -->									
-
-
-
-
 						<table class="table table-striped table-bordered table-hover" id="photo_category">
 							<thead>
 								<tr>
-									<th>Név</th>
+									<?php foreach ($langs as $lang) { ?>
+										<th>Név / <?php echo $lang; ?></th>
+									<?php } ?>
 									<th>Képek száma</th>
 									<th style="max-width: 100px"></th>
 									<th style="max-width: 100px"></th>
 								</tr>
 							</thead>
 							<tbody>
-							<?php foreach($all_category as $value) { ?>
-								<tr class="odd gradeX" data-id="<?php echo $value['category_id'];?>">
-									<td>
-										<?php echo $value['category_name'];?>
-									</td>
-										<?php
-										// megszámoljuk, hogy az éppen aktuális kategóriának mennyi eleme van a photo_gallery tábla photo_category oszlopában
-										$counter = 0;
-										foreach($category_counter as $v) {
-											if($value['category_id'] == $v['photo_category']) {
-												$counter++;
-											}
-										}
-										?>
-									<td><?php echo $counter;?></td>
-
-
-								<td>
-                                    <a class="edit" href="javascript:;"><i class="fa fa-edit"></i> Szerkeszt </a>
-                                </td>
-                                <td>
-                                    <a class="delete" href="javascript:;"><i class="fa fa-trash"></i> Töröl </a>
-                                </td>
-
-<!--
-									<td>
-															
-											<div class="actions">
-											<div class="btn-group">
-												<a class="btn btn-sm grey-steel" data-toggle="dropdown" title="műveletek"><i class="fa fa-cogs"></i></a>
-												<ul class="dropdown-menu pull-right">
-												<?php //if (1) { ?>	
-													<li><a class="edit" href="javascript:;"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
-													<li><a class="delete" href="javascript:;"><i class="fa fa-trash"></i> Töröl</a></li>
-												<?php //} ?>
-												</ul>
-											</div>
-										</div>
+							<?php foreach($all_category as $category) { ?>
+								<tr class="odd gradeX" data-id="<?php echo $category['id'];?>">
 									
+									<!-- kategóriák -->
+									<?php foreach ($langs as $lang) { ?>
+									<td data-lang="<?php echo $lang ?>"><?php echo $category['category_name_' . $lang];?></td>
+									<?php } ?>
+									<!-- képek száma -->
+									<td><?php echo isset($category_counter[$category['id']]) ? $category_counter[$category['id']] : 0;?></td>
 
-									</td>
--->
+									<td>
+	                                    <a class="edit" href="javascript:;"><i class="fa fa-edit"></i> Szerkeszt </a>
+	                                </td>
+	                                <td>
+	                                    <a class="delete" href="javascript:;"><i class="fa fa-trash"></i> Töröl </a>
+	                                </td>
+
 								</tr>
 							<?php } ?>	
 							</tbody>

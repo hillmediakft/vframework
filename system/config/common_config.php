@@ -1,4 +1,9 @@
 <?php
+$config['hash_cost_factor'] = 10;
+$config['language_default_site'] = 'hu';
+$config['language_default_admin'] = 'hu';
+$config['allowed_languages'] = array('hu', 'en');
+$config['reg_email_verify'] = true;
 
 //log fileok adatai
 $config['log'] = array(
@@ -64,12 +69,6 @@ $config['photogallery'] = array(
     'thumb_height' => 240,
     'upload_path' => UPLOADS . 'photo_gallery/'
 );
-
-$config['hash_cost_factor'] = 10;
-$config['language_default'] = 'hu';
-$config['allowed_languages'] = array('hu', 'en', 'de', 'ru');
-$config['reg_email_verify'] = true;
-
 
 $config['user'] = array(
     'width' => 600,

@@ -20,7 +20,7 @@
 	<div class="row">
 		<div class="col-md-12">
 
-			<form action="" method="POST" enctype="multipart/form-data" id="photo_form">	
+			<form action="admin/photo-gallery/update/<?php echo $photo['id']; ?>" method="POST" enctype="multipart/form-data" id="photo_form">	
 
 				<div class="portlet">
 					
@@ -41,35 +41,54 @@
 								<div class="row">
 										
 									<div class="col-md-6">
-
-										<label class="control-label">Kép feltöltése</label>					
-										<div class="fileupload fileupload-new" data-provides="fileupload">
-											<div class="fileupload-new thumbnail" style="width: 400px; height: 300px;"><img src="<?php echo $this->getConfig('photogallery.upload_path') . $photo['photo_filename'];?>" /></div>
-											<div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 400px; max-height: 300px; line-height: 20px;"></div>
-											<div>
-												<span class="btn btn-file green"><span class="fileupload-new">Kiválasztás</span><span class="fileupload-exists">Módosít</span><input id="uploadprofile" class="img" type="file" name="upload_gallery_photo"></span>
-												<a href="#" class="btn btn-warning" data-dismiss="fileupload">Töröl</a>
-											</div>
-										</div>
-										<div class="clearfix"></div>
-
-										<div class="note note-info">
-											Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!
-										</div>
+	                                <!-- bootstrap file upload -->
+	                                <?php 
+	                                	$placeholder = $this->getConfig('photogallery.upload_path') . $photo['filename'];
+	                                    echo $this->html_admin_helper->photoUpload(array(
+	                                        //'label' => 'Kép',
+	                                        'width' => 400,
+	                                        'height' => 300,
+	                                        'placeholder' => $placeholder,
+	                                        'input_name' => 'upload_gallery_photo',
+	                                        // 'info_content' => 'Kattintson a kiválasztás gombra! Ha másik képet szeretne kiválasztani, kattintson a megjelenő módosít gombra! Ha mégsem kívánja a kiválasztott képet feltölteni, kattintson a töröl gombra!'
+	                                        ));
+	                                ?>
+	                                <!-- bootstrap file upload END -->
 									</div>				
 
 									<div class="col-md-6">						
 					
-										<div class="form-group">
-											<label for="photo_caption" class="control-label">Fotó felirat</label>
-											<input type="text" name="photo_caption" id="photo_caption" class="form-control input-xlarge" value="<?php echo $photo['photo_caption'];?>"/>
-										</div>
+
+			                            <div class="portlet">
+			                                <!--<div class="portlet-title"></div>-->
+			                                <div class="portlet-body">
+			                                    <ul class="nav nav-tabs">
+			                                    <?php foreach ($langs as $key => $lang) { ?>
+			                                        <li class="<?php echo ($key == 0) ? 'active' : ''; ?>">
+			                                            <a href="#tab_1_<?php echo $key+1; ?>" data-toggle="tab"> <?php echo $lang; ?> </a>
+			                                        </li>
+			                                    <?php } ?>
+			                                    </ul>
+			                                    <div class="tab-content">
+			                                        <?php foreach ($langs as $key => $lang) { ?>
+			                                        <div class="tab-pane fade <?php echo ($key == 0) ? 'active in' : ''; ?>" id="tab_1_<?php echo $key+1; ?>">
+														<div class="form-group">
+															<label for="photo_caption_<?php echo $lang; ?>" class="control-label">Fotó felirat</label>
+															<input type="text" name="photo_caption_<?php echo $lang; ?>" class="form-control input-xlarge" value="<?php echo (isset($photo['caption_' . $lang])) ? $photo['caption_' . $lang] : '';?>"/>
+														</div>
+			                                        </div>
+			                                        <?php } ?>
+			                                    </div>
+			                                </div>
+			                            </div>
+
+
 										<div class="form-group">
 											<label for="photo_category" class="control-label">Fotó kategória</label>
 											<select class="form-control input-xlarge" name="photo_category" aria-controls="category">
 												<option value="">Válasszon kategóriát</option>
-												<?php foreach ($categorys as $value) { ?>
-													<option value="<?php echo $value['category_id']; ?>" <?php echo ($photo['photo_category'] == $value['category_id']) ? 'selected' : '';?>><?php echo $value['category_name']; ?></option>
+												<?php foreach ($categories as $category) { ?>
+													<option value="<?php echo $category['id']; ?>" <?php echo ($photo['category_id'] == $category['id']) ? 'selected' : '';?>><?php echo $category['category_name']; ?></option>
 												<?php } ?>	
 											</select>
 										</div>											
@@ -77,12 +96,12 @@
 											<label>Megjelenés galéria sliderben</label>
 											<div class="checkbox">
 												<label>
-													<span><input type="checkbox" value="1" name="photo_slider" <?php echo ($photo['photo_slider'] == 1) ? 'checked' : '';?>></span>
+													<span><input type="checkbox" value="1" name="photo_slider" <?php echo ($photo['slider'] == 1) ? 'checked' : '';?>></span>
 													Megjelenik
 												</label>
 											</div>
 										</div>
-										<input type="hidden" value="<?php echo $photo['photo_filename'];?>" name="old_photo">												
+										<input type="hidden" value="<?php echo $photo['filename'];?>" name="old_photo">												
 									
 									</div>
 													

@@ -8,7 +8,7 @@ use System\Libs\Config;
 use System\Libs\Message;
 use System\Libs\Uploader;
 
-class Clients extends AdminController {
+class Client extends AdminController {
 
     function __construct()
     {
@@ -21,6 +21,8 @@ class Clients extends AdminController {
      */
     public function index()
     {
+        Auth::hasAccess('client.index', $this->request->get_httpreferer());
+
         $view = new View();
         
         $data['title'] = 'Partnereink oldal';
@@ -36,6 +38,8 @@ class Clients extends AdminController {
      */
     public function insert()
     {
+        Auth::hasAccess('client.insert', $this->request->get_httpreferer());
+
         if ( $this->request->has_post() ) {
            
             $img_url = $this->request->get_post('img_url');
@@ -86,73 +90,55 @@ class Clients extends AdminController {
     public function delete()
     {
         if($this->request->is_ajax()){
-            if(Auth::hasAccess('client.delete')){
-                // a POST-ban kapott item_id egy tömb
-                $id_arr = $this->request->get_post('item_id');
-                // a sikeres törlések számát tárolja
-                $success_counter = 0;
-                // a sikeresen törölt id-ket tartalmazó tömb
-                $success_id = array();      
-                // a sikertelen törlések számát tárolja
-                $fail_counter = 0; 
-                // file helper példányosítás
-                $file_helper = DI::get('file_helper');
-                
-                foreach($id_arr as $id) {
-                    //átalakítjuk a integer-ré a kapott adatot
-                    $id = (int)$id;
-                    //lekérdezzük a törlendő kép nevét, hogy törölhessük a szerverről
-                    $photo_name = $this->client_model->selectPicture($id);
-                    //rekord törlése  
-                    $result = $this->client_model->delete($id);
-                    
-                    if($result !== false) {
-                        // ha a törlési sql parancsban nincs hiba
-                        if($result > 0){
-                            //ha van feltöltött képe (az adatbázisban szerepel a file-név)
-                            if(!empty($photo_name)){
-                                //kép file törlése a szerverről
-                                $file_helper->delete(Config::get('clientphoto.upload_path') . $photo_name);
-                            }               
-                            //sikeres törlés
-                            $success_counter += $result;
-                            $success_id[] = $id;
-                        }
-                        else {
-                            //sikertelen törlés
-                            $fail_counter++;
-                        }
-                    }
-                    else {
-                        // ha a törlési sql parancsban hiba van
-                        $this->response->json(array(
-                            'status' => 'error',
-                            'message_error' => 'Adatbázis lekérdezési hiba!',                  
-                        ));
-                    }
-                }
-
-                // üzenetek visszaadása
-                $respond = array();
-                $respond['status'] = 'success';
-                
-                if ($success_counter > 0) {
-                    $respond['message_success'] = 'Partner törölve.';
-                }
-                if ($fail_counter > 0) {
-                    $respond['message_error'] = 'A partnert már töröltek!';
-                }
-
-                // respond tömb visszaadása
-                $this->response->json($respond); 
-
-
-            } else {
+            
+            if(!Auth::hasAccess('client.delete')){
                 $this->response->json(array(
                     'status' => 'error',
                     'message' => 'Nincs engedélye a művelet végrehajtásához!'
                 ));
             }
+
+            // a POST-ban kapott item_id egy tömb
+            $id_arr = $this->request->get_post('item_id');
+            // a sikeres törlések számát tárolja
+            $success_counter = 0;
+            // file helper példányosítás
+            $file_helper = DI::get('file_helper');
+            
+            foreach($id_arr as $id) {
+                //átalakítjuk a integer-ré a kapott adatot
+                $id = (int)$id;
+                //lekérdezzük a törlendő kép nevét, hogy törölhessük a szerverről
+                $photo_name = $this->client_model->selectPicture($id);
+                //rekord törlése  
+                $result = $this->client_model->delete($id);
+                
+                if($result !== false) {
+                    //ha van feltöltött képe (az adatbázisban szerepel a file-név)
+                    if(!empty($photo_name)){
+                        //kép file törlése a szerverről
+                        $file_helper->delete(Config::get('clientphoto.upload_path') . $photo_name);
+                    }               
+                    //sikeres törlés
+                    $success_counter += $result;
+                }
+                else {
+                    // ha a törlési sql parancsban hiba van
+                    $this->response->json(array(
+                        'status' => 'error',
+                        'message' => 'Adatbázis lekérdezési hiba!',                  
+                    ));
+                }
+            }
+
+            // siker üzenet visszaadása
+            $this->response->json(array(
+                'status' => 'success',
+                'message' => 'Partner törölve.',                  
+            ));
+
+        } else {
+            $this->response->redirect('admin/error');
         }
     }
 
@@ -161,6 +147,8 @@ class Clients extends AdminController {
      */
     public function update($id)
     {
+        Auth::hasAccess('client.update', $this->request->get_httpreferer());        
+
         $id = (int)$id;
         
         if ($this->request->has_post()) {

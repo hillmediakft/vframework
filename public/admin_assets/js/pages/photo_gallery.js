@@ -10,6 +10,7 @@ var Portfolio = function () {
             e.preventDefault();
 
 			var id = $(this).attr('data-id');
+            var id_arr = [id]; // berakjuk egy tömbbe az id-t
             var deleted_photo = $('#photo_' + id); // a törlendo fotó div eleme
 			
 			bootbox.setDefaults({
@@ -18,7 +19,7 @@ var Portfolio = function () {
 			
 			bootbox.confirm("Biztosan törölni akarja a fotót?", function(result) {
 				if (result) {
-					delete_photo(id, deleted_photo);
+					delete_photo(id_arr, deleted_photo);
 				}
             }); 
         });			
@@ -28,17 +29,17 @@ var Portfolio = function () {
 	/**
 	 * Photo törlése ajax-al
 	 *
-	 * @param array id
+	 * @param array id_arr
 	 * @param objektum deleted_photo 	HTML elem, amit törölni kell a dom-ból
 	 */
-	var delete_photo = function (id, deleted_photo) {
+	var delete_photo = function (id_arr, deleted_photo) {
 
         $.ajax({
             url: "admin/photo-gallery/delete_photo",
             type: 'POST',
             dataType: 'json',
             data: {
-                item_id: id
+                item_id: id_arr
             },
             beforeSend: function() {
                 App.blockUI({
@@ -53,34 +54,20 @@ var Portfolio = function () {
                 
                 if (result.status == 'success') {
 
-                    deleted_photo.remove(); // HTML elem törlése a DOM-ból
+                    // HTML elem törlése a DOM-ból
+                    deleted_photo.remove();
 
-                    if(result.message_success) {
-                        App.alert({
-                            type: 'success',
-                            //icon: 'warning',
-                            message: result.message_success,
-                            container: ajax_message,
-                            place: 'append',
-                            close: true, // make alert closable
-                            reset: false, // close all previouse alerts first
-                            //focus: true, // auto scroll to the alert after shown
-                            closeInSeconds: 3 // auto close after defined seconds
-                        });                                
-                    }
-                    if (result.message_error) {
-                        App.alert({
-                            type: 'warning',
-                            //icon: 'warning',
-                            message: result.message_error,
-                            container: ajax_message,
-                            place: 'append',
-                            close: true, // make alert closable
-                            reset: false, // close all previouse alerts first
-                            //focus: true, // auto scroll to the alert after shown
-                            closeInSeconds: 3 // auto close after defined seconds
-                        });  
-                    }
+                    App.alert({
+                        type: 'success',
+                        //icon: 'warning',
+                        message: result.message,
+                        container: ajax_message,
+                        place: 'append',
+                        close: true, // make alert closable
+                        reset: false, // close all previouse alerts first
+                        //focus: true, // auto scroll to the alert after shown
+                        closeInSeconds: 3 // auto close after defined seconds
+                    });                                
                 
                 }    
                 else if (result.status == 'error') {

@@ -14,6 +14,7 @@ class Blog extends AdminController {
 	{
 		parent::__construct();
 		$this->loadModel('blog_model');
+		$this->loadModel('blog_translation_model');
 		$this->loadModel('blogcategory_model');
 	}
     
@@ -23,12 +24,13 @@ class Blog extends AdminController {
 
 		$data['title'] = 'Admin blog oldal';
 		$data['description'] = 'Admin blog oldal description';	
-		$data['all_blog'] = $this->blog_model->selectBlog();
-		
+		$data['all_blog'] = $this->blog_model->selectBlog(null, LANG);
+//var_dump($data['all_blog']);die;
 		$view = new View();
 		//$view->setHelper(array('str', 'arr'));
 // $view->debug(true);		
-		$view->add_links(array('datatable', 'bootbox', 'vframework', 'blog'));
+		$view->add_links(array('datatable', 'bootbox', 'vframework'));
+		$view->add_link('js', ADMIN_JS . 'pages/blog.js');
 		$view->render('blog/tpl_blog', $data);
 	}
     
@@ -67,19 +69,32 @@ if($this->request->checkUploadError('upload_blog_picture')){
 			}
 
 
-			// az adatbázisba kerülő adatok
+		// insert a blog táblába
+			// a blog táblába kerülő adatok
 			$data['status'] = $this->request->get_post('status', 'integer');
-			
-			$data['title'] = $this->request->get_post('blog_title');
-			$data['body'] = $this->request->get_post('blog_body', 'strip_danger_tags');
-			$data['category_id'] = $this->request->get_post('blog_category');
+			//$data['title'] = $this->request->get_post('blog_title');
+			//$data['body'] = $this->request->get_post('blog_body', 'strip_danger_tags');
 			$data['picture'] = $dest_image;
+			// ha nincs kategória kiválsztva, az érték null lesz (a template-ben üres string kell ah nincs kategória)
+			$data['category_id'] = $this->request->get_post('blog_category', 'integer');
+			
 			$data['add_date'] = date('Y-m-d-G:i');
 
-			// DB lekérdezés
-			$result = $this->blog_model->insert($data);
+			$last_insert_id = $this->blog_model->insert($data);
 
-			if($result !== false) {
+			if($last_insert_id !== false) {
+
+			// insert a blog_translation táblába
+				$translation_data['blog_id'] = (int)$last_insert_id;
+
+				$langcodes = Config::get('allowed_languages');
+				foreach ($langcodes as $lang) {
+					$translation_data['language_code'] = $lang;
+					$translation_data['title'] = $this->request->get_post('blog_title_' . $lang);
+					$translation_data['body'] = $this->request->get_post('blog_body_' . $lang, 'strip_danger_tags');
+					$this->blog_translation_model->insert($translation_data);
+				}
+
 				Message::set('success', 'Blog hozzáadása sikerült!');
 				$this->response->redirect('admin/blog');
 			} else {
@@ -91,10 +106,12 @@ if($this->request->checkUploadError('upload_blog_picture')){
 		$view = new View();
 		
 		$data['title'] = 'Admin blog oldal';
-		$data['description'] = 'Admin blog oldal description';	
-		$data['category_list'] = $this->blogcategory_model->selectCategory();
-		
-		$view->add_links(array('bootstrap-fileinput', 'ckeditor', 'vframework', 'blog_insert'));
+		$data['description'] = 'Admin blog oldal description';
+		$data['category_list'] = $this->blogcategory_model->selectCategory(null, LANG);
+
+		$view->setHelper(array('html_admin_helper'));
+		$view->add_links(array('bootstrap-fileinput', 'ckeditor', 'vframework'));
+		$view->add_link('js', ADMIN_JS . 'pages/blog_insert.js');
 		$view->render('blog/tpl_blog_insert', $data);
 	}
     
@@ -107,7 +124,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 
 		$id = (int)$id;
 
-		if( $this->request->has_post() ){
+		if( $this->request->is_post() ){
 
 			// fájl feltöltési hiba ellenőrzése
 			if($this->request->checkUploadError('upload_blog_picture')){
@@ -124,9 +141,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 
 		// az adatbázisba kerülő adatok
 			$data['status'] = $this->request->get_post('status', 'integer');
-			$data['title'] = $this->request->get_post('blog_title');
-			$data['body'] = $this->request->get_post('blog_body', 'strip_danger_tags');
-
+			
 			// ha van új feltöltött kép
 			if(isset($dest_image)) {
 				$url_helper = DI::get('url_helper');
@@ -136,13 +151,35 @@ if($this->request->checkUploadError('upload_blog_picture')){
 	            $old_thumb_path = $url_helper->thumbPath($old_img_path);
 			}
 			
-			$data['category_id'] = $this->request->get_post('blog_category');
+			$data['category_id'] = $this->request->get_post('blog_category', 'integer');
 			$data['add_date'] = date('Y-m-d-G:i');
 
-		// adatbázis lekérdezés	
+		// update a blog táblában	
 			$result = $this->blog_model->update($id, $data);
 		
 			if($result !== false) {
+
+			// update a blog_translation táblában
+				$langcodes = Config::get('allowed_languages');
+				foreach ($langcodes as $lang) {
+					
+					$translation_data['title'] = $this->request->get_post('blog_title_' . $lang);
+					$translation_data['body'] = $this->request->get_post('blog_body_' . $lang, 'strip_danger_tags');
+					
+					// új nyelv hozzáadása esetén meg kell nézni, hogy van-e már $lang nyelvi kódú elem ehhez az id-hez,
+					// mert ha nincs, akkor nem is fogja tudni update-elni, ezért update helyett insert kell					
+					if (!$this->blog_translation_model->checkLangVersion($id, $lang)) {
+						$translation_data['blog_id'] = $id; 
+						$translation_data['language_code'] = $lang; 
+						$this->blog_translation_model->insert($translation_data);
+					}
+					// ha már van ilyen nyelvi kódú elem
+					else {
+						$this->blog_translation_model->update($id, $lang, $translation_data);
+					}
+
+				}
+
 	            // megvizsgáljuk, hogy létezik-e új feltöltött kép
 	            if(isset($dest_image)) {
 	            	$file_helper = DI::get('file_helper');
@@ -162,13 +199,20 @@ if($this->request->checkUploadError('upload_blog_picture')){
 		$view = new View();
 
 		$data['title'] = 'Admin blog oldal';
-		$data['description'] = 'Admin blog oldal description';	
-		$data['category_list'] = $this->blogcategory_model->selectCategory();
-		$data['blog'] = $this->blog_model->selectBlog($id);
-// $view->debug(true);		
-		$view->add_links(array('bootstrap-fileinput', 'ckeditor', 'vframework', 'blog_update'));
+		$data['description'] = 'Admin blog oldal description';
+		$data['category_list'] = $this->blogcategory_model->selectCategory(null, LANG);
+
+		$blog = $this->blog_model->selectBlog($id);
+		// átalakítjuk a kapott két nyelvi tömböt egy tömbre amiben benne van minden nyelv
+		$blog = DI::get('arr_helper')->convertMultilanguage($blog, array('title', 'body', 'category_name'), 'id', 'language_code');
+		$data['blog'] = $blog[0];
+		
+		$view->setHelper(array('html_admin_helper'));		
+		$view->add_links(array('bootstrap-fileinput', 'ckeditor', 'vframework'));
+		$view->add_link('js', ADMIN_JS . 'pages/blog_update.js');
 		$view->render('blog/tpl_blog_update', $data);
 	}  
+
 
 	/**
 	 *	Blog törlése AJAX-al
@@ -176,79 +220,57 @@ if($this->request->checkUploadError('upload_blog_picture')){
 	public function delete()
 	{
         if($this->request->is_ajax()){
-		        
-		        if(!Auth::hasAccess('blog.delete')){
-		            $this->response->json(array(
-		            	'status' => 'error',
-		            	'message' => 'Nincs engedélye a művelet végrehajtásához!'
-		            ));
-				}	            
 
-	        	// a POST-ban kapott item_id egy tömb
-	        	$id_arr = $this->request->get_post('item_id');
-				// a sikeres törlések számát tárolja
-				$success_counter = 0;
-		        // a sikeresen törölt id-ket tartalmazó tömb
-		        $success_id = array();		
-				// a sikertelen törlések számát tárolja
-				$fail_counter = 0; 
-		        // a paraméterként kapott stringből tömböt csinálunk a , karakter mentén
-		        //$id_arr = explode(',', $id_string);
-				
-				// helperek példányosítása
-				$file_helper = DI::get('file_helper');
-				$url_helper = DI::get('url_helper');
+	        if(!Auth::hasAccess('blog.delete')){
+	            $this->response->json(array(
+	            	'status' => 'error',
+	            	'message' => 'Nincs engedélye a művelet végrehajtásához!'
+	            ));
+			}	            
 
-				// bejárjuk a $id_arr tömböt és minden elemen végrehajtjuk a törlést
-				foreach($id_arr as $id) {
-					//átalakítjuk a integer-ré a kapott adatot
-					$id = (int)$id;
-					//lekérdezzük a törlendő blog képének a nevét, hogy törölhessük a szerverről
-					$photo_name = $this->blog_model->selectPicture($id);
-					//blog törlése	
-					$result = $this->blog_model->delete($id);
-					
-					if($result !== false) {
-						// ha a törlési sql parancsban nincs hiba
-						if($result > 0){
-							//ha van feltöltött képe a bloghoz (az adatbázisban szerepel a file-név)
-							if(!empty($photo_name)){
-								$picture_path = Config::get('blogphoto.upload_path') . $photo_name;
-								$thumb_picture_path = $url_helper->thumbPath($picture_path);
-								// képek törlése
-								$file_helper->delete(array($picture_path, $thumb_picture_path));
-							}				
-							//sikeres törlés
-							$success_counter += $result;
-							$success_id[] = $id;
-						}
-						else {
-							//sikertelen törlés
-							$fail_counter++;
-						}
-					}
-					else {
-						// ha a törlési sql parancsban hiba van
-		                $this->response->json(array(
-		                    'status' => 'error',
-		                    'message_error' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!',                  
-			            ));
-					}
+        	// a POST-ban kapott item_id egy tömb
+        	$id_arr = $this->request->get_post('item_id');
+			
+			// a sikeres törlések számát tárolja
+			$success_counter = 0;
+			
+			// helperek példányosítása
+			$file_helper = DI::get('file_helper');
+			$url_helper = DI::get('url_helper');
+
+			// bejárjuk a $id_arr tömböt és minden elemen végrehajtjuk a törlést
+			foreach($id_arr as $id) {
+				//átalakítjuk a integer-ré a kapott adatot
+				$id = (int)$id;
+				//lekérdezzük a törlendő blog képének a nevét, hogy törölhessük a szerverről
+				$photo_name = $this->blog_model->selectPicture($id);
+				//blog törlése	
+				$result = $this->blog_model->delete($id);
+				// ha a törlési sql parancsban nincs hiba
+				if($result !== false) {
+					//ha van feltöltött képe a bloghoz (az adatbázisban szerepel a file-név)
+					if(!empty($photo_name)){
+						$picture_path = Config::get('blogphoto.upload_path') . $photo_name;
+						$thumb_picture_path = $url_helper->thumbPath($picture_path);
+						// képek törlése
+						$file_helper->delete(array($picture_path, $thumb_picture_path));
+					}				
+					//sikeres törlés
+					$success_counter += $result;
 				}
+				else {
+					// ha a törlési sql parancsban hiba van
+	                $this->response->json(array(
+	                    'status' => 'error',
+	                    'message_error' => 'Adatbázis lekérdezési hiba!'
+		            ));
+				}
+			}
 
-		        // üzenetek visszaadása
-		        $respond = array();
-		        $respond['status'] = 'success';
-		        
-		        if ($success_counter > 0) {
-		            $respond['message_success'] = $success_counter . ' blog törölve.';
-		        }
-		        if ($fail_counter > 0) {
-		            $respond['message_error'] = $fail_counter . ' blogot már töröltek!';
-		        }
-
-		        // respond tömb visszaadása
-		        $this->response->json($respond);
+            $this->response->json(array(
+                'status' => 'success',
+                'message' => $success_counter . ' blog törölve.'
+            ));
 
         }
 	}
@@ -262,10 +284,17 @@ if($this->request->checkUploadError('upload_blog_picture')){
 
 		$data['title'] = 'Admin blog oldal';
 		$data['description'] = 'Admin blog oldal description';	
-		$data['all_blog_category'] = $this->blogcategory_model->selectCategory();
 		$data['category_counter'] = $this->blog_model->categoryCounter();
+		// minden kategória, minden nyelven
+		$data['all_blog_category'] = $this->blogcategory_model->selectCategory();
+		$data['all_blog_category'] = DI::get('arr_helper')->convertMultilanguage($data['all_blog_category'], array('category_name'), 'id', 'language_code');
+//var_dump($data['all_blog_category']);die;
+
+		//$data['langs'] = Config::get('allowed_languages');
+
 //$view->debug(true);			
-		$view->add_links(array('datatable', 'bootbox', 'vframework', 'blog_category'));
+		$view->add_links(array('datatable', 'bootbox', 'vframework'));
+		$view->add_link('js', ADMIN_JS . 'pages/blog_category.js');
 		$view->render('blog/tpl_blog_category', $data);	
 	}
 
@@ -275,22 +304,36 @@ if($this->request->checkUploadError('upload_blog_picture')){
 	public function category_insert_update()
 	{
 		if ($this->request->is_ajax()) {
+
+			$this->loadModel('blogcategory_translation_model');
+
 			// az id értéke lehet null is!
 			$id = $this->request->get_post('id', 'integer');
-			$new_name = $this->request->get_post('data');
 			
-			if ($new_name == '') {
+			// neveket tartalmazó asszociatív tömb (hu => kategória név, en => category name)
+			$new_names = $this->request->get_post('data');
+
+			$primary_name = $new_names[LANG];
+			if ($primary_name === '') {
 				$this->response->json(array(
 					'status' => 'error',
 					'message' => 'Nem lehet üres a kategória név mező!'
 				));
-			}	
+			}
 
 		// kategóriák lekérdezése (annak ellenőrzéséhez, hogy már létezik-e ilyen kategória)
-			$existing_categorys = $this->blogcategory_model->selectCategory();
+		// csak a "primary" nyelvnél nézi	
+			$existing_categorys = $this->blogcategory_model->selectCategory(null, LANG);
+
 			// bejárjuk a kategória neveket és összehasonlítjuk az új névvel (kisbetűssé alakítjuk, hogy ne számítson a nagybetű-kisbetű eltérés)
 			foreach($existing_categorys as $value) {
-				if(strtolower($new_name) == strtolower($value['category_name'])) {
+				
+				if (
+					// insert eset  
+					(is_null($id) && strtolower($primary_name) == strtolower($value['category_name'])) ||
+					// update eset
+					(!is_null($id) && $id != $value['id'] && strtolower($primary_name) == strtolower($value['category_name']))
+				) {
 					$this->response->json(array(
 						'status' => 'error',
 						'message' => 'Már létezik ' . $value['category_name'] . ' kategória!'
@@ -300,16 +343,22 @@ if($this->request->checkUploadError('upload_blog_picture')){
 
 		//insert (ha az $id értéke null)
 			if (is_null($id)) {
-				$result = $this->blogcategory_model->insertCategory($new_name);
-				
-				if ($result) {
+
+				// kategória létrehozása a blog_category táblába
+				$last_insert_id = $this->blogcategory_model->insertCategory();
+								
+				if ($last_insert_id !== false) {
+					// kategória nevek beírása a blog_category_translation táblába
+					foreach ($new_names as $langcode => $name) {
+						$this->blogcategory_translation_model->insert($last_insert_id, $langcode, $name);
+					}
+					
 					$this->response->json(array(
 						'status' => 'success',
 						'message' => 'Kategória hozzáadva.',
-						'inserted_id' => $result
+						'inserted_id' => $last_insert_id
 					));
-				}
-				if ($result === false){ 
+				} else { 
 					$this->response->json(array(
 						'status' => 'error',
 						'message' => 'Adatbázis lekérdezési hiba!'
@@ -318,19 +367,16 @@ if($this->request->checkUploadError('upload_blog_picture')){
 			}
 		// update
 			else {
-				$result = $this->blogcategory_model->updateCategory($id, $new_name);
-
-				if ($result !== false) {
-					$this->response->json(array(
-						'status' => 'success',
-						'message' => 'Kategória módosítva.'
-					));
-				} else { 
-					$this->response->json(array(
-						'status' => 'error',
-						'message' => 'Adatbázis lekérdezési hiba!'
-					));
+				// kategória nevek beírása a blog_category_translation táblába
+				foreach ($new_names as $langcode => $name) {
+					$this->blogcategory_translation_model->update($id, $langcode, $name);
 				}
+
+				$this->response->json(array(
+					'status' => 'success',
+					'message' => 'Kategória módosítva.'
+				));
+
 			}
 		}
 	}
@@ -341,83 +387,71 @@ if($this->request->checkUploadError('upload_blog_picture')){
 	public function category_delete()
 	{
         if($this->request->is_ajax()){
-	        if(Auth::hasAccess('blog.category_delete')){
-	        	$id = $this->request->get_post('item_id', 'integer');
 
-			// a sikeres törlések számát tárolja
-				$success_counter = 0;
-			// a sikertelen törlések számát tárolja
-				$fail_counter = 0; 
-
-			// lekérdezzük a törlendő képek nevét
-				$photo_names_temp = $this->blog_model->selectPictureWhereCategory($id);
-
-				$photo_names = array();
-				foreach ($photo_names_temp as $key => $value) {
-					$photo_names[] = $value['picture'];
-				}
-				unset($photo_names_temp);
-
-			// blogbejegyzések törlése, amik a törlendő kategóriához tartoznak
-				$result = $this->blog_model->deleteWhereCategory($id);
-
-			// képek törlése
-				if($result !== false) {
-					if($result > 0){
-						// helperek példányosítása
-						$file_helper = DI::get('file_helper');
-						$url_helper = DI::get('url_helper');
-
-						foreach($photo_names as $value){
-							$picture_path = Config::get('blogphoto.upload_path') . $value;
-							$thumb_picture_path = $url_helper->thumbPath($picture_path);
-							//képek file törlése
-							$file_helper->delete(array($picture_path, $thumb_picture_path));
-						}				
-					}
-				}
-
-			// kategória törlése a blog_category táblából
-				$result = $this->blogcategory_model->deleteCategory($id);
-				
-				if($result !== false) {
-					// ha a törlési sql parancsban nincs hiba
-					if($result > 0){
-						$success_counter += $result;
-					}
-					else {
-						//sikertelen törlés
-						$fail_counter++;
-					}
-				}
-				else {
-					// ha a törlési sql parancsban hiba van
-	                $this->response->json(array(
-	                    'status' => 'error',
-	                    'message_error' => 'Hibas sql parancs: nem sikerult a DELETE lekerdezes az adatbazisbol!',                  
-	                ));
-				}
-
-		        // üzenetek visszaadása
-		        $respond = array();
-		        $respond['status'] = 'success';
-		        
-		        if ($success_counter > 0) {
-		            $respond['message_success'] = 'Kategória törölve.';
-		        }
-		        if ($fail_counter > 0) {
-		            $respond['message_error'] = 'A kategóriát már törölték!';
-		        }
-
-		        // respond tömb visszaadása
-		        $this->response->json($respond);
-
-	        } else {
+	        if(!Auth::hasAccess('blog.category_delete')){
 	            $this->response->json(array(
 	            	'status' => 'error',
 	            	'message' => 'Nincs engedélye a művelet végrehajtásához!'
-	            ));
+	            	));
 	        }
+	        	
+        	$id = $this->request->get_post('item_id', 'integer');
+
+					// ha az van beállítva, hogy kategória törlésnél az összes hozzá tartozó elemet is töröljük
+						$delete_category_delete_items = false;
+						if ($delete_category_delete_items) {
+
+						// lekérdezzük a törlendő képek nevét
+							$photo_names_temp = $this->blog_model->selectPictureWhereCategory($id);
+
+							$photo_names = array();
+							foreach ($photo_names_temp as $key => $value) {
+								$photo_names[] = $value['picture'];
+							}
+							unset($photo_names_temp);
+
+						// blogbejegyzések törlése, amik a törlendő kategóriához tartoznak
+							$result = $this->blog_model->deleteWhereCategory($id);
+
+						// képek törlése
+							if($result !== false) {
+								if($result > 0){
+									// helperek példányosítása
+									$file_helper = DI::get('file_helper');
+									$url_helper = DI::get('url_helper');
+
+									foreach($photo_names as $value){
+										$picture_path = Config::get('blogphoto.upload_path') . $value;
+										$thumb_picture_path = $url_helper->thumbPath($picture_path);
+										//képek file törlése
+										$file_helper->delete(array($picture_path, $thumb_picture_path));
+									}				
+								}
+							}
+						
+						}
+
+
+			// kategória törlése a blog_category táblából
+			// (ezzel együtt törlődnek a blog_translation táblából is az ehhez a kategóriához tartozó translations elemek)
+			$result = $this->blogcategory_model->deleteCategory($id);
+			
+			if($result !== false) {
+                $this->response->json(array(
+                    'status' => 'success',
+                    'message' => 'Kategória törölve.'
+                    ));
+			}
+			else {
+				// ha a törlési sql parancsban hiba van
+                $this->response->json(array(
+                    'status' => 'error',
+                    'message' => 'Adatbázis lekérdezési hiba!',                  
+                	));
+			}
+
+        } else {
+        	$this->response->redirect('admin/error');
         }
 	}	
 

@@ -31,7 +31,7 @@
 					<div class="caption"><i class="fa fa-file"></i>Szerkeszthető oldalak</div>
 				</div>
 				<div class="portlet-body">
-					<table class="table table-striped table-bordered table-hover" id="users">
+					<table class="table table-striped table-bordered table-hover">
 						<thead>
 							<tr class="heading">
 								<th>#id</th>

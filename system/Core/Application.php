@@ -12,20 +12,40 @@ class Application {
 
     protected $request;
 
-    public function __construct() {
+    public function __construct()
+    {
         // request objektum visszaadása (itt már létrejön az uri és router objektum is!)
         $this->request = DI::get('request');
 
         // area állandó létrehozása
         define('AREA', $this->request->get_uri('area'));
-        define('LANG', $this->request->get_uri('langcode'));
-        // Betöltjük az aktuális nyelvnek megfelelő üzenet fájlt
-        Message::init('messages_' . AREA, $this->request->get_uri('langcode'));
-
-        if (AREA == 'site' && MULTILANG_SITE == true) {
-            // nyelvi fájl betöltése
-            Language::init(LANG, DI::get('connect'));
+        
+        // visszaadjuk a nyelvi kódot, ha nincs az url-ben akkor NULL
+        $langcode = $this->request->get_uri('langcode');
+        // default nyelvi kód beállítása, ha nincs nyelvi kód az url-ben
+        if (is_null($langcode)) {
+            $langcode = Config::get('language_default_' . AREA);
+            // beállítjuk az uri objektumban is a default nyelvi kódot
+            DI::get('uri')->set_langcode($langcode);
         }
+
+        // LANG állandó létrehozása
+        define('LANG', $langcode);
+
+        // Betöltjük az aktuális nyelvnek megfelelő üzenet fájlt
+        Message::init('messages_' . AREA, LANG);
+
+            // front oldal
+            if (AREA == 'site') {
+
+                if (MULTILANG_SITE == true) {
+                    // nyelvi fájl betöltése
+                    Language::init(LANG, DI::get('connect'));
+                }
+
+            }
+
+
         // Megadjuk az Auth osztály alapbeállításait ('auth.php' config file betöltése)
         Auth::init('auth');
 
@@ -36,7 +56,8 @@ class Application {
         $this->_loadController();
     }
 
-    private function _loadController() {
+    private function _loadController()
+    {
         $router = DI::get('router');
 
         /* ************* SITE ******************************* */
@@ -74,6 +95,7 @@ class Application {
                 // pages	
                 $router->get('/pages', 'pages@index');
                 $router->match('GET|POST', '/pages/update/:id', 'pages@update', array('id'));
+                $router->match('GET|POST', '/pages/insert', 'pages@insert');
 
                 // content	
                 $router->get('/content', 'content@index');
@@ -95,8 +117,14 @@ class Application {
                 $router->get('/photo-gallery', 'PhotoGallery@index');
                 $router->post('/photo-gallery/delete_photo', 'PhotoGallery@delete_photo');
                 $router->post('/photo-gallery/delete_category', 'PhotoGallery@delete_category');
-                $router->match('GET|POST', '/photo-gallery/insert', 'PhotoGallery@insert');
-                $router->match('GET|POST', '/photo-gallery/update/:id', 'PhotoGallery@update', array('id'));
+                
+                $router->post('/photo-gallery/category_insert_update', 'PhotoGallery@category_insert_update');
+                
+                $router->match('GET', '/photo-gallery/create', 'PhotoGallery@create');
+                $router->match('POST', '/photo-gallery/store', 'PhotoGallery@store');
+                $router->match('GET', '/photo-gallery/edit/:id', 'PhotoGallery@edit');
+                $router->match('POST', '/photo-gallery/update/:id', 'PhotoGallery@update');
+
                 $router->get('/photo-gallery/category', 'PhotoGallery@category');
 
                 // slider	
@@ -113,13 +141,13 @@ class Application {
                 $router->get('/testimonials/delete/:id', 'testimonials@delete', array('id'));
 
                 // clients	
-                $router->get('/clients', 'clients@index');
-                $router->post('/clients/client_img_upload/(upload)', 'clients@client_img_upload', array('upload'));
-                $router->post('/clients/client_img_upload/(crop)', 'clients@client_img_upload', array('crop'));
-                $router->post('/clients/delete', 'clients@delete');
-                $router->match('GET|POST', '/clients/insert', 'clients@insert');
-                $router->match('GET|POST', '/clients/update/:id', 'clients@update', array('id'));
-                $router->post('/clients/order', 'clients@order');
+                $router->get('/clients', 'client@index');
+                $router->post('/clients/client_img_upload/(upload)', 'client@client_img_upload', array('upload'));
+                $router->post('/clients/client_img_upload/(crop)', 'client@client_img_upload', array('crop'));
+                $router->post('/clients/delete', 'client@delete');
+                $router->match('GET|POST', '/clients/insert', 'client@insert');
+                $router->match('GET|POST', '/clients/update/:id', 'client@update', array('id'));
+                $router->post('/clients/order', 'client@order');
 
                 // file manager	
                 $router->get('/file_manager', 'FileManager@index');
@@ -133,6 +161,7 @@ class Application {
                 // translations	
                 $router->get('/translations', 'translations@index');
                 $router->post('/translations/save', 'translations@save');
+                $router->match('GET|POST', '/translations/insert', 'translations@insert');
 
                 // newsletter	
                 $router->get('/newsletter', 'newsletter@index');

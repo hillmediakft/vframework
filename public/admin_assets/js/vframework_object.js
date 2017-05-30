@@ -136,12 +136,18 @@ var vframework = function () {
                     } else {
                         deleteRow.remove(); // HTML elem törlése a DOM-ból
                     }
+                    
+                    if(result.message) {
 
-                    if(result.message_success) {
+                        // ha az üzenet tömb
+                        if (result.message instanceof Array) {
+                            result.message = result.message.join('<br>');
+                        }
+
                         App.alert({
                             type: 'success',
                             //icon: 'warning',
-                            message: result.message_success,
+                            message: result.message,
                             container: ajax_message,
                             place: 'append',
                             close: true, // make alert closable
@@ -149,34 +155,29 @@ var vframework = function () {
                             //focus: true, // auto scroll to the alert after shown
                             closeInSeconds: 3 // auto close after defined seconds
                         });                                
-                    }
-                    if (result.message_error) {
-                        App.alert({
-                            type: 'warning',
-                            //icon: 'warning',
-                            message: result.message_error,
-                            container: ajax_message,
-                            place: 'append',
-                            close: true, // make alert closable
-                            reset: false, // close all previouse alerts first
-                            //focus: true, // auto scroll to the alert after shown
-                            closeInSeconds: 3 // auto close after defined seconds
-                        });  
+
                     }
                 
                 }    
                 else if (result.status == 'error') {
-                    App.alert({
-                        type: 'danger',
-                        //icon: 'warning',
-                        message: result.message,
-                        container: ajax_message,
-                        place: 'append',
-                        close: true, // make alert closable
-                        //reset: false, // close all previouse alerts first
-                        //focus: true, // auto scroll to the alert after shown
-                        closeInSeconds: 5 // auto close after defined seconds
-                    });
+                    if(result.message) {
+
+                        if (result.message instanceof Array) {
+                            result.message = result.message.join('<br>');    
+                        }
+
+                        App.alert({
+                            type: 'danger',
+                            //icon: 'warning',
+                            message: result.message,
+                            container: ajax_message,
+                            place: 'append',
+                            close: true, // make alert closable
+                            //reset: false, // close all previouse alerts first
+                            //focus: true, // auto scroll to the alert after shown
+                            closeInSeconds: 5 // auto close after defined seconds
+                        });
+                    }
                 }
             },
             error: function(xhr, textStatus, errorThrown){

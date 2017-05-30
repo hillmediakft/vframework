@@ -23,7 +23,16 @@ var Blog_insert = function () {
 	};
 
     var ckeditorInit = function () {
-        CKEDITOR.replace('blog_body', {customConfig: 'config_custom3.js'});
+
+    	var langs = $('html').attr('data-langs');
+		var langs_array = langs.split(",");
+
+		// bejárjuk a checkboxokat tartalmazó objektumot
+		$.each(langs_array, function(index, val) {
+    		CKEDITOR.replace('blog_body_' + val, {customConfig: 'config_custom3.js'});
+		});
+
+
     };
 
     return {

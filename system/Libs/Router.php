@@ -150,6 +150,26 @@ class Router
         }
     }
 
+
+public function url($fn, $params = array())
+{
+    foreach ($this->afterRoutes['GET'] as $route) {
+        if ($fn == $route['fn']) {
+            
+            foreach ($params as $key => $value) {
+                $route['pattern'] = str_replace(':' . $key, $value, $route['pattern']);
+            }
+
+
+            return trim($route['pattern'], '/');
+        }
+    }
+
+    // return $this->afterRoutes[$method];
+}
+
+
+
     /**
      * Shorthand for a route accessed using any method
      *
