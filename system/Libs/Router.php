@@ -150,25 +150,29 @@ class Router
         }
     }
 
+    /**
+     * Visszadja az url-t a kérés metódusa és a controller/action/paraméterek lapaján
+     *
+     * @param string $method    - get, post stb.
+     * @param string $fn        - controller@action
+     * @param array $params     - url-ben lévő paraméter neve és értéke pl.:'id' => 5, 'name' => 'sanyi'
+     * @return string
+     */
+    public function url($method, $fn, $params = array())
+    {
+        $method = strtoupper($method);
+        foreach ($this->afterRoutes[$method] as $route) {
+            if ($fn == $route['fn']) {
+                
+                foreach ($params as $key => $value) {
+                    $route['pattern'] = str_replace(':' . $key, $value, $route['pattern']);
+                }
 
-public function url($fn, $params = array())
-{
-    foreach ($this->afterRoutes['GET'] as $route) {
-        if ($fn == $route['fn']) {
-            
-            foreach ($params as $key => $value) {
-                $route['pattern'] = str_replace(':' . $key, $value, $route['pattern']);
+
+                return trim($route['pattern'], '/');
             }
-
-
-            return trim($route['pattern'], '/');
         }
     }
-
-    // return $this->afterRoutes[$method];
-}
-
-
 
     /**
      * Shorthand for a route accessed using any method
