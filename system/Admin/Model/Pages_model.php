@@ -42,7 +42,7 @@ class Pages_model extends AdminModel {
 			$this->query->set_where('pages.id', '=', $id);
 		}
 		if (!is_null($language_code)) {
-			$this->query->set_where('language_code', '=', $language_code);
+			$this->query->set_where('pages_translation.language_code', '=', $language_code);
 		}
 
 		return $this->query->select();
