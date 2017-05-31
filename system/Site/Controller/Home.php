@@ -14,12 +14,12 @@ class Home extends SiteController {
 
     public function index()
     {
-        $page_data = $this->home_model->getPageData('home_oldal');
+        //$page_data = $this->home_model->getPageData('home_oldal');
         $data = $this->addGlobalData();
 
-        $data['title'] = $page_data['metatitle'];
-        $data['description'] = $page_data['metadescription'];
-        $data['keywords'] = $page_data['metakeywords'];
+        //$data['title'] = $page_data['metatitle'];
+        //$data['description'] = $page_data['metadescription'];
+        //$data['keywords'] = $page_data['metakeywords'];
 
 
         $view = new View();
