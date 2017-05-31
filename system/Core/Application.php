@@ -99,7 +99,10 @@ class Application {
 
                 // content	
                 $router->get('/content', 'content@index');
-                $router->match('GET|POST', '/content/edit/:id', 'content@edit', array('id'));
+                $router->get('/content/create', 'content@create');
+                $router->post('/content/store', 'content@store');
+                $router->get('/content/edit/:id', 'content@edit');
+                $router->post('/content/update/:id', 'content@update');
 
                 // user	
                 $router->get('/user', 'user@index');
