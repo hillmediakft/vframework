@@ -130,10 +130,6 @@ $link['autocomplete'] = array(
 
 /*----------------- OLDALSPECIFIKUS LINKEK --------------------*/
 
-// content (pl. lábléc stb.)
-$link['content'] = array('js' => ADMIN_JS . 'pages/content.js');
-$link['edit_content'] = array('js' => ADMIN_JS . 'pages/edit_content.js');
-
 // partnerek
 $link['clients'] = array('js' => ADMIN_JS . 'pages/clients.js');
 $link['client_insert'] = array('js' => ADMIN_JS . 'pages/client_insert.js');
