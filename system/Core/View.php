@@ -7,6 +7,7 @@ use System\Libs\Auth;
 class View {
 	
 	private $request;
+	private $router;
 	
 	/**
 	 *	Az aktuális terület neve (pl.: site vagy admin)
@@ -81,6 +82,9 @@ class View {
 	{
 		// request objektum
 		$this->request = DI::get('request');
+		// router objektum		
+		$this->router = DI::get('router');
+
 		$this->area = $this->request->get_uri('area');
 		// linkek tömb behívása
 		$this->modul_link = include_once(CONFIG . '/links_' . $this->area . '.php');
