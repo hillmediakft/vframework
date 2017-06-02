@@ -12,7 +12,7 @@
 				<a href="admin/blog">Blogok kezelése</a>
 				<i class="fa fa-angle-right"></i>
 			</li>
-			<li><a href="admin/blog/insert">Blog hozzáadása</a></li>
+			<li><span>Blog hozzáadása</span></li>
 		</ul>
 	</div>
 	<!-- END PAGE TITLE & BREADCRUMB-->
@@ -27,7 +27,7 @@
 			<!-- echo out the system feedback (error and success messages) -->
 			<?php $this->renderFeedbackMessages(); ?>			
 		
-			<form action="" method="POST" id="new_blog_form" enctype="multipart/form-data">	
+			<form action="admin/blog/store" method="POST" id="new_blog_form" enctype="multipart/form-data">	
 
 				<!-- BEGIN EXAMPLE TABLE PORTLET-->
 				<div class="portlet">

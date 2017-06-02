@@ -24,7 +24,7 @@ class Blog extends AdminController {
 
 		$data['title'] = 'Admin blog oldal';
 		$data['description'] = 'Admin blog oldal description';	
-		$data['all_blog'] = $this->blog_model->selectBlog(null, LANG);
+		$data['all_blog'] = $this->blog_model->findBlog(null, LANG);
 //var_dump($data['all_blog']);die;
 		$view = new View();
 		//$view->setHelper(array('str', 'arr'));
@@ -37,23 +37,39 @@ class Blog extends AdminController {
     /**
      * Blog bejegyzés hozzáadása
      */
-    public function insert()
+    public function create()
 	{
-		Auth::hasAccess('blog.insert', $this->request->get_httpreferer());
+		Auth::hasAccess('blog.create', $this->request->get_httpreferer());
 
+		$data['title'] = 'Admin blog oldal';
+		$data['description'] = 'Admin blog oldal description';
+		$data['category_list'] = $this->blogcategory_model->findCategory(null, LANG);
+
+		$view = new View();
+		$view->setHelper(array('html_admin_helper'));
+		$view->add_links(array('bootstrap-fileinput', 'ckeditor', 'vframework'));
+		$view->add_link('js', ADMIN_JS . 'pages/blog_insert.js');
+		$view->render('blog/tpl_blog_insert', $data);
+	}
+
+	/**
+	 * Új blog adatok az adatbázisba (feldolgozó)
+	 */
+	public function store()
+	{
 		if( $this->request->is_post() ){
 
 			// kép feltöltési hiba vizsgálata
 			if($this->request->checkUploadError('upload_blog_picture')){
 				Message::set('error', $this->request->getFilesError('upload_blog_picture'));
-				$this->response->redirect('admin/blog/insert');				
+				$this->response->redirect('admin/blog/create');				
 			}
 /*			
 if($this->request->checkUploadError('upload_blog_picture')){
 	foreach ($this->request->getFileError('upload_blog_picture') as $filename => $error_msg) {
 		$message = $filename . ' - ' . Message::show($error_msg);
 		Message::set('error', $message);
-		$this->response->redirect('admin/blog/insert');				
+		$this->response->redirect('admin/blog/create');				
 	}
 }
 */
@@ -61,11 +77,11 @@ if($this->request->checkUploadError('upload_blog_picture')){
 			if ($this->request->hasFiles('upload_blog_picture')) {
 				$dest_image = $this->_uploadPicture($this->request->getFiles('upload_blog_picture'));
 				if ($dest_image === false) {
-					$this->response->redirect('admin/blog/insert');
+					$this->response->redirect('admin/blog/create');
 				}
 			} else {
 				Message::set('error', 'uploaded_missing');
-				$this->response->redirect('admin/blog/insert');
+				$this->response->redirect('admin/blog/create');
 			}
 
 
@@ -99,43 +115,57 @@ if($this->request->checkUploadError('upload_blog_picture')){
 				$this->response->redirect('admin/blog');
 			} else {
 				Message::set('error' , 'unknown_error');
-				$this->response->redirect('admin/blog/insert');
+				$this->response->redirect('admin/blog/create');
 			}
-		}
+		}		
+	}
+
+	/**
+	 * Blog adatok módosítása oldal
+	 */
+	public function edit($id)
+	{
+		Auth::hasAccess('blog.edit', $this->request->get_httpreferer());
+		
+		$id = (int)$id;
 
 		$view = new View();
-		
+
 		$data['title'] = 'Admin blog oldal';
 		$data['description'] = 'Admin blog oldal description';
-		$data['category_list'] = $this->blogcategory_model->selectCategory(null, LANG);
+		$data['category_list'] = $this->blogcategory_model->findCategory(null, LANG);
 
-		$view->setHelper(array('html_admin_helper'));
+		$blog = $this->blog_model->findBlog($id);
+		// átalakítjuk a kapott két nyelvi tömböt egy tömbre amiben benne van minden nyelv
+		$blog = DI::get('arr_helper')->convertMultilanguage($blog, array('title', 'body', 'category_name'), 'id', 'language_code');
+		$data['blog'] = $blog[0];
+
+		$view->setHelper(array('html_admin_helper'));		
 		$view->add_links(array('bootstrap-fileinput', 'ckeditor', 'vframework'));
-		$view->add_link('js', ADMIN_JS . 'pages/blog_insert.js');
-		$view->render('blog/tpl_blog_insert', $data);
+		$view->add_link('js', ADMIN_JS . 'pages/blog_update.js');
+		$view->render('blog/tpl_blog_update', $data);		
 	}
+
     
     /**
      * Blog bejegyzés módosítása
      */
 	public function update($id)
 	{
-		Auth::hasAccess('blog.update', $this->request->get_httpreferer());
-
-		$id = (int)$id;
-
 		if( $this->request->is_post() ){
+
+			$id = (int)$id;
 
 			// fájl feltöltési hiba ellenőrzése
 			if($this->request->checkUploadError('upload_blog_picture')){
 				Message::set('error', $this->request->getFilesError('upload_blog_picture'));
-				$this->response->redirect('admin/blog/update/' . $id);				
+				$this->response->redirect('admin/blog/edit/' . $id);				
 			}
 			// kép feltöltése (ellenőrizzük, hogy van-e feltöltött kép)
 			if($this->request->hasFiles('upload_blog_picture')) {
 				$dest_image = $this->_uploadPicture($this->request->getFiles('upload_blog_picture'));
 				if($dest_image === false) {
-					$this->response->redirect('admin/blog/update/' . $id);
+					$this->response->redirect('admin/blog/edit/' . $id);
 				}
 			}
 
@@ -191,26 +221,11 @@ if($this->request->checkUploadError('upload_blog_picture')){
 				$this->response->redirect('admin/blog');
 			} else {
 				Message::set('error', 'unknown_error');
-				$this->response->redirect('admin/blog/update/' . $id);
+				$this->response->redirect('admin/blog/edit/' . $id);
 			}	
 
 		}
 
-		$view = new View();
-
-		$data['title'] = 'Admin blog oldal';
-		$data['description'] = 'Admin blog oldal description';
-		$data['category_list'] = $this->blogcategory_model->selectCategory(null, LANG);
-
-		$blog = $this->blog_model->selectBlog($id);
-		// átalakítjuk a kapott két nyelvi tömböt egy tömbre amiben benne van minden nyelv
-		$blog = DI::get('arr_helper')->convertMultilanguage($blog, array('title', 'body', 'category_name'), 'id', 'language_code');
-		$data['blog'] = $blog[0];
-		
-		$view->setHelper(array('html_admin_helper'));		
-		$view->add_links(array('bootstrap-fileinput', 'ckeditor', 'vframework'));
-		$view->add_link('js', ADMIN_JS . 'pages/blog_update.js');
-		$view->render('blog/tpl_blog_update', $data);
 	}  
 
 
@@ -243,7 +258,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 				//átalakítjuk a integer-ré a kapott adatot
 				$id = (int)$id;
 				//lekérdezzük a törlendő blog képének a nevét, hogy törölhessük a szerverről
-				$photo_name = $this->blog_model->selectPicture($id);
+				$photo_name = $this->blog_model->findPicture($id);
 				//blog törlése	
 				$result = $this->blog_model->delete($id);
 				// ha a törlési sql parancsban nincs hiba
@@ -286,13 +301,9 @@ if($this->request->checkUploadError('upload_blog_picture')){
 		$data['description'] = 'Admin blog oldal description';	
 		$data['category_counter'] = $this->blog_model->categoryCounter();
 		// minden kategória, minden nyelven
-		$data['all_blog_category'] = $this->blogcategory_model->selectCategory();
+		$data['all_blog_category'] = $this->blogcategory_model->findCategory();
 		$data['all_blog_category'] = DI::get('arr_helper')->convertMultilanguage($data['all_blog_category'], array('category_name'), 'id', 'language_code');
-//var_dump($data['all_blog_category']);die;
 
-		//$data['langs'] = Config::get('allowed_languages');
-
-//$view->debug(true);			
 		$view->add_links(array('datatable', 'bootbox', 'vframework'));
 		$view->add_link('js', ADMIN_JS . 'pages/blog_category.js');
 		$view->render('blog/tpl_blog_category', $data);	
@@ -323,7 +334,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 
 		// kategóriák lekérdezése (annak ellenőrzéséhez, hogy már létezik-e ilyen kategória)
 		// csak a "primary" nyelvnél nézi	
-			$existing_categorys = $this->blogcategory_model->selectCategory(null, LANG);
+			$existing_categorys = $this->blogcategory_model->findCategory(null, LANG);
 
 			// bejárjuk a kategória neveket és összehasonlítjuk az új névvel (kisbetűssé alakítjuk, hogy ne számítson a nagybetű-kisbetű eltérés)
 			foreach($existing_categorys as $value) {
@@ -402,7 +413,7 @@ if($this->request->checkUploadError('upload_blog_picture')){
 						if ($delete_category_delete_items) {
 
 						// lekérdezzük a törlendő képek nevét
-							$photo_names_temp = $this->blog_model->selectPictureWhereCategory($id);
+							$photo_names_temp = $this->blog_model->findPictureWhereCategory($id);
 
 							$photo_names = array();
 							foreach ($photo_names_temp as $key => $value) {

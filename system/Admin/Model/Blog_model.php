@@ -1,6 +1,5 @@
 <?php
 namespace System\Admin\Model;
-
 use System\Core\AdminModel;
 
 class Blog_model extends AdminModel {
@@ -19,7 +18,7 @@ class Blog_model extends AdminModel {
 	 *	@param $id Integer 
 	 *	@param $langcode string 
 	 */
-	public function selectBlog($id = null, $langcode = null)
+	public function findBlog($id = null, $langcode = null)
 	{
 		$this->query->set_table('blog');
 		$this->query->set_columns(
@@ -112,7 +111,7 @@ class Blog_model extends AdminModel {
 	/**
 	 * Egy bloghoz tartozó kép nevét adja vissza
 	 */
-	public function selectPicture($id)
+	public function findPicture($id)
 	{
 		$this->query->set_columns(array('picture'));
 		$this->query->set_where('id', '=', $id);
@@ -121,9 +120,9 @@ class Blog_model extends AdminModel {
 	}
 
 	/**
-	 * Visszaadja a blog képek nevét, ahol a blog_category = a $category paraméterrel
+	 * Visszaadja a képek nevét, ahol a kategória = a $category paraméterrel
 	 */
-	public function selectPictureWhereCategory($category)
+	public function findPictureWhereCategory($category)
 	{
 		$this->query->set_columns(array('picture'));
 		$this->query->set_where('category_id', '=', $category);

@@ -35,7 +35,7 @@ use System\Libs\Auth;
 						<div class="caption"><i class="fa fa-cogs"></i>Blogok kezelése</div>
 						
 							<div class="actions">
-								<a href="admin/blog/insert" class="btn blue btn-sm"><i class="fa fa-plus"></i> Új bejegyzés</a>
+								<a href="admin/blog/create" class="btn blue btn-sm"><i class="fa fa-plus"></i> Új bejegyzés</a>
 								<button class="btn red btn-sm" id="delete_group" type="button"><i class="fa fa-trash"></i> Csoportos törlés</button>
 								<div class="btn-group">
 									<a data-toggle="dropdown" href="#" class="btn btn-sm default">
@@ -73,7 +73,7 @@ use System\Libs\Auth;
 							<?php foreach($all_blog as $blog) { ?>
 								<tr class="odd gradeX">
 									<td>
-										<?php if (1) { ?>
+										<?php if (Auth::hasAccess('blog.delete')) { ?>
 										<input type="checkbox" class="checkboxes" name="blog_id_<?php echo $blog['id'];?>" value="<?php echo $blog['id'];?>"/>
 										<?php } ?>	
 									</td>
@@ -94,8 +94,8 @@ use System\Libs\Auth;
 											<div class="btn-group">
 												<a class="btn btn-sm grey-steel" href="#" data-toggle="dropdown"><i class="fa fa-cogs"></i></a>
 												<ul class="dropdown-menu pull-right">
-													<?php if (Auth::hasAccess('blog.update')) { ?>	
-														<li><a href="admin/blog/update/<?php echo $blog['id'];?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
+													<?php if (Auth::hasAccess('blog.edit')) { ?>	
+														<li><a href="admin/blog/edit/<?php echo $blog['id'];?>"><i class="fa fa-pencil"></i> Szerkeszt</a></li>
 													<?php } ?>
 													<?php if (Auth::hasAccess('blog.delete')) { ?>
 														<li><a class="delete_item" data-id="<?php echo $blog['id']; ?>"><i class="fa fa-trash"></i> Töröl</a></li>

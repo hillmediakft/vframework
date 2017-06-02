@@ -27,7 +27,7 @@
 			<!-- echo out the system feedback (error and success messages) -->
 			<?php $this->renderFeedbackMessages(); ?>			
 
-			<form action="" method="POST" id="update_blog_form" enctype="multipart/form-data">	
+			<form action="admin/blog/update/<?php echo $blog['id']; ?>" method="POST" id="update_blog_form" enctype="multipart/form-data">	
 				<!-- BEGIN EXAMPLE TABLE PORTLET-->
 				<div class="portlet">
 

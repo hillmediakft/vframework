@@ -19,7 +19,7 @@ class BlogCategory_model extends AdminModel {
 	 *	@param integer 	$id  
 	 *	@param string 	$lang  - csak a megadott nyelvű elemet adja vissza
 	 */
-	public function selectCategory($id = null, $lang = null)
+	public function findCategory($id = null, $lang = null)
 	{
 		$this->query->set_columns(
 			'blog_category_translation.category_id AS id,
