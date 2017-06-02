@@ -161,16 +161,19 @@ class Router
     public function url($method, $fn, $params = array())
     {
         $method = strtoupper($method);
+        $hit = false;
         foreach ($this->afterRoutes[$method] as $route) {
             if ($fn == $route['fn']) {
-                
+                // ha van találat
+                $hit = true;
                 foreach ($params as $key => $value) {
                     $route['pattern'] = str_replace(':' . $key, $value, $route['pattern']);
                 }
-
-
                 return trim($route['pattern'], '/');
             }
+        }
+        if(!$hit){
+            throw new \Exception('Ehhez a route-hoz nem tartozik url: ' . $method . ' / ' . $fn);
         }
     }
 
