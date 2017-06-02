@@ -256,8 +256,8 @@
                         <span class="title">Bejegyzések</span>
                     </a>
                 </li>
-                <li class="nav-item <?php $this->menu_active('blog', 'insert'); ?> ">
-                    <a href="admin/blog/insert" class="nav-link ">
+                <li class="nav-item <?php $this->menu_active('blog', 'create'); ?> ">
+                    <a href="admin/blog/create" class="nav-link ">
                         <span class="title">Új bejegyzés</span>
                     </a>
                 </li>
@@ -268,6 +268,33 @@
                 </li>
             </ul>
         </li>
+
+        <!-- GYAKORI KÉRDÉSEK -->
+        <li class="nav-item <?php $this->menu_active('gyik'); ?>">
+            <a href="javascript:;" class="nav-link nav-toggle">
+                <i class="fa fa-question-circle"></i>
+                <span class="title">Gyakori kérdések</span>
+                <span class="arrow"></span>
+            </a>
+            <ul class="sub-menu">
+                <li class="nav-item <?php $this->menu_active('gyik', 'index'); ?>">
+                    <a href="admin/gyik" class="nav-link">
+                        <span class="title">GYIK listája</span>
+                    </a>
+                </li>
+                <li class="nav-item <?php $this->menu_active('gyik', 'create'); ?>">
+                    <a href="admin/gyik/create" class="nav-link">
+                        <span class="title">Új kérdés hozzáadása</span>
+                    </a>
+                </li>
+                <li class="nav-item <?php $this->menu_active('gyik', 'category'); ?>">
+                    <a href="admin/gyik/category" class="nav-link">
+                        <span class="title">GYIK kategóriák</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
     <!-- END MENU ITEMS -->
 
     </ul>
