@@ -29,7 +29,8 @@ class Client extends AdminController {
         $data['description'] = 'Partnereink description';
         $data['all_client'] = $this->client_model->allClient();
 //$view->debug(true);
-        $view->add_links(array('select2', 'datatable', 'bootbox', 'vframework', 'clients'));
+        $view->add_links(array('select2', 'datatable', 'bootbox', 'vframework'));
+        $view->add_link('js', ADMIN_JS . 'pages/clients.js');
         $view->render('clients/tpl_clients', $data);
     }
 
@@ -80,7 +81,8 @@ class Client extends AdminController {
         $data['title'] = 'Új partner oldal';
         $data['description'] = 'Új partner description';
 //$view->debug(true);
-        $view->add_links(array('select2', 'bootstrap-fileupload', 'croppic', 'vframework', 'client_insert'));
+        $view->add_links(array('select2', 'bootstrap-fileupload', 'croppic', 'vframework'));
+        $view->add_link('js', ADMIN_JS . 'pages/client_insert.js');
         $view->render('clients/tpl_client_insert', $data);
     }
 
@@ -195,7 +197,8 @@ class Client extends AdminController {
         $data['description'] = 'Partner módosítása description';
         $data['client'] = $this->client_model->oneClient($id);
 
-        $view->add_links(array('bootstrap-fileupload', 'croppic', 'vframework', 'client_update'));
+        $view->add_links(array('bootstrap-fileupload', 'croppic', 'vframework'));
+        $view->add_link('js', ADMIN_JS . 'pages/client_update.js');
         $view->render('clients/tpl_client_update', $data);
     }
 
