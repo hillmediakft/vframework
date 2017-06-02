@@ -175,13 +175,29 @@ class Application {
 
                 // blog	
                 $router->get('/blog', 'blog@index');
+                $router->get('/blog/create', 'blog@create');
+                $router->post('/blog/store', 'blog@store');
+                $router->get('/blog/edit/:id', 'blog@edit');
+                $router->post('/blog/update/:id', 'blog@update');
                 $router->post('/blog/delete', 'blog@delete');
-                $router->match('GET|POST', '/blog/insert', 'blog@insert');
-                $router->match('GET|POST', '/blog/update/:id', 'blog@update', array('id'));
+                $router->post('/blog/change_status', 'blog@change_status');
+                // blog kategóriák
                 $router->get('/blog/category', 'blog@category');
                 $router->post('/blog/category_insert_update', 'blog@category_insert_update');
                 $router->post('/blog/category_delete', 'blog@category_delete');
-                $router->post('/blog/change_status', 'blog@change_status');
+
+                // GYIK 
+                $router->get('/gyik', 'gyik@index');
+                $router->get('/gyik/create', 'gyik@create');
+                $router->post('/gyik/store', 'gyik@store');
+                $router->get('/gyik/edit/:id', 'gyik@edit');
+                $router->post('/gyik/update/:id', 'gyik@update');
+                $router->post('/gyik/delete', 'gyik@delete');
+                $router->post('/gyik/change_status', 'gyik@change_status');
+                // GYIK kategóriák
+                $router->get('/gyik/category', 'gyik@category');
+                $router->post('/gyik/category_insert_update', 'gyik@category_insert_update');
+                $router->post('/gyik/category_delete', 'gyik@category_delete');
 
                 //documents
                 $router->get('/documents', 'documents@index');
