@@ -128,12 +128,15 @@ $link['autocomplete'] = array(
 	'js' => ADMIN_ASSETS . 'plugins/autocomplete/src/jquery.autocomplete.js'
 );
 
-/*----------------- OLDALSPECIFIKUS LINKEK --------------------*/
+// Google Maps
+$link['google-maps'] = array(
+	'js' => array(
+		'https://maps.googleapis.com/maps/api/js?key=AIzaSyDsyHr_ERbn8TBSwHRB1mWk28VDByR-oL0',
+		ADMIN_ASSETS . 'plugins/gmaps/gmaps.min.js'
+	) 
+);
 
-// partnerek
-$link['clients'] = array('js' => ADMIN_JS . 'pages/clients.js');
-$link['client_insert'] = array('js' => ADMIN_JS . 'pages/client_insert.js');
-$link['client_update'] = array('js' => ADMIN_JS . 'pages/client_update.js');
+/*----------------- OLDALSPECIFIKUS LINKEK --------------------*/
 
 // hírlevél
 $link['newsletter_eventsource'] = array('js' => ADMIN_JS . 'pages/newsletter_eventsource.js');
@@ -152,14 +155,6 @@ $link['photo_category_update'] = array('js' => ADMIN_JS . 'pages/photo_category_
 $link['testimonials'] = array('js' => ADMIN_JS . 'pages/testimonials.js');
 $link['testimonial_insert'] = array('js' => ADMIN_JS . 'pages/testimonial_insert.js');
 $link['testimonial_update'] = array('js' => ADMIN_JS . 'pages/testimonial_update.js');
-
-// Google Maps
-$link['google-maps'] = array(
-	'js' => array(
-		'https://maps.googleapis.com/maps/api/js?key=AIzaSyDsyHr_ERbn8TBSwHRB1mWk28VDByR-oL0',
-		ADMIN_ASSETS . 'plugins/gmaps/gmaps.min.js'
-	) 
-);
 
 // documents
 $link['documents'] = array('js' => ADMIN_JS . 'pages/documents.js');
