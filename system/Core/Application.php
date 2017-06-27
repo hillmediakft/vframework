@@ -173,6 +173,12 @@ class Application {
                 $router->match('GET|POST', '/newsletter/insert', 'newsletter@insert');
                 $router->match('GET|POST', '/newsletter/update/:id', 'newsletter@update', array('id'));
 
+                // Címlék (terms)
+                $router->get('/terms', 'Terms@index');
+                $router->post('/terms/insert_update', 'Terms@insert_update');
+                $router->post('/terms/delete', 'Terms@delete');
+
+
                 // blog	
                 $router->get('/blog', 'blog@index');
                 $router->get('/blog/create', 'blog@create');

@@ -7,12 +7,18 @@ use System\Libs\Auth;
 use System\Libs\Message;
 use System\Libs\Config;
 use System\Libs\Uploader;
+use System\Libs\EventManager;
 
 class Blog extends AdminController {
+
+	private $content_type_id;
 
 	function __construct()
 	{
 		parent::__construct();
+
+		$this->content_type_id = Config::get('content_types.blog');
+
 		$this->loadModel('blog_model');
 		$this->loadModel('blog_translation_model');
 		$this->loadModel('blogcategory_model');
@@ -43,11 +49,17 @@ class Blog extends AdminController {
 
 		$data['title'] = 'Admin blog oldal';
 		$data['description'] = 'Admin blog oldal description';
+		
+		// kategóriák lekérdezése
 		$data['category_list'] = $this->blogcategory_model->findCategory(null, LANG);
+
+		// címkék lekérdezése
+		$this->loadModel('terms_model');
+		$data['terms'] = $this->terms_model->findTerms(null, LANG);
 
 		$view = new View();
 		$view->setHelper(array('html_admin_helper'));
-		$view->add_links(array('bootstrap-fileinput', 'ckeditor', 'vframework'));
+		$view->add_links(array('bootstrap-fileinput', 'ckeditor', 'select2', 'vframework'));
 		$view->add_link('js', ADMIN_JS . 'pages/blog_insert.js');
 		$view->render('blog/tpl_blog_insert', $data);
 	}
@@ -111,6 +123,12 @@ if($this->request->checkUploadError('upload_blog_picture')){
 					$this->blog_translation_model->insert($translation_data);
 				}
 
+// taxonomy
+$terms = ($this->request->has_post('tags')) ? $this->request->get_post('tags') : array();
+if (!empty($terms)) {
+	EventManager::trigger('insert_taxonomy', array($last_insert_id, $terms, $this->content_type_id));
+}
+
 				Message::set('success', 'Blog hozzáadása sikerült!');
 				$this->response->redirect('admin/blog');
 			} else {
@@ -140,8 +158,15 @@ if($this->request->checkUploadError('upload_blog_picture')){
 		$blog = DI::get('arr_helper')->convertMultilanguage($blog, array('title', 'body', 'category_name'), 'id', 'language_code');
 		$data['blog'] = $blog[0];
 
+		// Címkék
+        $this->loadModel('terms_model');
+		$data['terms'] = $this->terms_model->findTerms(null, LANG);
+        $this->loadModel('taxonomy_model');
+        $data['terms_by_content_id'] = DI::get('arr_helper')->convertArrayToOneDimensional($this->taxonomy_model->getTermsByContentId($id));
+
+
 		$view->setHelper(array('html_admin_helper'));		
-		$view->add_links(array('bootstrap-fileinput', 'ckeditor', 'vframework'));
+		$view->add_links(array('bootstrap-fileinput', 'ckeditor', 'select2', 'vframework'));
 		$view->add_link('js', ADMIN_JS . 'pages/blog_update.js');
 		$view->render('blog/tpl_blog_update', $data);		
 	}
@@ -216,6 +241,13 @@ if($this->request->checkUploadError('upload_blog_picture')){
 	                //régi képek törlése
 	            	$file_helper->delete(array($old_img_path, $old_thumb_path));
 	            }
+
+// taxonomy
+$terms = ($this->request->has_post('tags')) ? $this->request->get_post('tags') : array();
+EventManager::trigger('update_taxonomy', array($id, $terms, $this->content_type_id));
+
+
+
 
 				Message::set('success', 'Bejegyzés módosítása sikerült!');
 				$this->response->redirect('admin/blog');

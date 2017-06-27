@@ -17,6 +17,15 @@ $config['layout'] = array(
     'default_admin' => 'tpl_layout'
 );
 
+// taxonomy rendszer tartalom id-k
+$config['content_types'] = array(
+    "blog" => 1,
+    "oldal" => 2,
+    "kep" => 3,
+    "szolgaltatas" => 4,
+    "gyik" => 5
+);
+
 $config['email'] = array(
     'password_reset' => array(
         'admin_url' => BASE_URL . 'admin/login/verifypasswordreset',

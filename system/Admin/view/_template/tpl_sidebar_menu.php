@@ -185,6 +185,14 @@
             </a>
         </li>
 
+        <!-- TARTALOM CÍMKÉZÉSE -->
+        <li class="nav-item <?php $this->menu_active('terms'); ?> ">
+            <a href="admin/terms" class="nav-link">
+                <i class="fa fa-tags"></i>
+                <span class="title">Tartalom címkézése</span>
+            </a>
+        </li>
+
         <!-- ALAP BEÁLLÍTÁSOK -->
         <li class="nav-item <?php $this->menu_active('settings'); ?> ">
             <a href="javascript:;" class="nav-link nav-toggle">

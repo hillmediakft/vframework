@@ -34,12 +34,21 @@ var Blog_update = function () {
 
     };
 
+    /**
+     * Címkék kiválasztása (selec2-vel)
+     */
+    var multipleSelect = function () {
+        $(".select2-multiple").select2({
+            theme: "classic"
+        });
+    }
 
     return {
         //main function to initiate the module
         init: function () {
 			send_form();
 			ckeditorInit();
+			multipleSelect();
 			vframework.hideAlert();
         }
     };

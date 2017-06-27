@@ -111,6 +111,17 @@
                                     </div>
                                 </div>
 
+                                <!-- CÍMKÉK -->	
+                                <h3 class="form-section">Címkék</h3>	                                        
+                                <div class="form-group">
+                                    <select name="tags[]" id="tags" class="form-control input-xlarge select2-multiple" multiple>
+                                        <?php foreach ($terms as $term) { ?>
+                                            <option value="<?php echo $term['id']; ?>" <?php echo (in_array($term['id'], $terms_by_content_id)) ? 'selected' : ''; ?>><?php echo $term['text']; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div> 
+
+
 								<!-- régi kép elérési útja-->
                             	<input type="hidden" name="old_img" id="old_img" value="<?php echo $blog['picture']; ?>">
 							</div>

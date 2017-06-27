@@ -134,5 +134,29 @@ class Arr
         return $arr;
     } 
 
+    /*
+     * array (size=2)
+     * 0 => array (size=1)
+     *      'term_id' => string '3' (length=1)
+     * 1 => array (size=1)
+     *      'term_id' => string '4' (length=1)
+     * eredmény. array('3', '4') 
+     * @param   array az átalakítandó tömb
+     * @return  array átalakított tömb
+     */
+
+    public function convertArrayToOneDimensional($array)
+    {
+        $newArray = array();
+        if(!empty($array)) {
+            foreach ($array as $subArray) {
+                foreach ($subArray as $val) {
+                    $newArray[] = $val;
+                }
+            }
+        }
+        return $newArray;
+    }
+
 }
 ?>
