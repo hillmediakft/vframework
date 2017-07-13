@@ -280,7 +280,9 @@ EventManager::trigger('update_taxonomy', array($id, $terms, $this->content_type_
 			
 			// a sikeres törlések számát tárolja
 			$success_counter = 0;
-			
+			// törölt elemek id-it tárolja
+			$deleted_record_id = array();
+
 			// helperek példányosítása
 			$file_helper = DI::get('file_helper');
 			$url_helper = DI::get('url_helper');
@@ -304,6 +306,7 @@ EventManager::trigger('update_taxonomy', array($id, $terms, $this->content_type_
 					}				
 					//sikeres törlés
 					$success_counter += $result;
+					$deleted_record_id[] = $id;
 				}
 				else {
 					// ha a törlési sql parancsban hiba van
@@ -313,6 +316,11 @@ EventManager::trigger('update_taxonomy', array($id, $terms, $this->content_type_
 		            ));
 				}
 			}
+
+// taxonomy törlés
+if (!empty($deleted_record_id)) {
+    EventManager::trigger('delete_taxonomy', array($deleted_record_id, $this->content_type_id));
+}			
 
             $this->response->json(array(
                 'status' => 'success',
