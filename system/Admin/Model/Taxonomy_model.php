@@ -77,16 +77,15 @@ class Taxonomy_model extends AdminModel {
 
     /**
      * Lekérdezi a content id-hez tartozó term id-ket
-     * 	
-     * @return Array (az összes slide minden adata a "slider_order" szerint rendezve)
      */
     public function deleteByContentTypeAndId($content_id, $content_type_id)
     {
         $ids = $this->getTermsToDelete($content_id, $content_type_id);
-        $ids = DI::get('arr_helper')->convertArrayToOneDimensional($ids);
-        
-        $this->query->set_where('id', 'in', $ids);
-        $this->query->delete();
+        if (!empty($ids)) {
+            $ids = DI::get('arr_helper')->convertArrayToOneDimensional($ids);
+            $this->query->set_where('id', 'in', $ids);
+            $this->query->delete();
+        }        
 
 /*
         foreach ($ids as $id) {
