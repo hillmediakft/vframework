@@ -114,7 +114,7 @@ var EditGyik = function () {
             handleValidation();
             hideAlert();
             ckeditorInit();
-            //multipleSelect();
+            multipleSelect();
         }
     };
 

@@ -107,18 +107,6 @@
                                             <?php } ?>
                                         </select>
                                     </div>
-                                        
-                                    <!-- CÍMKÉK -->	
-                                    <!-- 
-                                    <h3 class="form-section">Címkék</h3>                                            
-                                    <div class="form-group">
-                                        <select name="tags[]" id="tags" class="form-control input-xlarge select2-multiple" multiple>
-                                            <?php //foreach ($terms as $term) { ?>
-                                                <option value="<?php //echo $term['id']; ?>"><?php //echo $term['term']; ?></option>
-                                            <?php //} ?>
-                                        </select>
-                                    </div>                                      
-                                     -->
 
                                     <!-- STÁTUSZ -->	
                                     <div class="form-group">
@@ -127,7 +115,18 @@
                                             <option value="0">Inaktív</option>
                                             <option value="1" selected>Aktív</option>
                                         </select>
-                                    </div>	
+                                    </div>
+
+                                    <!-- CÍMKÉK --> 
+                                    <h3 class="form-section">Címkék</h3>                                            
+                                    <div class="form-group">
+                                        <select name="tags[]" id="tags" class="form-control input-xlarge select2-multiple" multiple>
+                                            <?php foreach ($terms as $term) { ?>
+                                                <option value="<?php echo $term['id']; ?>"><?php echo $term['text']; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>                                      
+
                                 </div>
                             </div>
 

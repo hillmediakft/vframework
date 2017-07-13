@@ -113,7 +113,7 @@ var NewGyik = function () {
             handleValidation();
             hideAlert();
             ckeditorInit();
-            //multipleSelect();
+            multipleSelect();
         }
     };
 

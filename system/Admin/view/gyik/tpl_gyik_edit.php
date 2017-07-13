@@ -80,7 +80,7 @@
                                                     <!-- VÁLASZ --> 
                                                     <div class="form-group">
                                                         <label for="description_<?php echo $lang; ?>" class="control-label">Válasz (<?php echo $lang; ?>)</label>
-                                                        <textarea name="description_<?php echo $lang; ?>" id="description" placeholder="" class="form-control input-xlarge" rows="10"><?php echo $gyik['title_' . $lang] ?></textarea>
+                                                        <textarea name="description_<?php echo $lang; ?>" id="description" placeholder="" class="form-control input-xlarge" rows="10"><?php echo $gyik['description_' . $lang] ?></textarea>
                                                     </div>
 
                                                 </div>
@@ -101,19 +101,6 @@
                                             <?php } ?>
                                         </select>
                                     </div>
-                                    
-                                    
-                                    <!-- CÍMKÉK -->
-                                    <!--
-                                    <h3 class="form-section">Címkék</h3>                                            
-                                    <div class="form-group">
-                                        <select name="tags[]" id="tags" class="form-control input-xlarge select2-multiple" multiple>
-                                            <?php //foreach ($terms as $term) { ?>
-                                                <option value="<?php //echo $term['id']; ?>" <?php //echo (in_array($term['id'], $terms_by_content_id)) ? 'selected' : ''; ?>><?php //echo $term['term']; ?></option>
-                                            <?php //} ?>
-                                        </select>
-                                    </div>                                      
-                                    -->
 
                                     <!-- TERMÉK STÁTUSZ -->	
                                     <div class="form-group">
@@ -123,6 +110,16 @@
                                             <option value="1" <?php echo ($gyik['status'] == 1) ? 'selected' : ''; ?>>Aktív</option>
                                         </select>
                                     </div>	
+
+                                    <!-- CÍMKÉK -->
+                                    <h3 class="form-section">Címkék</h3>                                            
+                                    <div class="form-group">
+                                        <select name="tags[]" id="tags" class="form-control input-xlarge select2-multiple" multiple>
+                                            <?php foreach ($terms as $term) { ?>
+                                                <option value="<?php echo $term['id']; ?>" <?php echo (in_array($term['id'], $terms_by_content_id)) ? 'selected' : ''; ?>><?php echo $term['text']; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>                                      
 
                                 </div>
                             </div>

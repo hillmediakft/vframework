@@ -6,12 +6,18 @@ use System\Libs\DI;
 use System\Libs\Auth;
 use System\Libs\Message;
 use System\Libs\Config;
+use System\Libs\EventManager;
 
 class Gyik extends AdminController {
+
+	private $content_type_id;	
 
 	function __construct()
 	{
 		parent::__construct();
+
+		$this->content_type_id = Config::get('content_types.gyik');
+
 		$this->loadModel('gyik_model');
 		$this->loadModel('gyik_translation_model');
 		$this->loadModel('gyikcategory_model');
@@ -41,6 +47,10 @@ class Gyik extends AdminController {
 		$data['title'] = 'Admin gyik oldal';
 		$data['description'] = 'Admin gyik oldal description';
 		$data['category_list'] = $this->gyikcategory_model->findCategory(null, LANG);
+
+		// címkék lekérdezése
+		$this->loadModel('terms_model');
+		$data['terms'] = $this->terms_model->findTerms(null, LANG);
 
 		$view = new View();
 		$view->add_links(array('bootbox', 'ckeditor', 'validation', 'select2'));
@@ -76,6 +86,12 @@ class Gyik extends AdminController {
 					$this->gyik_translation_model->insert($translation_data);
 				}
 
+// taxonomy
+$terms = ($this->request->has_post('tags')) ? $this->request->get_post('tags') : array();
+if (!empty($terms)) {
+	EventManager::trigger('insert_taxonomy', array($last_insert_id, $terms, $this->content_type_id));
+}
+
 				Message::set('success', 'GYIK hozzáadva!');
 				$this->response->redirect('admin/gyik');
 			} else {
@@ -103,6 +119,12 @@ class Gyik extends AdminController {
 		$gyik = DI::get('arr_helper')->convertMultilanguage($gyik, array('title', 'description', 'category_name'));
 		$data['gyik'] = $gyik[0];
 
+		// Címkék
+        $this->loadModel('terms_model');
+		$data['terms'] = $this->terms_model->findTerms(null, LANG);
+        $this->loadModel('taxonomy_model');
+        $data['terms_by_content_id'] = DI::get('arr_helper')->convertArrayToOneDimensional($this->taxonomy_model->getTermsByContentId($id));
+
 		$view = new View();
 		$view->add_links(array('bootbox', 'ckeditor', 'validation', 'select2'));
 		$view->add_link('js', ADMIN_JS . 'pages/gyik_edit.js');
@@ -115,6 +137,8 @@ class Gyik extends AdminController {
      */
 	public function update($id)
 	{
+//var_dump($this->request->get_post());die;
+
 		if( $this->request->is_post() ){
 
 			$id = (int)$id;
@@ -150,6 +174,11 @@ class Gyik extends AdminController {
 
 				}
 
+// taxonomy
+$terms = ($this->request->has_post('tags')) ? $this->request->get_post('tags') : array();
+EventManager::trigger('update_taxonomy', array($id, $terms, $this->content_type_id));
+
+
 				Message::set('success', 'Bejegyzés módosítása sikerült!');
 				$this->response->redirect('admin/gyik');
 			} else {
@@ -179,6 +208,8 @@ class Gyik extends AdminController {
         	$id_arr = $this->request->get_post('item_id');
 			// a sikeres törlések számát tárolja
 			$success_counter = 0;
+			// törölt elemek id-it tárolja
+			$deleted_record_id = array();
 
 			// bejárjuk a $id_arr tömböt és minden elemen végrehajtjuk a törlést
 			foreach($id_arr as $id) {
@@ -190,6 +221,7 @@ class Gyik extends AdminController {
 				if($result !== false) {
 					//sikeres törlés
 					$success_counter += $result;
+					$deleted_record_id[] = $id;
 				}
 				else {
 					// ha a törlési sql parancsban hiba van
@@ -199,6 +231,11 @@ class Gyik extends AdminController {
 		            ));
 				}
 			}
+
+// taxonomy törlés
+if (!empty($deleted_record_id)) {
+    EventManager::trigger('delete_taxonomy', array($deleted_record_id, $this->content_type_id));
+}
 
             $this->response->json(array(
                 'status' => 'success',
