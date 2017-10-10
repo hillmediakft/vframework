@@ -55,7 +55,9 @@
 									
 									<!-- címkék -->
 									<?php foreach ($langs as $lang) { ?>
-										<td data-lang="<?php echo $lang ?>"><?php echo $term['text_' . $lang];?></td>
+										<td data-lang="<?php echo $lang ?>">
+											<?php echo isset($term['text_' . $lang]) ? $term['text_' . $lang] : '';?>
+										</td>
 									<?php } ?>
 
 									<!-- Szerkesztés -->

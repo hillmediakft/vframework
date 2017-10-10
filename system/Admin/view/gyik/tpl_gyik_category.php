@@ -61,7 +61,7 @@
 									
 									<!-- kategóriák -->
 									<?php foreach ($langs as $lang) { ?>
-										<td data-lang="<?php echo $lang ?>"><?php echo $category['category_name_' . $lang];?></td>
+										<td data-lang="<?php echo $lang ?>"><?php echo isset($category['category_name_' . $lang]) ? $category['category_name_' . $lang] : '';?></td>
 									<?php } ?>
 									
 									<!-- bejegyzések száma -->
