@@ -42,21 +42,5 @@ class Photo_gallery_translation_model extends AdminModel {
 		}
 		*/
 
-    /**
-     * Megadott nyelvi kódú elem létezését vizsgálja
-     *
-     * @param integer $photo_id
-     * @param string $langcode
-     * @return bool
-     */
-    public function checkLangVersion($photo_id, $langcode)
-    {
-    	$this->query->set_columns('COUNT(id) AS counter');
-    	$this->query->set_where('photo_id', '=', $photo_id);
-    	$this->query->set_where('language_code', '=', $langcode);
-    	$result = $this->query->select();
-    	return ($result[0]['counter'] == 1) ? true : false;
-    }
-
 }
 ?>

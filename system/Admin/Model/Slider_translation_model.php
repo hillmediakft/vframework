@@ -39,21 +39,5 @@ class Slider_translation_model extends AdminModel {
 			return $this->query->delete('slider_id', '=', $slider_id);
 		}
 
-    /**
-     * Megadott nyelvi kódú elem létezését vizsgálja
-     *
-     * @param integer $slider_id
-     * @param string $langcode
-     * @return bool
-     */
-    public function checkLangVersion($slider_id, $langcode)
-    {
-    	$this->query->set_columns('COUNT(id) AS counter');
-    	$this->query->set_where('slider_id', '=', $slider_id);
-    	$this->query->set_where('language_code', '=', $langcode);
-    	$result = $this->query->select();
-    	return ($result[0]['counter'] == 1) ? true : false;
-    }
-
 }
 ?>

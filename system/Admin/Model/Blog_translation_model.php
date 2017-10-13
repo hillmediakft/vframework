@@ -46,21 +46,5 @@ class Blog_translation_model extends AdminModel {
 		return $this->query->delete('category_id', '=', $category_id);
  	}
 
-    /**
-     * Megadott nyelvi kódú elem létezését vizsgálja
-     *
-     * @param integer $blog_id
-     * @param string $langcode
-     * @return bool
-     */
-    public function checkLangVersion($blog_id, $langcode)
-    {
-    	$this->query->set_columns('COUNT(id) AS counter');
-    	$this->query->set_where('blog_id', '=', $blog_id);
-    	$this->query->set_where('language_code', '=', $langcode);
-    	$result = $this->query->select();
-    	return ($result[0]['counter'] == 1) ? true : false;
-    }
-
 }
 ?>

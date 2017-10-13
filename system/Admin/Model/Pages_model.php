@@ -86,21 +86,5 @@ class Pages_model extends AdminModel {
 		return $this->query->update($translation_data);
 	}
 
-    /**
-     * Megadott nyelvi kódú elem létezését vizsgálja
-     *
-     * @param integer $page_id
-     * @param string $language_code
-     * @return bool
-     */
-    public function checkLangVersion($page_id, $language_code)
-    {
-    	$this->query->set_columns('COUNT(id) AS counter');
-    	$this->query->set_where('page_id', '=', $page_id);
-    	$this->query->set_where('language_code', '=', $language_code);
-    	$result = $this->query->select();
-    	return ($result[0]['counter'] == 1) ? true : false;
-    }
-		
 }
 ?>

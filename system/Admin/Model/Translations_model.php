@@ -59,22 +59,5 @@ class Translations_model extends AdminModel {
         return $this->query->update(array('text' => $text));
     }
 
-    /**
-     * Megadott nyelvi kódú elem létezését vizsgálja
-     *
-     * @param integer $translation_id
-     * @param string $langcode
-     * @return bool
-     */
-    public function checkLangVersion($translation_id, $langcode)
-    {
-    	$this->query->set_table('translations_content');
-        $this->query->set_columns('COUNT(id) AS counter');
-        $this->query->set_where('translation_id', '=', $translation_id);
-        $this->query->set_where('language_code', '=', $langcode);
-        $result = $this->query->select();
-        return ($result[0]['counter'] == 1) ? true : false;
-    }
-
 }
 ?>

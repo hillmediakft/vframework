@@ -45,21 +45,5 @@ class Gyik_translation_model extends AdminModel {
 		return $this->query->delete('category_id', '=', $category_id);
  	}
 
-    /**
-     * Megadott nyelvi kódú elem létezését vizsgálja
-     *
-     * @param integer $gyik_id
-     * @param string $langcode
-     * @return bool
-     */
-    public function checkLangVersion($gyik_id, $langcode)
-    {
-    	$this->query->set_columns('COUNT(id) AS counter');
-    	$this->query->set_where('gyik_id', '=', $gyik_id);
-    	$this->query->set_where('language_code', '=', $langcode);
-    	$result = $this->query->select();
-    	return ($result[0]['counter'] == 1) ? true : false;
-    }
-
 }
 ?>
