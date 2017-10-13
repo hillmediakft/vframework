@@ -223,7 +223,7 @@ if (!empty($terms)) {
 					
 					// új nyelv hozzáadása esetén meg kell nézni, hogy van-e már $lang nyelvi kódú elem ehhez az id-hez,
 					// mert ha nincs, akkor nem is fogja tudni update-elni, ezért update helyett insert kell					
-					if (!$this->blog_translation_model->checkLangVersion($id, $lang)) {
+					if (!$this->blog_translation_model->_checkLangVersion('blog_translation', 'blog_id', $id, $lang)) {
 						$translation_data['blog_id'] = $id; 
 						$translation_data['language_code'] = $lang; 
 						$this->blog_translation_model->insert($translation_data);
@@ -420,7 +420,14 @@ if (!empty($deleted_record_id)) {
 			else {
 				// kategória nevek beírása a blog_category_translation táblába
 				foreach ($new_names as $langcode => $name) {
-					$this->blogcategory_translation_model->update($id, $langcode, $name);
+					
+					// új nyelv hozzáadása esetén meg kell nézni, hogy van-e már $langcode nyelvi kódú elem ehhez az id-hez,
+					// mert ha nincs, akkor nem is fogja tudni update-elni, ezért update helyett insert kell					
+					if (!$this->blogcategory_translation_model->_checkLangVersion('blog_category_translation', 'category_id', $id, $langcode)) {
+						$this->blogcategory_translation_model->insert($id, $langcode, $name);
+					} else {
+						$this->blogcategory_translation_model->update($id, $langcode, $name);
+					}					
 				}
 
 				$this->response->json(array(

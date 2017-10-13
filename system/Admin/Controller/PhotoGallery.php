@@ -190,7 +190,7 @@ class PhotoGallery extends AdminController {
 				
 				// új nyelv hozzáadása esetén meg kell nézni, hogy van-e már $lang nyelvi kódú elem ehhez az id-hez,
 				// mert ha nincs, akkor nem is fogja tudni update-elni, ezért update helyett insert kell					
-				if (!$this->photo_gallery_translation_model->checkLangVersion($id, $lang)) {
+				if (!$this->photo_gallery_translation_model->_checkLangVersion('photo_gallery_translation', 'photo_id', $id, $lang)) {
 					$translation_data['photo_id'] = $id; 
 					$translation_data['language_code'] = $lang; 
 					$this->photo_gallery_translation_model->insert($translation_data);
@@ -432,7 +432,13 @@ class PhotoGallery extends AdminController {
 
 				// kategória nevek beírása a photo_category_translation táblába
 				foreach ($new_names as $langcode => $name) {
-					$this->PhotoCategory_translation_model->update($id, $langcode, $name);
+					// új nyelv hozzáadása esetén meg kell nézni, hogy van-e már $lang nyelvi kódú elem ehhez az id-hez,
+					// mert ha nincs, akkor nem is fogja tudni update-elni, ezért update helyett insert kell					
+					if (!$this->PhotoCategory_translation_model->_checkLangVersion('photo_category_translation', 'category_id', $id, $langcode)) {
+						$this->PhotoCategory_translation_model->insert($id, $langcode, $name);
+					} else {
+						$this->PhotoCategory_translation_model->update($id, $langcode, $name);
+					}
 				}
 
 				$this->response->json(array(

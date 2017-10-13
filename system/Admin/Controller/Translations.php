@@ -58,7 +58,7 @@ class Translations extends AdminController {
                 if (!empty($text)) {
 
                     // ha nincs még $language_code nyelvű elem az adatbázisban, akkor insert-et kell csinálni
-                    if (!$this->translations_model->checkLangVersion($id, $language_code)) {
+                    if (!$this->translations_model->_checkLangVersion('translations_content', 'translation_id', $id, $language_code)) {
                         $this->translations_model->insertContent(array(
                             'translation_id' => $id,
                             'language_code' => $language_code,

@@ -147,7 +147,7 @@ class Slider extends AdminController {
                         
                         // új nyelv hozzáadása esetén meg kell nézni, hogy van-e már $lang nyelvi kódú elem ehhez az id-hez,
                         // mert ha nincs, akkor nem is fogja tudni update-elni, ezért update helyett insert kell                    
-                        if (!$this->slider_translation_model->checkLangVersion($id, $lang)) {
+                        if (!$this->slider_translation_model->_checkLangVersion('slider_translation', 'slider_id', $id, $lang)) {
                             $translation_data['slider_id'] = $id; 
                             $translation_data['language_code'] = $lang; 
                             $this->slider_translation_model->insert($translation_data);

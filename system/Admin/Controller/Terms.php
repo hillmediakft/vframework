@@ -106,7 +106,7 @@ class Terms extends AdminController {
 
                     // új nyelv utólagos hozzáadása esetén meg kell nézni, hogy van-e már $langcode nyelvi kódú elem ehhez az id-hez,
                     // mert ha nincs, akkor nem is fogja tudni update-elni, ezért update helyett insert kell                    
-                    if (!$this->terms_translation_model->checkLangVersion($id, $langcode)) {
+                    if (!$this->terms_translation_model->_checkLangVersion('terms_translation', 'term_id', $id, $langcode)) {
                         $translation_data['term_id'] = $id;
                         $translation_data['language_code'] = $langcode;
                         $this->terms_translation_model->insertTranslation($translation_data);

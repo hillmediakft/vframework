@@ -120,7 +120,7 @@ class Content extends AdminController {
 					
 				// új nyelv hozzáadása esetén meg kell nézni, hogy van-e már $lang nyelvi kódú elem ehhez az id-hez,
 				// mert ha nincs, akkor nem is fogja tudni update-elni, ezért update helyett insert kell					
-				if (!$this->content_model->checkLangVersion($id, $lang)) {
+				if (!$this->content_model->_checkLangVersion('content_translation', 'content_id', $id, $lang)) {
 					$translation_data['content_id'] = $id; 
 					$translation_data['language_code'] = $lang; 
 					$this->content_model->insertContentTranslation($translation_data);

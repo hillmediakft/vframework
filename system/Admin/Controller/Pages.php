@@ -92,7 +92,17 @@ class Pages extends AdminController {
 					$translation_data['metatitle'] = $this->request->get_post('metatitle_' . $lang);
 					$translation_data['metadescription'] = $this->request->get_post('metadescription_' . $lang);
 					$translation_data['metakeywords'] = $this->request->get_post('metakeywords_' . $lang);
-					$this->pages_model->updateContent($id, $lang, $translation_data);
+					
+					// új nyelv hozzáadása esetén meg kell nézni, hogy van-e már $lang nyelvi kódú elem ehhez az id-hez,
+					// mert ha nincs, akkor nem is fogja tudni update-elni, ezért update helyett insert kell					
+					if (!$this->pages_model->_checkLangVersion('pages_translation', 'page_id', $id, $lang)) {
+						$translation_data['page_id'] = $id;
+						$translation_data['language_code'] = $lang;
+						$this->pages_model->insertContent($translation_data);
+					} else {
+						$this->pages_model->updateContent($id, $lang, $translation_data);
+					}
+
 				}
 				
 	            Message::set('success', 'page_update_success');
