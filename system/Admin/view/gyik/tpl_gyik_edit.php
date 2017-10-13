@@ -74,13 +74,13 @@
                                                     <!-- KÉRDÉS --> 
                                                     <div class="form-group">
                                                         <label for="title_<?php echo $lang; ?>" class="control-label">Kérdés (<?php echo $lang; ?>)<?php echo ($key == 0) ? '<span class="required">*</span>' : ''; ?></label>
-                                                        <input type="text" name="title_<?php echo $lang; ?>" id="title" placeholder="" class="form-control" value="<?php echo $gyik['title_' . $lang] ?>"/>
+                                                        <input type="text" name="title_<?php echo $lang; ?>" id="title" placeholder="" class="form-control" value="<?php echo isset($gyik['title_' . $lang]) ? $gyik['title_' . $lang] : ''; ?>"/>
                                                     </div>
 
                                                     <!-- VÁLASZ --> 
                                                     <div class="form-group">
                                                         <label for="description_<?php echo $lang; ?>" class="control-label">Válasz (<?php echo $lang; ?>)</label>
-                                                        <textarea name="description_<?php echo $lang; ?>" id="description" placeholder="" class="form-control input-xlarge" rows="10"><?php echo $gyik['description_' . $lang] ?></textarea>
+                                                        <textarea name="description_<?php echo $lang; ?>" id="description" placeholder="" class="form-control input-xlarge" rows="10"><?php echo isset($gyik['description_' . $lang]) ? $gyik['description_' . $lang] : ''; ?></textarea>
                                                     </div>
 
                                                 </div>
