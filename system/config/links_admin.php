@@ -144,13 +144,6 @@ $link['newsletter_insert'] = array('js' => ADMIN_JS . 'pages/newsletter_insert.j
 $link['newsletter_update'] = array('js' => ADMIN_JS . 'pages/newsletter_update.js');
 $link['newsletter_stats'] = array('js' => ADMIN_JS . 'pages/newsletter_stats.js');
 
-// fotó galéria
-$link['photo_gallery'] = array('js' => ADMIN_JS . 'pages/photo_gallery.js');
-$link['photo_gallery_insert_update'] = array('js' => ADMIN_JS . 'pages/photo_gallery_insert_update.js');
-$link['photo_category'] = array('js' => ADMIN_JS . 'pages/photo_category.js');
-$link['photo_category_insert'] = array('js' => ADMIN_JS . 'pages/photo_category_insert.js');
-$link['photo_category_update'] = array('js' => ADMIN_JS . 'pages/photo_category_update.js');
-
 // rólunk mondták
 $link['testimonials'] = array('js' => ADMIN_JS . 'pages/testimonials.js');
 $link['testimonial_insert'] = array('js' => ADMIN_JS . 'pages/testimonial_insert.js');
