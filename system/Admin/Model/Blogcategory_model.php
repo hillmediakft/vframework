@@ -24,11 +24,10 @@ class BlogCategory_model extends AdminModel {
 		$this->query->set_columns(
 			'blog_category_translation.category_id AS id,
 			blog_category_translation.category_name,
-			languages.code AS language_code'	
+			blog_category_translation.language_code'
 			);
 
 		$this->query->set_join('inner', 'blog_category_translation', 'blog_category.id', '=', 'blog_category_translation.category_id'); 
-		$this->query->set_join('inner', 'languages', 'blog_category_translation.language_code', '=', 'languages.code'); 
 
 		if (!is_null($lang)) {
 			$this->query->set_where('blog_category_translation.language_code', '=', $lang); 
