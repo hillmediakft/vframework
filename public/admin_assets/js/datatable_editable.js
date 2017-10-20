@@ -249,13 +249,15 @@ var DatatableEditable = function () {
 	                        var data = {};
 
 	                        // php feldolgozó url-je (insert, vagy update feldolgozó)
-	                        //var target_url;
+	                        var target_url;
 
 	                        // INSERT
 	                        // új elem létrehozásakor még nincs data-id attribútum, ezért az id-nek adunk egy null értéket, ebből a php feldolgozó tuni fogja, hogy insert lekérdezést kell csinálni
 	                        if (typeof id === 'undefined') {
 	                            id = null;
 	                        
+	                            target_url = setup.urlInsert;
+
 	                            var langs = $('html').attr('data-langs');
 	                            var langs_array = langs.split(",");
 
@@ -279,6 +281,8 @@ var DatatableEditable = function () {
 	                        // UPDATE    
 	                        } else {
 	                            
+	                        	target_url = setup.urlUpdate;
+
 	                            // bejárjuk az input elemeket, és az value attribútum értékét berakjuk a data objektumba vagy tömbbe
 	                            $.each(reference.closest('tr').find('input'), function(index, val) {
 	                                var langcode = $(val).parents('td').attr('data-lang');
@@ -293,7 +297,7 @@ var DatatableEditable = function () {
 	                                id: id,
 	                                data: data
 	                            },
-	                            url: setup.urlInsertUpdate,
+	                            url: target_url,
 	                            dataType: "json",
 	                            beforeSend: function () {
 	                                App.blockUI({
