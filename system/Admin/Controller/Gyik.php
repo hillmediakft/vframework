@@ -260,6 +260,7 @@ if (!empty($deleted_record_id)) {
 		$data['all_gyik_category'] = DI::get('arr_helper')->convertMultilanguage($data['all_gyik_category'], array('category_name'), 'id', 'language_code');
 
 		$view->add_links(array('datatable', 'bootbox', 'vframework'));
+		$view->add_link('js', ADMIN_JS . 'datatable_editable.js');
 		$view->add_link('js', ADMIN_JS . 'pages/gyik_category.js');
 		$view->render('gyik/tpl_gyik_category', $data);	
 	}

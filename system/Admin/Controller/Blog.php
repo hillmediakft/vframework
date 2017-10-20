@@ -342,9 +342,11 @@ if (!empty($deleted_record_id)) {
 		$data['category_counter'] = $this->blog_model->categoryCounter();
 		// minden kategória, minden nyelven
 		$data['all_blog_category'] = $this->blogcategory_model->findCategory();
+//var_dump($data['all_blog_category']);
 		$data['all_blog_category'] = DI::get('arr_helper')->convertMultilanguage($data['all_blog_category'], array('category_name'), 'id', 'language_code');
-
+//var_dump($data['all_blog_category']);die;
 		$view->add_links(array('datatable', 'bootbox', 'vframework'));
+		$view->add_link('js', ADMIN_JS . 'datatable_editable.js');
 		$view->add_link('js', ADMIN_JS . 'pages/blog_category.js');
 		$view->render('blog/tpl_blog_category', $data);	
 	}
