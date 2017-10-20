@@ -35,8 +35,9 @@ class PhotoGallery extends AdminController {
 		$data['all_photos'] = $this->photo_gallery_model->findPhoto(null, LANG);
 
 		$view = new View();
+		$view->add_links(array('bootbox', 'mixitup', 'vframework'));
 		$view->add_link('css', ADMIN_CSS . 'pages/portfolio.css');
-		$view->add_links(array('bootbox', 'mixitup', 'vframework', 'photo_gallery'));
+		$view->add_link('js', ADMIN_JS . 'pages/photo_gallery.js');
 		$view->setHelper(array('url_helper'));
 		$view->render('photo_gallery/tpl_photo_gallery', $data);
 	}
@@ -53,11 +54,11 @@ class PhotoGallery extends AdminController {
 		$data['title'] = 'Új fotó oldal';
 		$data['description'] = 'Új fotó oldal description';
 		$data['categorys'] = $this->photocategory_model->findCategory(null, LANG);
-//var_dump($data['categorys']);die;
 
 		$view = new View();
 		$view->setHelper(array('html_admin_helper'));
-		$view->add_links(array('bootstrap-fileinput', 'vframework', 'photo_gallery_insert_update'));
+		$view->add_links(array('bootstrap-fileinput', 'vframework'));
+		$view->add_link('js', ADMIN_JS . 'pages/photo_gallery_insert_update.js');
 		$view->render('photo_gallery/tpl_photo_insert', $data);	
 	}
 	
@@ -292,7 +293,9 @@ class PhotoGallery extends AdminController {
 		$data['all_category'] = DI::get('arr_helper')->convertMultilanguage($all_category, array('category_name'), 'id', 'language_code');
 		$data['category_counter'] = $this->photo_gallery_model->categoryCounter();
 //var_dump($data);die;
-		$view->add_links(array('bootbox', 'datatable', 'bootstrap-editable', 'vframework', 'photo_category'));
+		$view->add_links(array('bootbox', 'datatable', 'bootstrap-editable', 'vframework'));
+		$view->add_link('js', ADMIN_JS . 'datatable_editable.js');
+		$view->add_link('js', ADMIN_JS . 'pages/photo_category.js');
 		$view->render('photo_gallery/tpl_photo_category', $data);	
 	}
 
@@ -376,7 +379,7 @@ class PhotoGallery extends AdminController {
 			$id = $this->request->get_post('id', 'integer');
 			// neveket tartalmazó asszociatív tömb (hu => kategória név, en => category name)
 			$new_names = $this->request->get_post('data');
-
+//var_dump($_POST);die;			
 			$primary_name = $new_names[LANG];
 			if ($primary_name === '') {
 				$this->response->json(array(
@@ -429,7 +432,6 @@ class PhotoGallery extends AdminController {
 			}
 			// update
 			else {
-
 				// kategória nevek beírása a photo_category_translation táblába
 				foreach ($new_names as $langcode => $name) {
 					// új nyelv hozzáadása esetén meg kell nézni, hogy van-e már $lang nyelvi kódú elem ehhez az id-hez,
