@@ -58,18 +58,18 @@ class Config {
         
 		// megvizsgáljuk, hogy be van-e már töltve a file
 		if(in_array($file_path, self::$is_loaded)){
-			throw new \Exception('HIBA: A megadott config file mar be van toltve!');
+			throw new \Exception('HIBA: A ' . $file . '.php config file mar be van toltve!');
 		}
 		
 		if(!file_exists($file_path)){
-			throw new \Exception('HIBA: A megadott config file nem toltheto be!');
+			throw new \Exception('HIBA: A ' . $file . '.php config file nem toltheto be!');
 		}
 		
 		// fájl betöltése (a file-nak tartalmaznia kell egy $config tömböt)
 		include($file_path);
 		
 		if (!isset($config) OR !is_array($config)) {
-			throw new \Exception('HIBA: A betoltott config file nem megfelelo!');
+			throw new \Exception('HIBA: A betoltott ' . $file . '.php config file nem megfelelo!');
 		}
 				
 		// berakjuk a file nevet a betöltött fájlokhoz
