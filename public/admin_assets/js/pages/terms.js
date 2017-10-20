@@ -21,8 +21,9 @@ var Terms = function () {
      *                          default_value: "0"
      *                      },
      *
-     * urlInsertUpdate -> annak a php feldolgozónak az url-je ami végrehajtja a hozzáadást és módosítást
-     * urlDelete ->     annak a php feldolgozónak az url-je ami végrehajtja a törlést
+     * urlInsert -> annak a php feldolgozónak az url-je ami végrehajtja az új elem hozzáadást és módosítást
+     * urlUpdate -> annak a php feldolgozónak az url-je ami végrehajtja azelem módosítást
+     * urlDelete -> annak a php feldolgozónak az url-je ami végrehajtja a törlést
      *   
      */
     var setup = {
@@ -65,8 +66,7 @@ var Terms = function () {
                 {"orderable": true, "searchable": true, "targets": 0},
                 {"orderable": true, "searchable": true, "targets": 1},
                 {"orderable": false, "searchable": false, "targets": 2},
-                {"orderable": false, "searchable": false, "targets": 3},
-                {"orderable": false, "searchable": false, "targets": 4}
+                {"orderable": false, "searchable": false, "targets": 3}
             ],
             // save datatable state(pagination, sort, etc) in cookie.
             "bStateSave": true,
@@ -84,21 +84,21 @@ var Terms = function () {
         },
 
     // táblázat oszlop elrendezés
-        colNumbers: 5,
+        colNumbers: 4,
         modCols: {
             hu: 0,
-            en: 1,
-            de: 2,
+            en: 1
         },
         anotherCols: {
         },
         controlCols: {
-            edit_save: 3,
-            delete_cancel: 4
+            edit_save: 2,
+            delete_cancel: 3
         },
 
     // feldolgozó url-ek
-        urlInsertUpdate: "admin/terms/insert_update",
+        urlInsert: "admin/terms/insert_update",
+        urlUpdate: "admin/terms/insert_update",
         urlDelete: "admin/terms/delete"
     };
     

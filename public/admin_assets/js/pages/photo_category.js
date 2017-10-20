@@ -21,8 +21,9 @@ var Photo_category = function () {
      *                          default_value: "0"
      *                      },
      *
-     * urlInsertUpdate -> annak a php feldolgozónak az url-je ami végrehajtja a hozzáadást és módosítást
-     * urlDelete ->     annak a php feldolgozónak az url-je ami végrehajtja a törlést
+     * urlInsert -> a php feldolgozónak az url-je ami végrehajtja az új elem hozzáadást és módosítást
+     * urlUpdate -> a php feldolgozónak az url-je ami végrehajtja azelem módosítást
+     * urlDelete -> a php feldolgozónak az url-je ami végrehajtja a törlést
      *   
      */
     var setup = {
@@ -66,8 +67,7 @@ var Photo_category = function () {
                 {"orderable": true, "searchable": true, "targets": 1},
                 {"orderable": true, "searchable": false, "targets": 2},
                 {"orderable": false, "searchable": false, "targets": 3},
-                {"orderable": false, "searchable": false, "targets": 4},
-                {"orderable": false, "searchable": false, "targets": 5}
+                {"orderable": false, "searchable": false, "targets": 4}
             ],
             // save datatable state(pagination, sort, etc) in cookie.
             "bStateSave": true,
@@ -85,26 +85,25 @@ var Photo_category = function () {
         },
 
     // táblázat oszlop elrendezés    
-        colNumbers: 6,
+        colNumbers: 5,
         modCols: {
             hu: 0,
-            en: 1,
-            de: 2
+            en: 1
         },
         anotherCols: {
             kepek_szama: {
-                column: 3,
+                column: 2,
                 default_value: "0"
             }
         },
-
-    // feldolgozó url-ek        
         controlCols: {
-            edit_save: 4,
-            delete_cancel: 5
+            edit_save: 3,
+            delete_cancel: 4
         },
 
-        urlInsertUpdate: "admin/photo-gallery/category_insert_update",
+    // feldolgozó url-ek        
+        urlInsert: "admin/photo-gallery/category_insert_update",
+        urlUpdate: "admin/photo-gallery/category_insert_update",
         urlDelete: "admin/photo-gallery/delete_category"
     };
     
