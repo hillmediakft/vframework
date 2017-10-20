@@ -27,6 +27,7 @@ class Terms extends AdminController {
 
         $view = new View();
         $view->add_links(array('bootbox', 'datatable', 'vframework'));
+        $view->add_link('js', ADMIN_JS . 'datatable_editable.js');
         $view->add_link('js', ADMIN_JS . 'pages/terms.js');
         $view->render('terms/tpl_terms', $data);
     }
@@ -100,16 +101,13 @@ class Terms extends AdminController {
             }
         // update
             else {
-                //var_dump($new_names);die;
                 // kategória nevek beírása a terms_translation táblába
                 foreach ($new_names as $langcode => $name) {
 
                     // új nyelv utólagos hozzáadása esetén meg kell nézni, hogy van-e már $langcode nyelvi kódú elem ehhez az id-hez,
                     // mert ha nincs, akkor nem is fogja tudni update-elni, ezért update helyett insert kell                    
                     if (!$this->terms_translation_model->_checkLangVersion('terms_translation', 'term_id', $id, $langcode)) {
-                        $translation_data['term_id'] = $id;
-                        $translation_data['language_code'] = $langcode;
-                        $this->terms_translation_model->insertTranslation($translation_data);
+                        $this->terms_translation_model->insertTranslation($id, $langcode, $name);
                     } else {
                         $this->terms_translation_model->updateTranslation($id, $langcode, $name);
                     }
