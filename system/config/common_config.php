@@ -17,6 +17,12 @@ $config['layout'] = array(
     'default_admin' => 'tpl_layout'
 );
 
+//default helperek beállítása
+$config['default_helpers'] = array(
+    'site' => array(),
+    'admin' => array('html_admin_helper', 'url_helper')
+);
+
 // taxonomy rendszer tartalom id-k
 $config['content_types'] = array(
     "blog" => 1,

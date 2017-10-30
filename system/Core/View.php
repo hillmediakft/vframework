@@ -91,10 +91,14 @@ class View {
 		// default layout
 		if ($this->area == 'site') {
 			$layout = Config::get('layout.default_site', null);
+                        $default_helpers = Config::get('default_helpers.site', null);
 		} elseif ($this->area == 'admin') {
 			$layout = Config::get('layout.default_admin', null);
+                        $default_helpers = Config::get('default_helpers.admin', null);
 		}
+		// default helper betöltése config fájlból
 		$this->set_layout($layout);
+        $this->setHelper($default_helpers);
 	}
 	
 	/**
