@@ -48,7 +48,7 @@ class Url
     public function autoVersion($uri)
     {
 	    //ha külső forrásra mutat a link
-		if(strpos($uri,'http') !== false) {
+		if(filter_var($uri, FILTER_VALIDATE_URL)) {
 			return $uri;
 		} else {
 			if (substr($uri, 0, 1) == "/") {
