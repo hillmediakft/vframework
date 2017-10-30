@@ -461,7 +461,7 @@ HTML;
      */
     private function _set_css_link($link)
     {
-    	$this->css_link[] = '<link rel="stylesheet" href="' . $link . '" type="text/css" />' . "\r\n";
+    	$this->css_link[] = '<link rel="stylesheet" href="' . $this->url_helper->autoversion($link) . '" type="text/css" />' . "\r\n";
     }
 
     /**
@@ -469,7 +469,7 @@ HTML;
      */
     private function _set_js_link($link)
     {
-    	$this->js_link[] = '<script type="text/javascript" src="' . $link . '"></script>' . "\r\n";
+    	$this->js_link[] = '<script type="text/javascript" src="' . $this->url_helper->autoversion($link) . '"></script>' . "\r\n";
     }
 
     /**
